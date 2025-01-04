@@ -11,7 +11,7 @@ public class HomeController {
         return "WELCOME TO THE TRADING PLATFORM";
     }
 
-    @GetMapping("/new")
+    @GetMapping("/api")
     public String newHome(){
         return "WELCOME";
     }

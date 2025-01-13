@@ -1,10 +1,15 @@
 package com.chahat.trading_platform.controllers;
 
 import com.chahat.trading_platform.config.JWTProvider;
+import com.chahat.trading_platform.model.TwoFactorOTP;
 import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.response.AuthResponse;
 import com.chahat.trading_platform.repository.UserRepository;
 import com.chahat.trading_platform.service.CustomUserDetailsService;
+import com.chahat.trading_platform.service.EmailService;
+import com.chahat.trading_platform.service.TwoFactorOTPService;
+import com.chahat.trading_platform.utils.OtpUtils;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,6 +29,12 @@ public class AuthController {
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    private TwoFactorOTPService twoFactorOTPService;
+
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception {
@@ -57,7 +65,7 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<AuthResponse> login(@RequestBody User user) {
+    public ResponseEntity<AuthResponse> login(@RequestBody User user) throws MessagingException {
         String userName = user.getEmail();
         String password = user.getPassword();
 
@@ -66,6 +74,25 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         String jwt = JWTProvider.generateToken(auth);
+
+        User authUser = userRepository.findUserByEmail(user.getEmail());
+
+        if (user.getTwoFactorAuth().isEnabled()){
+            AuthResponse authResponse = new AuthResponse();
+            authResponse.setMessage("Two Factor is Enabled");
+            authResponse.setTwoFactorAuthEnable(true);
+            String otp = OtpUtils.generateOtp();
+
+            TwoFactorOTP oldTwoFactorOTP = twoFactorOTPService.findByUser(authUser.getId());
+            if (oldTwoFactorOTP != null){
+                twoFactorOTPService.deleteTwoFactorOTP(oldTwoFactorOTP);
+            }
+            TwoFactorOTP twoFactorOTP = twoFactorOTPService.createTwoFactorOTP(authUser, otp, jwt);
+
+            emailService.sendOtpMail(authUser.getEmail(), otp);
+            authResponse.setSession(twoFactorOTP.getId());
+            return new ResponseEntity<>(authResponse, HttpStatus.ACCEPTED);
+        }
 
         AuthResponse authResponse = new AuthResponse();
         authResponse.setJwt(jwt);
@@ -87,5 +114,19 @@ public class AuthController {
             throw new BadCredentialsException("Wrong Password");
         }
         return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+    }
+
+    public ResponseEntity<AuthResponse> verifyLoginOtp(@PathVariable String otp, @RequestParam String id) throws Exception {
+        TwoFactorOTP twoFactorOTP = twoFactorOTPService.findByID(id);
+
+        if (twoFactorOTPService.verifyTwoFactorOTP(twoFactorOTP, otp)){
+            AuthResponse authResponse = new AuthResponse();
+            authResponse.setMessage("Two Factor Authentication Verified");
+            authResponse.setJwt(twoFactorOTP.getJwt());
+            authResponse.setTwoFactorAuthEnable(true);
+            return new ResponseEntity<>(authResponse, HttpStatus.OK);
+
+        }
+        throw new Exception();
     }
 }

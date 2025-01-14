@@ -28,13 +28,14 @@ public class JWTProvider {
                 .compact();
     }
 
-    private static String getEmailFromToken(String token){
+    public static String getEmailFromToken(String token){
         token = token.substring(7);
         Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getBody();
 
         String email = String.valueOf(claims.get("email"));
         return email;
     }
+
     private static String populateAuthorities(Collection<? extends GrantedAuthority> authorities) {
         Set<String> auth = new HashSet<>();
         for (GrantedAuthority ga : authorities){

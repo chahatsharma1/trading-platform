@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class VerifyOTPRequest {
-    private String sessionId;
+    private String newPassword;
     private String otp;
 }

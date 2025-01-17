@@ -6,6 +6,7 @@ import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.model.VerificationCode;
 import com.chahat.trading_platform.request.ForgotPasswordRequest;
 import com.chahat.trading_platform.request.VerifyOTPRequest;
+import com.chahat.trading_platform.response.ApiResponse;
 import com.chahat.trading_platform.response.AuthResponse;
 import com.chahat.trading_platform.service.EmailService;
 import com.chahat.trading_platform.service.ForgotPasswordService;
@@ -101,8 +102,18 @@ public class UserController {
     }
 
     @PatchMapping("users/forgot-password/verify/{otp}")
-    public ResponseEntity<AuthResponse> forgotPasswordVerification(@RequestBody VerifyOTPRequest request) throws Exception {
-        AuthResponse authResponse = new AuthResponse();
-        return new ResponseEntity<>(authResponse, HttpStatus.OK);
+    public ResponseEntity<ApiResponse> forgotPasswordVerification(@RequestParam String id,
+                                                                   @RequestBody VerifyOTPRequest request) throws Exception {
+
+        ForgotPasswordToken token = forgotPasswordService.findById(id);
+
+        boolean isVerified = request.getOtp().equals(token.getOtp());
+        if (isVerified){
+            userService.updatePassword(token.getUser(), request.getNewPassword());
+            ApiResponse apiResponse = new ApiResponse();
+            apiResponse.setMessage("Password Successfully Changed");
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
+        throw new Exception("Wrong OTP");
     }
 }

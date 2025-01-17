@@ -4,6 +4,9 @@ import com.chahat.trading_platform.domain.VerificationType;
 import com.chahat.trading_platform.model.ForgotPasswordToken;
 import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.model.VerificationCode;
+import com.chahat.trading_platform.request.ForgotPasswordRequest;
+import com.chahat.trading_platform.request.VerifyOTPRequest;
+import com.chahat.trading_platform.response.AuthResponse;
 import com.chahat.trading_platform.service.EmailService;
 import com.chahat.trading_platform.service.ForgotPasswordService;
 import com.chahat.trading_platform.service.UserService;
@@ -13,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 public class UserController {
@@ -71,16 +72,37 @@ public class UserController {
     }
 
     @PostMapping("users/forgot-password/send-otp")
-    public ResponseEntity<String> sendForgotPasswordOTP(@RequestHeader("Authorization") String jwt, @PathVariable VerificationType verificationType) throws Exception {
-        User user = userService.findUserByJWT(jwt);
+    public ResponseEntity<AuthResponse> sendForgotPasswordOTP(@RequestBody ForgotPasswordRequest req) throws Exception {
+        User user = userService.findUserByEmail(req.getSendTo());
 
         String otp = OtpUtils.generateOtp();
 
-        UUID uuid = UUID.randomUUID();
-        String id = uuid.toString();
 
         ForgotPasswordToken token = forgotPasswordService.findByUser(user.getId());
-        return new ResponseEntity<>("OTP Successfully Sent", HttpStatus.OK);
+        if (token == null){
+            token = forgotPasswordService.createToken(user, otp, req.getVerificationType(), req.getSendTo());
+        } else{
+            token.setOtp(otp);
+            token.setVerificationType(req.getVerificationType());
+            token.setSendTo(req.getSendTo());
+            forgotPasswordService.save(token);
+        }
 
+        if (req.getVerificationType().equals(VerificationType.EMAIL)){
+            emailService.sendOtpMail(user.getEmail(), token.getOtp());
+        }
+
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setSession(token.getId());
+        authResponse.setMessage("Forgot Password OTP Successfully Sent");
+
+        return new ResponseEntity<>(authResponse, HttpStatus.OK);
+
+    }
+
+    @PatchMapping("users/forgot-password/verify/{otp}")
+    public ResponseEntity<AuthResponse> forgotPasswordVerification(@RequestBody VerifyOTPRequest request) throws Exception {
+        AuthResponse authResponse = new AuthResponse();
+        return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
 }

@@ -6,7 +6,9 @@ import com.chahat.trading_platform.model.User;
 
 public interface ForgotPasswordService {
 
-    ForgotPasswordToken createToken(User user, String id, String otp, VerificationType verificationType, String sendTo);
+    ForgotPasswordToken createToken(User user, String otp, VerificationType verificationType, String sendTo);
+
+    void save(ForgotPasswordToken token);
 
     ForgotPasswordToken findById(String Id);
 

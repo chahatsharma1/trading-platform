@@ -16,14 +16,18 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService{
     private ForgotPasswordRepository forgotPasswordRepository;
 
     @Override
-    public ForgotPasswordToken createToken(User user, String id, String otp, VerificationType verificationType, String sendTo) {
+    public ForgotPasswordToken createToken(User user, String otp, VerificationType verificationType, String sendTo) {
         ForgotPasswordToken token = new ForgotPasswordToken();
         token.setUser(user);
         token.setSendTo(sendTo);
         token.setVerificationType(verificationType);
         token.setOtp(otp);
-        token.setId(id);
         return forgotPasswordRepository.save(token);
+    }
+
+    @Override
+    public void save(ForgotPasswordToken token) {
+        forgotPasswordRepository.save(token);
     }
 
     @Override

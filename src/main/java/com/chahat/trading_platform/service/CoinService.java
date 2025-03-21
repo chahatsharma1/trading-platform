@@ -1,6 +1,8 @@
 package com.chahat.trading_platform.service;
 
 import com.chahat.trading_platform.model.Coin;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.util.List;
 
 public interface CoinService {
@@ -12,9 +14,9 @@ public interface CoinService {
 
     Coin findById(String coinId) throws Exception;
 
-    String searchCoin(String keyword) throws Exception;
+    String searchCoin(String keyword) throws JsonProcessingException;
 
-    String getTop50CoinsByMarketCapRank() throws Exception;
+    String getTop50CoinsByMarketCapRank() throws JsonProcessingException;
 
-    String getTradingCoins() throws Exception;
+    String getTradingCoins() throws JsonProcessingException;
 }

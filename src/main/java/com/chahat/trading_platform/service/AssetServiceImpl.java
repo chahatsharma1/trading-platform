@@ -32,26 +32,28 @@ public class AssetServiceImpl implements AssetService{
 
     @Override
     public Asset getAssetByUserIdAndAssetId(Long userID, Long assetId) {
-        return null;
+        return assetRepository.findByUserIdAndId(userID, assetId);
     }
 
     @Override
     public List<Asset> getUsersAssets(Long userId) {
-        return List.of();
+        return assetRepository.findByUserId(userId);
     }
 
     @Override
-    public Asset updateAsset(Asset asset, double quantity) {
-        return null;
+    public Asset updateAsset(Long assetId, double quantity) {
+        Asset asset = getAssetById(assetId);
+        asset.setQuantity(quantity + asset.getQuantity());
+        return assetRepository.save(asset);
     }
 
     @Override
     public Asset findAssetByUserIdAndCoinId(Long userId, String coinId) {
-        return null;
+        return assetRepository.findByUserIdAndCoinId(userId, coinId);
     }
 
     @Override
     public void deleteAsset(Long assetId) {
-
+        assetRepository.deleteById(assetId);
     }
 }

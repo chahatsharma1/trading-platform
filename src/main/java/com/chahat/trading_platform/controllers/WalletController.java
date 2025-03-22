@@ -4,6 +4,7 @@ import com.chahat.trading_platform.model.Order;
 import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.model.Wallet;
 import com.chahat.trading_platform.model.WalletTransaction;
+import com.chahat.trading_platform.service.OrderService;
 import com.chahat.trading_platform.service.UserService;
 import com.chahat.trading_platform.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class WalletController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping("/wallet")
     public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {

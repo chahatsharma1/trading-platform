@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class WithdrawalController {
 
@@ -42,5 +44,20 @@ public class WithdrawalController {
         if (!accept){
             walletService.addBalance(wallet, withdrawal.getAmount());
         }
+        return new ResponseEntity<>(withdrawal, HttpStatus.OK);
+    }
+
+    @GetMapping("/withdrawal")
+    public ResponseEntity<List<Withdrawal>> getWithdrawalHistory(@RequestHeader("Authorization") String jwt) throws Exception {
+        User user = userService.findUserByJWT(jwt);
+        List<Withdrawal> withdrawals = withdrawalService.getUsersWithdrawalHistory(user);
+        return new ResponseEntity<>(withdrawals, HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/withdrawal")
+    public ResponseEntity<List<Withdrawal>> getWithdrawalRequest(@RequestHeader("Authorization") String jwt) throws Exception {
+        User user = userService.findUserByJWT(jwt);
+        List<Withdrawal> withdrawals = withdrawalService.getAllWithdrawal();
+        return new ResponseEntity<>(withdrawals, HttpStatus.OK);
     }
 }

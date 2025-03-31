@@ -5,12 +5,13 @@ import com.chahat.trading_platform.model.PaymentOrder;
 import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.response.PaymentResponse;
 import com.razorpay.RazorpayException;
+import com.stripe.exception.StripeException;
 
 public interface PaymentService {
 
     PaymentOrder createOrder(User user, Long amount, PaymentMethod paymentMethod);
     PaymentOrder getPaymentOrderById(Long id) throws Exception;
     Boolean ProceedPaymentOrder(PaymentOrder paymentOrder, String paymentId) throws RazorpayException;
-    PaymentResponse createRazorPayPaymentLink(User user, Long amount);
-    PaymentResponse createStripePaymentLink(User user, Long amount, Long orderId);
+    PaymentResponse createRazorPayPaymentLink(User user, Long amount) throws RazorpayException;
+    PaymentResponse createStripePaymentLink(User user, Long amount, Long orderId) throws StripeException;
 }

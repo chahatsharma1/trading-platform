@@ -1,10 +1,9 @@
 package com.chahat.trading_platform.controllers;
 
-import com.chahat.trading_platform.model.Order;
-import com.chahat.trading_platform.model.User;
-import com.chahat.trading_platform.model.Wallet;
-import com.chahat.trading_platform.model.WalletTransaction;
+import com.chahat.trading_platform.model.*;
+import com.chahat.trading_platform.response.PaymentResponse;
 import com.chahat.trading_platform.service.OrderService;
+import com.chahat.trading_platform.service.PaymentService;
 import com.chahat.trading_platform.service.UserService;
 import com.chahat.trading_platform.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,9 @@ public class WalletController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @GetMapping("/wallet")
     public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
@@ -45,6 +47,20 @@ public class WalletController {
         User user = userService.findUserByJWT(jwt);
         Order order = orderService.getOrderById(orderId);
         Wallet wallet = walletService.payOrderPayment(order, user);
+        return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+    }
+
+    @PutMapping("/wallet/deposit")
+    public ResponseEntity<Wallet> addBalanceToWallet(@RequestHeader("Authorization") String jwt, @RequestParam(name = "order_id") Long orderId, @RequestParam(name="payment_id") String paymentId) throws Exception {
+        User user = userService.findUserByJWT(jwt);
+        Wallet wallet = walletService.getUserWallet(user);
+        PaymentOrder paymentOrder = paymentService.getPaymentOrderById(orderId);
+        Boolean status = paymentService.ProceedPaymentOrder(paymentOrder, paymentId);
+
+        if (status){
+            wallet = walletService.addBalance(wallet, paymentOrder.getAmount());
+        }
+
         return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
     }
 }

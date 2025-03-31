@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -33,13 +34,13 @@ public class UserController {
     @Autowired
     private ForgotPasswordService forgotPasswordService;
 
-    @GetMapping("users/profile")
+    @GetMapping("/profile")
     public ResponseEntity<User> getUserProfile(@RequestHeader("Authorization") String jwt ) throws Exception {
         User user = userService.findUserByJWT(jwt);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PatchMapping("users/enable-two-factor/verify/{otp}")
+    @PatchMapping("/enable-two-factor/verify/{otp}")
     public ResponseEntity<User> enableTwoFactorAuth(@RequestHeader("Authorization") String jwt, @PathVariable String otp) throws Exception {
         User user = userService.findUserByJWT(jwt);
 
@@ -57,7 +58,7 @@ public class UserController {
         throw new Exception("Wrong OTP");
     }
 
-    @PostMapping("users/verification/{verificationType}/send-otp")
+    @PostMapping("/verification/{verificationType}/send-otp")
     public ResponseEntity<String> sendVerification(@RequestHeader("Authorization") String jwt, @PathVariable VerificationType verificationType) throws Exception {
         User user = userService.findUserByJWT(jwt);
 
@@ -72,7 +73,7 @@ public class UserController {
         return new ResponseEntity<>("OTP Successfully Sent", HttpStatus.OK);
     }
 
-    @PostMapping("users/forgot-password/send-otp")
+    @PostMapping("/forgot-password/send-otp")
     public ResponseEntity<AuthResponse> sendForgotPasswordOTP(@RequestBody ForgotPasswordRequest req) throws Exception {
         User user = userService.findUserByEmail(req.getSendTo());
 
@@ -101,7 +102,7 @@ public class UserController {
 
     }
 
-    @PatchMapping("users/forgot-password/verify/{otp}")
+    @PatchMapping("/forgot-password/verify/{otp}")
     public ResponseEntity<ApiResponse> forgotPasswordVerification(@RequestParam String id,
                                                                    @RequestBody VerifyOTPRequest request) throws Exception {
 

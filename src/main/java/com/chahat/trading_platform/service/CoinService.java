@@ -18,5 +18,5 @@ public interface CoinService {
 
     String getTop50CoinsByMarketCapRank() throws JsonProcessingException;
 
-    String getTradingCoins() throws JsonProcessingException;
+    String getTrendingCoins() throws JsonProcessingException;
 }

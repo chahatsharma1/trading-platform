@@ -83,9 +83,9 @@ public class Coin {
 
     @JsonProperty("atl_date")
     private LocalDateTime atlDate;
-
-    @JsonProperty("roi")
-    private Object roi; // Placeholder as the type is null in the data
+//
+//    @JsonProperty("roi")
+//    private Object roi; // Placeholder as the type is null in the data
 
     @JsonProperty("last_updated")
     private LocalDateTime lastUpdated;

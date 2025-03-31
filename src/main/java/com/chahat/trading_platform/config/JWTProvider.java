@@ -2,18 +2,18 @@ package com.chahat.trading_platform.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import javax.crypto.SecretKey;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 public class JWTProvider {
 
-    private final static SecretKey key = Jwts.SIG.HS256.key().build();
+    private final static SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(JwtConstant.SECRET_KEY));
+
 
     public static String generateToken(Authentication auth){
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
@@ -29,7 +29,9 @@ public class JWTProvider {
     }
 
     public static String getEmailFromToken(String token){
-        token = token.substring(7);
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getBody();
 
         String email = String.valueOf(claims.get("email"));
@@ -43,5 +45,4 @@ public class JWTProvider {
         }
         return String.join(",", auth);
     }
-
 }

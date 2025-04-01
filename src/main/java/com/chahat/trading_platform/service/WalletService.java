@@ -4,11 +4,13 @@ import com.chahat.trading_platform.model.Order;
 import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.model.Wallet;
 
+import java.math.BigDecimal;
+
 public interface WalletService {
 
     Wallet getUserWallet(User user);
     Wallet addBalance(Wallet wallet, Long amount);
     Wallet findByID(Long id) throws Exception;
-    Wallet walletToWalletTransaction(User sender, Wallet receiver, Long amount) throws Exception;
+    Wallet walletToWalletTransaction(User sender, Wallet receiver, BigDecimal amount) throws Exception;
     Wallet payOrderPayment(Order order, User user) throws Exception;
 }

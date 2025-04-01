@@ -30,8 +30,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order createOrder(User user, OrderItem orderItem, OrderType orderType) {
         double price = orderItem.getCoin().getCurrentPrice() * orderItem.getQuantity();
+        System.out.println(price);
 
         Order order = new Order();
+        order.setUser(user);
         order.setOrderItem(orderItem);
         order.setOrderType(orderType);
         order.setPrice(BigDecimal.valueOf(price));
@@ -82,7 +84,6 @@ public class OrderServiceImpl implements OrderService {
             assetService.updateAsset(oldAsset.getId(), quantity);
         }
         return savedOrder;
-
     }
 
     @Transactional
@@ -100,7 +101,7 @@ public class OrderServiceImpl implements OrderService {
             Order order = createOrder(user, orderItem, OrderType.SELL);
             orderItem.setOrder(order);
 
-            if (assetToSell.getQuantity() >= quantity) {
+            if (assetToSell.getQuantity()  >= quantity) {
 
                 order.setOrderStatus(OrderStatus.SUCCESS);
                 order.setOrderType(OrderType.SELL);
@@ -125,7 +126,7 @@ public class OrderServiceImpl implements OrderService {
             return buyAsset(coin, quantity, user);
         }
         else if (orderType.equals(OrderType.SELL)){
-            return buyAsset(coin, quantity, user);
+            return sellAsset(coin, quantity, user);
         }
         throw new Exception("Invalid Order Type");
     }

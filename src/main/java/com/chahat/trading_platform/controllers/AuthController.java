@@ -8,6 +8,7 @@ import com.chahat.trading_platform.repository.UserRepository;
 import com.chahat.trading_platform.service.CustomUserDetailsService;
 import com.chahat.trading_platform.service.EmailService;
 import com.chahat.trading_platform.service.TwoFactorOTPService;
+import com.chahat.trading_platform.service.WatchListService;
 import com.chahat.trading_platform.utils.OtpUtils;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class AuthController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private WatchListService watchListService;
+
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception {
 
@@ -49,6 +53,8 @@ public class AuthController {
         newUser.setEmail(user.getEmail());
         newUser.setPassword(user.getPassword());
         User savedUser = userRepository.save(newUser);
+
+        watchListService.createList(savedUser);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
 

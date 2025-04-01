@@ -5,7 +5,6 @@ import com.chahat.trading_platform.model.Coin;
 import com.chahat.trading_platform.model.Order;
 import com.chahat.trading_platform.model.OrderItem;
 import com.chahat.trading_platform.model.User;
-
 import java.util.List;
 
 public interface OrderService {

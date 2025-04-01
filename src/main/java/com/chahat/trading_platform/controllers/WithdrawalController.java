@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/withdrawal")
 public class WithdrawalController {
 
     @Autowired
@@ -25,7 +26,7 @@ public class WithdrawalController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/withdrawal/{amount}")
+    @PostMapping("/{amount}")
     public ResponseEntity<?> withdrawalRequest(@PathVariable Long amount, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJWT(jwt);
         Wallet wallet = walletService.getUserWallet(user);
@@ -35,7 +36,7 @@ public class WithdrawalController {
         return new ResponseEntity<>(withdrawal, HttpStatus.OK);
     }
 
-    @PatchMapping("/admin/withdrawal/{id}/proceed/{accept}")
+    @PatchMapping("/admin/{id}/proceed/{accept}")
     public ResponseEntity<?> proceedWithdrawal(@PathVariable Long id, @PathVariable boolean accept, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJWT(jwt);
         Withdrawal withdrawal = withdrawalService.proceedWithWithdrawal(id, accept);
@@ -47,14 +48,14 @@ public class WithdrawalController {
         return new ResponseEntity<>(withdrawal, HttpStatus.OK);
     }
 
-    @GetMapping("/withdrawal")
+    @GetMapping
     public ResponseEntity<List<Withdrawal>> getWithdrawalHistory(@RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJWT(jwt);
         List<Withdrawal> withdrawals = withdrawalService.getUsersWithdrawalHistory(user);
         return new ResponseEntity<>(withdrawals, HttpStatus.OK);
     }
 
-    @GetMapping("/admin/withdrawal")
+    @GetMapping("/admin")
     public ResponseEntity<List<Withdrawal>> getWithdrawalRequest(@RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJWT(jwt);
         List<Withdrawal> withdrawals = withdrawalService.getAllWithdrawal();

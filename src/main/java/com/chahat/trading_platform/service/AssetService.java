@@ -3,6 +3,9 @@ package com.chahat.trading_platform.service;
 import com.chahat.trading_platform.model.Asset;
 import com.chahat.trading_platform.model.Coin;
 import com.chahat.trading_platform.model.User;
+import org.apache.commons.lang3.concurrent.BackgroundInitializer;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface AssetService {

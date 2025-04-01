@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping
+@RequestMapping("/payment")
 public class PaymentDetailsController {
 
     @Autowired
@@ -22,7 +22,7 @@ public class PaymentDetailsController {
     @PostMapping("/addPayment")
     public ResponseEntity<PaymentDetails> addPaymentDetails(@RequestBody PaymentDetails paymentDetails, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJWT(jwt);
-        PaymentDetails paymentDetails1 = paymentDetailsService.addPaymentDetails(paymentDetails.getAccountNo(), paymentDetails.getAccountHolderName(), paymentDetails.getIfscCode(), paymentDetails.getBankName(), paymentDetails.getUser());
+        PaymentDetails paymentDetails1 = paymentDetailsService.addPaymentDetails(paymentDetails.getAccountNo(), paymentDetails.getAccountHolderName(), paymentDetails.getIfscCode(), paymentDetails.getBankName(), user);
         return new ResponseEntity<>(paymentDetails1, HttpStatus.CREATED);
     }
 

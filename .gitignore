@@ -23,5 +23,3 @@ target/
 # Ignore frontend dependencies and build files
 frontend/node_modules/
 frontend/build/
-
-

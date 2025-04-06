@@ -38,6 +38,7 @@ const Navbar = () => {
                 <div className="p-0 ml-9">
                     <Button variant="outline" className="flex items-center gap-3">
                         <SearchIcon></SearchIcon>
+                        <p>Search</p>
                     </Button>
                 </div>
             </div>

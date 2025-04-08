@@ -27,7 +27,7 @@ const AssetTable = () => {
                     <TableCell>9124463121</TableCell>
                     <TableCell>1364881428323</TableCell>
                     <TableCell>-0.2009</TableCell>
-                    <TableCell className="text-right">₹69249</TableCell>
+                    <TableCell className="text-right">₹6851107</TableCell>
                 </TableRow>)}
             </TableBody>
         </Table>

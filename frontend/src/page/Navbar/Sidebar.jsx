@@ -2,6 +2,7 @@ import React from 'react';
 import {ActivityIcon, BanknoteIcon, BriefcaseIcon, EyeIcon, HomeIcon, LandmarkIcon, LogOutIcon, UserIcon, WalletIcon } from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {SheetClose} from "@/components/ui/sheet.jsx";
+import {useNavigate} from "react-router-dom";
 
 
 const menu = [
@@ -16,12 +17,13 @@ const menu = [
     {name: "Logout", path: "/", icon: <LogOutIcon className='h-6 w-6'/>}
 ]
 const Sidebar = () => {
+    const navigate = useNavigate();
     return (
         <div className= 'mt-7 flex flex-col items-center space-y-5'>
             {menu.map((item) => (
                 <div key={item.name}>
                     <SheetClose className="w-full">
-                        <Button variant="outline" className="flex items-center gap-5 py-6 w-60">
+                        <Button variant="outline" className="flex items-center gap-5 py-6 w-60" onClick = {() => navigate(item.path)}>
                             <span className="w-1">{item.icon} </span>
                         <p>{item.name}</p>
                         </Button>

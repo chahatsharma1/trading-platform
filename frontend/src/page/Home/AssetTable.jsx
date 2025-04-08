@@ -6,7 +6,7 @@ const AssetTable = () => {
     return (
         <Table>
             <TableHeader>
-                <TableRow>
+                <TableRow className="hover:bg-transparent pointer-events-none">
                     <TableHead>Coin</TableHead>
                     <TableHead>Symbol</TableHead>
                     <TableHead>Volume</TableHead>
@@ -29,7 +29,6 @@ const AssetTable = () => {
                     <TableCell>-0.2009</TableCell>
                     <TableCell className="text-right">₹69249</TableCell>
                 </TableRow>)}
-
             </TableBody>
         </Table>
     );

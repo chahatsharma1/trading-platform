@@ -1,11 +1,11 @@
 import React from 'react';
 
-const AdminWithdrawal = () => {
+const TransferForm = () => {
     return (
         <div>
-            
+
         </div>
     );
 };
 
-export default AdminWithdrawal;
+export default TransferForm;

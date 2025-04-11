@@ -55,7 +55,7 @@ const Home = () => {
                                 <p className="text-gray-800"> Bitcoin </p>
                             </div>
                             <div className="flex items-end gap-2">
-                                <p className="text-l font-bold">6851107</p>
+                                <p className="text-l font-bold">₹6851107</p>
                                 <p className="text-red-600">
                                     <span> 754.041</span>
                                     <span> (0.95578%) </span>

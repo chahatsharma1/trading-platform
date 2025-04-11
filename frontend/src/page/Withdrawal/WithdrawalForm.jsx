@@ -26,7 +26,6 @@ const WithdrawalForm = () => {
             <div className="text-center space-y-2">
                 <Label className="text-gray-700">Enter withdrawal amount</Label>
                 <Input
-                    type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="₹100"

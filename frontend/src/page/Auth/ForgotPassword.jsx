@@ -22,17 +22,17 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="min-h-screen bg-black flex items-center justify-center px-4">
-            <div className="w-full max-w-md bg-[#111] shadow-md rounded-xl p-8 space-y-6">
+        <div className="min-h-screen bg-[#0F172A] flex items-center justify-center px-4">
+            <div className="w-full max-w-md bg-[#1E293B] shadow-md rounded-xl p-8 space-y-6">
                 {/* Brand */}
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold text-white">TradeX</h1>
-                    <p className="text-sm text-gray-400">Secure Crypto Trading Platform</p>
+                    <h1 className="text-3xl font-bold text-[#F1F5F9]">TradeX</h1>
+                    <p className="text-sm text-[#F1F5F9]">Secure Crypto Trading Platform</p>
                 </div>
 
                 {/* Title */}
-                <h2 className="text-xl font-semibold text-white text-center">Forgot Password?</h2>
-                <p className="text-sm text-gray-400 text-center">
+                <h2 className="text-xl font-semibold text-[#F1F5F9] text-center">Forgot Password?</h2>
+                <p className="text-sm text-[#F1F5F9] text-center">
                     Enter your registered email address and we’ll send you an OTP to reset your password.
                 </p>
 
@@ -42,20 +42,20 @@ const ForgotPassword = () => {
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-[#1a1a1a] text-white border-gray-700 placeholder-gray-500"
+                    className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500"
                 />
 
                 {/* Send OTP Button */}
                 <Button
-                    className="w-full bg-white text-black hover:bg-gray-200"
+                    className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]"
                     onClick={handleSendResetLink}
                 >
                     Send OTP
                 </Button>
 
                 {/* Navigation */}
-                <p className="text-sm text-center text-gray-400">
-                    <Link to="/login" className="text-white underline hover:text-gray-300">
+                <p className="text-sm text-center text-[#F1F5F9]">
+                    <Link to="/login" className="text-[#38BDF8] underline hover:text-[#3B82F6]">
                         Back to login
                     </Link>
                 </p>
@@ -63,13 +63,13 @@ const ForgotPassword = () => {
 
             {/* OTP Dialog */}
             <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
-                <DialogContent className="bg-[#111] rounded-lg shadow-xl max-w-sm mx-auto">
+                <DialogContent className="bg-[#1E293B] rounded-lg shadow-xl max-w-sm mx-auto">
                     <DialogHeader>
-                        <DialogTitle className="text-white text-center">Verify OTP</DialogTitle>
+                        <DialogTitle className="text-[#F1F5F9] text-center">Verify OTP</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
-                        <p className="text-sm text-gray-400 text-center">
-                            Enter the 6-digit OTP sent to <span className="font-medium text-white">{email}</span>
+                        <p className="text-sm text-[#F1F5F9] text-center">
+                            Enter the 6-digit OTP sent to <span className="font-medium text-[#38BDF8]">{email}</span>
                         </p>
                         <Input
                             type="text"
@@ -77,10 +77,10 @@ const ForgotPassword = () => {
                             maxLength={6}
                             value={otp}
                             onChange={(e) => setOtp(e.target.value)}
-                            className="bg-[#1a1a1a] text-white border-gray-700 placeholder-gray-500 tracking-widest text-center"
+                            className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500 tracking-widest text-center"
                         />
                         <Button
-                            className="w-full bg-white text-black hover:bg-gray-200"
+                            className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]"
                             onClick={handleOtpVerify}
                         >
                             Verify OTP

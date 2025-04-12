@@ -18,7 +18,7 @@ import Signup from "@/page/Auth/Signup.jsx";
 import ForgotPassword from "@/page/Auth/ForgotPassword.jsx";
 
 function App() {
-    const isLoggedIn = true; // Replace with actual login logic
+    const isLoggedIn = false; // Replace with actual login logic
 
     return (
         <>

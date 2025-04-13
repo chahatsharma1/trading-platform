@@ -43,10 +43,10 @@ const AccountVerificationForm = ({ closeParentDialog }) => {
 
     return (
         <>
-            <div className="space-y-4">
+            <div className="space-y-4 text-[#F1F5F9]">
                 <div className="space-y-1">
-                    <p className="text-sm text-slate-600 font-medium">Sending OTP to</p>
-                    <div className="bg-gray-100 text-gray-800 px-3 py-2 rounded-md text-sm font-semibold">
+                    <p className="text-sm text-[#94A3B8] font-medium">Sending OTP to</p>
+                    <div className="bg-[#1E293B] text-[#F1F5F9] px-3 py-2 rounded-md text-sm font-semibold border border-[#334155]">
                         {email}
                     </div>
                 </div>
@@ -54,15 +54,16 @@ const AccountVerificationForm = ({ closeParentDialog }) => {
                 <Button
                     type="button"
                     onClick={handleSendOtp}
-                    className="w-full bg-slate-800 text-white hover:bg-slate-700 rounded-xl py-2 text-sm font-medium">
+                    className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB] rounded-xl py-2 text-sm font-medium"
+                >
                     Send OTP
                 </Button>
             </div>
 
             <Dialog open={otpDialogOpen} onOpenChange={setOtpDialogOpen}>
-                <DialogContent>
+                <DialogContent className="bg-[#0F172A] text-[#F1F5F9]">
                     <DialogHeader>
-                        <DialogTitle>Verify OTP</DialogTitle>
+                        <DialogTitle className="text-[#F1F5F9]">Verify OTP</DialogTitle>
                     </DialogHeader>
                     <div className="flex justify-center gap-2 mt-4">
                         {otp.map((digit, index) => (
@@ -73,13 +74,14 @@ const AccountVerificationForm = ({ closeParentDialog }) => {
                                 onChange={(e) => handleChangeOtp(index, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                 ref={(el) => (inputRefs.current[index] = el)}
-                                className="w-10 text-center text-lg bg-gray-300"
+                                className="w-10 h-10 text-center text-lg bg-[#1E293B] text-[#F1F5F9] border border-[#334155] focus:ring-0 focus:border-[#3B82F6]"
                             />
                         ))}
                     </div>
                     <Button
                         onClick={handleVerifyOtp}
-                        className="w-full mt-6 bg-gray-800 text-white hover:bg-gray-700 rounded-xl py-2 text-sm font-medium">
+                        className="w-full mt-6 bg-[#3B82F6] text-white hover:bg-[#2563EB] rounded-xl py-2 text-sm font-medium"
+                    >
                         Verify OTP
                     </Button>
                 </DialogContent>

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "@/page/State/Auth/Action"; // adjust path if needed
 
 const Login = () => {
     const dispatch = useDispatch();
+    const navigate=useNavigate();
 
     const [formData, setFormData] = useState({
         email: "",
@@ -22,7 +23,7 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch(login(formData)); // Trigger redux action
+        dispatch(login({...formData, navigate})); // Trigger redux action
     };
 
     return (

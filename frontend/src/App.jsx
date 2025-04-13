@@ -16,9 +16,19 @@ import HomePage from "@/page/Auth/HomePage.jsx";
 import Login from "@/page/Auth/Login.jsx";
 import Signup from "@/page/Auth/Signup.jsx";
 import ForgotPassword from "@/page/Auth/ForgotPassword.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getUser } from "@/page/State/Auth/Action.js";
 
 function App() {
-    const isLoggedIn = false; // Replace with actual login logic
+    const { auth } = useSelector(store => store);
+    const dispatch = useDispatch();
+
+    const isLoggedIn = Boolean(auth?.user);
+
+    useEffect(() => {
+        dispatch(getUser(auth.jwt || localStorage.getItem("jwt")));
+    }, [auth.jwt, dispatch]);
 
     return (
         <>
@@ -47,7 +57,6 @@ function App() {
                     </>
                 )}
 
-                {/* Catch-All */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </>

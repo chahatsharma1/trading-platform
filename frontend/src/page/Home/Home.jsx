@@ -1,12 +1,16 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Button } from "@/components/ui/button.jsx";
 import AssetTable from "@/page/Home/AssetTable.jsx";
 import StockChart from "@/page/Home/StockChart.jsx";
 import { Avatar, AvatarImage } from "@/components/ui/avatar.jsx";
 import { DotIcon, MessageCircle, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input.jsx";
+import {getCoinList} from "@/page/State/Coin/Action.js";
+import {useDispatch, useSelector} from "react-redux";
 
 const Home = () => {
+    const dispatch=useDispatch();
+    const {coin}=useSelector(store => store)
     const [category, setCategory] = React.useState("all");
     const [inputValue, setInputValue] = React.useState("");
     const [isBotRelease, setIsBotRelease] = React.useState(false);
@@ -28,6 +32,10 @@ const Home = () => {
         }
     };
 
+    useEffect(() => {
+        dispatch((getCoinList(1)))
+    }, []);
+
     return (
         <div className="relative bg-[#0F172A] min-h-screen text-[#F1F5F9]">
             <div className="lg:flex">
@@ -46,7 +54,7 @@ const Home = () => {
                             Top Losers
                         </Button>
                     </div>
-                    <AssetTable />
+                    <AssetTable coin={coin.coinList} category={category}/>
                 </div>
 
                 <div className="hidden lg:block lg:w-[50%] p-5">

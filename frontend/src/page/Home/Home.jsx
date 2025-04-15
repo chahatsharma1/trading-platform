@@ -1,30 +1,23 @@
-import React, {useEffect} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button.jsx";
 import AssetTable from "@/page/Home/AssetTable.jsx";
 import StockChart from "@/page/Home/StockChart.jsx";
 import { Avatar, AvatarImage } from "@/components/ui/avatar.jsx";
 import { DotIcon, MessageCircle, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input.jsx";
-import {getCoinList} from "@/page/State/Coin/Action.js";
-import {useDispatch, useSelector} from "react-redux";
+import { getCoinList, getTop50Coins } from "@/page/State/Coin/Action.js";
+import { useDispatch, useSelector } from "react-redux";
 
 const Home = () => {
-    const dispatch=useDispatch();
-    const {coin}=useSelector(store => store)
-    const [category, setCategory] = React.useState("all");
-    const [inputValue, setInputValue] = React.useState("");
-    const [isBotRelease, setIsBotRelease] = React.useState(false);
+    const dispatch = useDispatch();
+    const { coin } = useSelector(store => store);
+
+    const [activeCategory, setActiveCategory] = useState("all");
+    const [inputValue, setInputValue] = useState("");
+    const [isBotRelease, setIsBotRelease] = useState(false);
 
     const handleBotRelease = () => setIsBotRelease(!isBotRelease);
-
-    const handleCategory = (value) => {
-        setCategory(value);
-    };
-
-    const handleChange = (e) => {
-        setInputValue(e.target.value);
-    };
-
+    const handleChange = (e) => setInputValue(e.target.value);
     const handleKeyPress = (event) => {
         if (event.key === "Enter") {
             console.log(inputValue);
@@ -33,28 +26,44 @@ const Home = () => {
     };
 
     useEffect(() => {
-        dispatch((getCoinList(1)))
+        if (activeCategory === "top50") {
+            dispatch(getTop50Coins());
+        }
+    }, [activeCategory]);
+
+    useEffect(() => {
+        dispatch(getCoinList(1));
     }, []);
+
+    const categoryList = [
+        { label: "All", value: "all" },
+        { label: "Top 50", value: "top50" },
+        { label: "Top Gainers", value: "topGainers" },
+        { label: "Top Losers", value: "topLosers" }
+    ];
 
     return (
         <div className="relative bg-[#0F172A] min-h-screen text-[#F1F5F9]">
             <div className="lg:flex">
                 <div className="lg:w-[50%]">
                     <div className="p-3 flex items-center gap-4">
-                        <Button onClick={() => handleCategory("all")} variant={category === "all" ? "default" : "outline"} className="rounded-full bg-[#3B82F6] text-white hover:bg-[#3B82F6]/90 border-none">
-                            All
-                        </Button>
-                        <Button onClick={() => handleCategory("top50")} variant={category === "top50" ? "default" : "outline"} className="rounded-full bg-[#3B82F6] text-white hover:bg-[#3B82F6]/90 border-none">
-                            Top 50
-                        </Button>
-                        <Button onClick={() => handleCategory("topGainers")} variant={category === "topGainers" ? "default" : "outline"} className="rounded-full bg-[#3B82F6] text-white hover:bg-[#3B82F6]/90 border-none">
-                            Top Gainers
-                        </Button>
-                        <Button onClick={() => handleCategory("topLosers")} variant={category === "topLosers" ? "default" : "outline"} className="rounded-full bg-[#3B82F6] text-white hover:bg-[#3B82F6]/90 border-none">
-                            Top Losers
-                        </Button>
+                        {categoryList.map((item) => (
+                            <Button
+                                key={item.value}
+                                onClick={() => setActiveCategory(item.value)}
+                                className={`rounded-full px-4 py-2 border transition-colors duration-200 text-sm
+                                    ${activeCategory === item.value
+                                    ? "bg-[#3B82F6] text-white border-transparent cursor-default hover:bg-[#3B82F6]"
+                                    : "bg-[#1E293B] text-[#94A3B8] border-[#334155] hover:bg-[#334155] hover:text-white"}`}>
+                                {item.label}
+                            </Button>
+                        ))}
                     </div>
-                    <AssetTable coin={coin.coinList} category={category}/>
+
+                    <AssetTable
+                        coin={activeCategory === "all" ? coin.coinList : coin.top50}
+                        category={activeCategory}
+                    />
                 </div>
 
                 <div className="hidden lg:block lg:w-[50%] p-5">
@@ -70,10 +79,10 @@ const Home = () => {
                                 <p>Bitcoin</p>
                             </div>
                             <div className="flex items-end gap-2">
-                                <p className="text-lg font-bold">₹6,851,107</p>
-                                <p className="text-red-500">
-                                    <span>754.041</span>
-                                    <span> (0.95578%) </span>
+                                <p className="text-lg font-bold">₹7,355,264</p>
+                                <p className="text-green-500">
+                                    <span>+70,606</span>
+                                    <span> (0.96%) </span>
                                 </p>
                             </div>
                         </div>

@@ -48,12 +48,18 @@ export const getTop50Coins = () => async (dispatch) => {
 export const getMarketChart = (coinId, days, jwt) => async (dispatch) => {
     dispatch({ type: FETCH_MARKET_CHART_REQUEST });
     try {
-        const response = await api.get(`/coins/${coinId}/market_chart?days=${days}`, {
+        const response = await api.get(`/coins/chart/${coinId}?days=${days}`, {
             headers:{
                 Authorization: `Bearer ${jwt}`
             }
         });
-        dispatch({ type: FETCH_MARKET_CHART_SUCCESS, payload: response.data });
+        const formatted = response.data.prices.map(([timestamp, price]) => ({
+            x: timestamp,
+            y: price,
+        }));
+
+        dispatch({ type: FETCH_MARKET_CHART_SUCCESS, payload: formatted });
+        console.log("data", response.data);
     } catch (error) {
         console.log("error", error)
         dispatch({ type: FETCH_MARKET_CHART_FAILURE, payload: error.message });

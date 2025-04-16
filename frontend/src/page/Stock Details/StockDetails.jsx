@@ -60,7 +60,7 @@ const StockDetails = () => {
             </div>
 
             <div>
-                <StockChart />
+                <StockChart coinId={id}/>
             </div>
 
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

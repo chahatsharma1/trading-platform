@@ -67,7 +67,7 @@ const Home = () => {
                 </div>
 
                 <div className="hidden lg:block lg:w-[50%] p-5">
-                    <StockChart />
+                    <StockChart coinId={"bitcoin"} />
                     <div className="flex gap-5 items-center mt-6">
                         <Avatar>
                             <AvatarImage src="https://coin-images.coingecko.com/coins/images/1/standard/bitcoin.png?1696501400" />

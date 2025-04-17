@@ -50,32 +50,26 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
-    public Boolean ProceedPaymentOrder(PaymentOrder paymentOrder, String paymentId) throws RazorpayException {
-        if(paymentOrder.getStatus() == null){
+    public Boolean ProceedPaymentOrder(PaymentOrder paymentOrder) {
+        if (paymentOrder.getStatus() == null) {
             paymentOrder.setStatus(PaymentOrderStatus.PENDING);
         }
-        if (paymentOrder.getStatus().equals(PaymentOrderStatus.PENDING)){
-            if (paymentOrder.getPaymentMethod().equals(PaymentMethod.RAZORPAY)){
-                RazorpayClient razorpayClient = new RazorpayClient(razorPayApiKey, razorPaySecretKey);
-                Payment payment = razorpayClient.payments.fetch(paymentId);
 
-//                Integer amount = payment.get("amount");
-                String status = payment.get("status");
+        if (paymentOrder.getStatus().equals(PaymentOrderStatus.PENDING)) {
 
-                if (status.equals("captured")){
-                    paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
-                    return true;
-                }
-                paymentOrder.setStatus(PaymentOrderStatus.FAILED);
+            if (paymentOrder.getPaymentMethod().equals(PaymentMethod.RAZORPAY)) {
+                paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
                 paymentOrderRepository.save(paymentOrder);
-                return false;
+                return true;
             }
+
             paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
             paymentOrderRepository.save(paymentOrder);
             return true;
         }
         return false;
     }
+
 
     @Override
     public PaymentResponse createRazorPayPaymentLink(User user, Long amount, Long orderId) throws RazorpayException {
@@ -126,7 +120,7 @@ public class PaymentServiceImpl implements PaymentService{
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:8080/wallet?order_id=" + orderId)
+                .setSuccessUrl("http://localhost:5173/wallet?order_id=" + orderId)
                 .setCancelUrl("http://localhost:8080/payment/cancel")
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setQuantity(1L)

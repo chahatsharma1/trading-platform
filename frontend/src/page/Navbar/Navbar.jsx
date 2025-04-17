@@ -4,12 +4,17 @@ import { Button } from "@/components/ui/button.jsx";
 import { Menu, SearchIcon } from "lucide-react";
 import {Avatar, AvatarFallback, AvatarImage,} from "@/components/ui/avatar.jsx";
 import Sidebar from "@/page/Navbar/Sidebar.jsx";
-import { useNavigate } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 
 const Navbar = () => {
+    const location = useLocation();
     const navigate = useNavigate();
     const {auth} =useSelector(store =>store)
+
+    if (location.pathname === "/"){
+        return null
+    }
 
     return (
         <div className="px-2 py-3 z-50 bg-[#0F172A] text-[#F1F5F9] sticky top-0 left-0 right-0 flex justify-between items-center border-b border-gray-700">

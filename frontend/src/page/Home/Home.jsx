@@ -7,6 +7,13 @@ import { DotIcon, MessageCircle, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input.jsx";
 import { getCoinList, getTop50Coins } from "@/page/State/Coin/Action.js";
 import { useDispatch, useSelector } from "react-redux";
+import {
+    Pagination,
+    PaginationContent, PaginationEllipsis,
+    PaginationItem,
+    PaginationLink, PaginationNext,
+    PaginationPrevious
+} from "@/components/ui/pagination.jsx";
 
 const Home = () => {
     const dispatch = useDispatch();
@@ -62,8 +69,26 @@ const Home = () => {
 
                     <AssetTable
                         coin={activeCategory === "all" ? coin.coinList : coin.top50}
-                        category={activeCategory}
-                    />
+                        category={activeCategory}/>
+                    <div>
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem                                    m>
+                                    <PaginationPrevious href="#" />
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationLink href="#">1</PaginationLink>
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationEllipsis />
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationNext href="#" />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+
+                    </div>
                 </div>
 
                 <div className="hidden lg:block lg:w-[50%] p-5">

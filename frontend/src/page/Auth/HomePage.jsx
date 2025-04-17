@@ -1,8 +1,31 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+const isTokenValid = (token) => {
+    if (!token) return false;
+    try {
+        const [, payload] = token.split(".");
+        const decoded = JSON.parse(atob(payload));
+        const expiry = decoded.exp * 1000;
+        return Date.now() < expiry;
+    } catch (e) {
+        return false;
+    }
+};
 
 const HomePage = () => {
+    const navigate = useNavigate();
+
+    const handleLoginClick = () => {
+        const token = localStorage.getItem("jwt");
+        if (isTokenValid(token)) {
+            navigate("/home");
+        } else {
+            navigate("/login");
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#0F172A] text-[#F1F5F9] flex flex-col">
             {/* Header / Hero Section */}
@@ -10,16 +33,19 @@ const HomePage = () => {
                 <h1 className="text-4xl font-extrabold mb-2 tracking-tight">
                     Welcome to <span className="text-slate-300">TradeX</span>
                 </h1>
-                <p className="text-slate-400 text-lg mb-6">Your gateway to secure and instant crypto trading.</p>
+                <p className="text-slate-400 text-lg mb-6">
+                    Your gateway to secure and instant crypto trading.
+                </p>
                 <div className="flex justify-center gap-4">
                     <Link to="/signup">
                         <Button className="bg-[#3B82F6] text-white hover:bg-[#2563EB]">Get Started</Button>
                     </Link>
-                    <Link to="/login">
-                        <Button className="bg-[#3B82F6] text-white hover:bg-[#2563EB]">
-                            Login
-                        </Button>
-                    </Link>
+                    <Button
+                        onClick={handleLoginClick}
+                        className="bg-[#3B82F6] text-white hover:bg-[#2563EB]"
+                    >
+                        Login
+                    </Button>
                 </div>
             </header>
 

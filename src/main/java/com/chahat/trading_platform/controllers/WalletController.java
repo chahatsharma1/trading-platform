@@ -55,11 +55,11 @@ public class WalletController {
 
     @Transactional
     @PutMapping("/deposit")
-    public ResponseEntity<Wallet> addBalanceToWallet(@RequestHeader("Authorization") String jwt, @RequestParam(name = "order_id") Long orderId, @RequestParam(name="payment_id") String paymentId) throws Exception {
+    public ResponseEntity<Wallet> addBalanceToWallet(@RequestHeader("Authorization") String jwt, @RequestParam(name = "order_id") Long orderId) throws Exception {
         User user = userService.findUserByJWT(jwt);
         Wallet wallet = walletService.getUserWallet(user);
         PaymentOrder paymentOrder = paymentService.getPaymentOrderById(orderId);
-        Boolean status = paymentService.ProceedPaymentOrder(paymentOrder, paymentId);
+        Boolean status = paymentService.ProceedPaymentOrder(paymentOrder);
 
         if (wallet.getBalance() == null){
             wallet.setBalance(BigDecimal.valueOf(0));

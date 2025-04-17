@@ -1,25 +1,38 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.jsx";
-import {
-    CopyIcon,
-    HistoryIcon,
-    RotateCw,
-    ShuffleIcon,
-    UploadIcon,
-    WalletIcon
-} from "lucide-react";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTrigger
-} from "@/components/ui/dialog.jsx";
+import {CopyIcon, HistoryIcon, RotateCw, ShuffleIcon, UploadIcon, WalletIcon} from "lucide-react";
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog.jsx";
 import TopupForm from "@/page/Wallet/TopupForm.jsx";
 import WithdrawalForm from "@/page/Withdrawal/WithdrawalForm.jsx";
 import TransferForm from "@/page/Wallet/TransferForm.jsx";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {depositMoney, getUserWallet} from "@/page/State/Wallet/Action.js";
+import {useLocation, useNavigate} from "react-router-dom";
+
+function useQuery(){
+    return new URLSearchParams(useLocation().search)
+}
 
 const Wallet = () => {
+    const dispatch=useDispatch();
+    const {wallet}= useSelector(store => store);
+    const query=useQuery();
+    const orderId = query.get("order_id");
+    const navigate = useNavigate();
+    useEffect(() => {
+        handleFetchUserWallet()
+    }, []);
+
+    useEffect(() => {
+        if (orderId){
+            dispatch(depositMoney({jwt: localStorage.getItem("jwt"), orderId, navigate}));
+        }
+    }, [orderId]);
+
+    const handleFetchUserWallet=() => {
+        dispatch(getUserWallet(localStorage.getItem("jwt")))
+    }
     return (
         <div className="min-h-screen py-10 px-4 flex justify-center bg-[#0F172A] text-[#F1F5F9]">
             <div className="w-full max-w-4xl">
@@ -36,12 +49,12 @@ const Wallet = () => {
                                     </div>
                                 </div>
                             </div>
-                            <RotateCw className="w-6 h-6 text-slate-400 hover:text-white cursor-pointer" />
+                            <RotateCw onClick={handleFetchUserWallet} className="w-6 h-6 text-slate-400 hover:text-white cursor-pointer" />
                         </div>
                     </CardHeader>
 
                     <CardContent className="pt-6">
-                        <div className="text-3xl font-bold text-white">₹20,000</div>
+                        <div className="text-3xl font-bold text-white">₹ {wallet.userWallet.balance}</div>
                         <div className="flex gap-5 mt-8 flex-wrap">
                             {[
                                 {
@@ -64,14 +77,17 @@ const Wallet = () => {
                                     <DialogTrigger asChild>
                                         <div className="w-28 h-28 flex flex-col justify-center items-center rounded-xl border border-[#334155] bg-[#0F172A] hover:bg-[#1E293B] hover:scale-105 transition-transform cursor-pointer shadow-sm">
                                             {icon}
-                                            <span className="text-sm mt-2 text-slate-200">{label}</span>
+                                            <span className="text-sm mt-2 text-slate-200 text-center">{label}</span>
                                         </div>
                                     </DialogTrigger>
                                     <DialogContent className="bg-[#1E293B] border-none text-[#F1F5F9]">
                                         <DialogHeader>
-                                            {form}
+                                            <DialogTitle>{label}</DialogTitle>
+                                            <DialogDescription/>
                                         </DialogHeader>
+                                        {form}
                                     </DialogContent>
+
                                 </Dialog>
                             ))}
                         </div>

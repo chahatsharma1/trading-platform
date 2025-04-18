@@ -1,97 +1,75 @@
-import {
-    WITHDRAWAL_REQUEST,
-    WITHDRAWAL_SUCCESS,
-    WITHDRAWAL_FAILURE,
-
-    WITHDRAWAL_PROCEED_REQUEST,
-    WITHDRAWAL_PROCEED_SUCCESS,
-    WITHDRAWAL_PROCEED_FAILURE,
-
-    GET_WITHDRAWAL_HISTORY_REQUEST,
-    GET_WITHDRAWAL_HISTORY_SUCCESS,
-    GET_WITHDRAWAL_HISTORY_FAILURE,
-
-    ADD_PAYMENT_DETAILS_REQUEST,
-    ADD_PAYMENT_DETAILS_SUCCESS,
-    ADD_PAYMENT_DETAILS_FAILURE,
-
-    GET_PAYMENT_DETAILS_REQUEST,
-    GET_PAYMENT_DETAILS_SUCCESS,
-    GET_PAYMENT_DETAILS_FAILURE
-} from './actionType';
+import {WITHDRAWAL_REQUEST, WITHDRAWAL_SUCCESS, WITHDRAWAL_FAILURE, WITHDRAWAL_PROCEED_REQUEST, WITHDRAWAL_PROCEED_SUCCESS, WITHDRAWAL_PROCEED_FAILURE, GET_WITHDRAWAL_HISTORY_REQUEST, GET_WITHDRAWAL_HISTORY_SUCCESS, GET_WITHDRAWAL_HISTORY_FAILURE, ADD_PAYMENT_DETAILS_SUCCESS, GET_PAYMENT_DETAILS_SUCCESS, GET_WITHDRAWAL_REQUEST_REQUEST, GET_WITHDRAWAL_REQUEST_SUCCESS, GET_WITHDRAWAL_REQUEST_FAILURE} from './actionType';
 
 const initialState = {
-    isLoading: false,
-    withdrawalData: null,
+    loading: false,
+    withdrawal: null,
     withdrawalProceedData: null,
-    withdrawalHistory: [],
+    history: [],
     paymentDetails: null,
     error: null
 };
 
-const reducer = (state = initialState, action) => {
+const withdrawalReducer = (state = initialState, action) => {
     switch (action.type) {
-        // Withdrawal
         case WITHDRAWAL_REQUEST:
         case WITHDRAWAL_PROCEED_REQUEST:
         case GET_WITHDRAWAL_HISTORY_REQUEST:
-        case ADD_PAYMENT_DETAILS_REQUEST:
-        case GET_PAYMENT_DETAILS_REQUEST:
+        case GET_WITHDRAWAL_REQUEST_REQUEST:
             return {
                 ...state,
-                isLoading: true,
+                loading: true,
                 error: null
             };
 
-        // Success Cases
         case WITHDRAWAL_SUCCESS:
             return {
                 ...state,
-                isLoading: false,
-                withdrawalData: action.payload,
+                loading: false,
+                withdrawal: action.payload,
                 error: null
             };
+
+        case ADD_PAYMENT_DETAILS_SUCCESS:
+        case GET_PAYMENT_DETAILS_SUCCESS:
+            return {
+                ...state,
+                paymentDetails: action.payload,
+                loading: false,
+                error: null
+            }
 
         case WITHDRAWAL_PROCEED_SUCCESS:
             return {
                 ...state,
-                isLoading: false,
-                withdrawalProceedData: action.payload,
+                loading: false,
+                requests: state.requests.map((item) =>
+                item.id === action.payload.id ? action.payload : item),
                 error: null
             };
 
         case GET_WITHDRAWAL_HISTORY_SUCCESS:
             return {
                 ...state,
-                isLoading: false,
-                withdrawalHistory: action.payload,
+                loading: false,
+                history: action.payload,
                 error: null
             };
 
-        case ADD_PAYMENT_DETAILS_SUCCESS:
+        case GET_WITHDRAWAL_REQUEST_SUCCESS:
             return {
                 ...state,
-                isLoading: false,
+                requests: action.payload,
+                loading: false,
                 error: null
-            };
+            }
 
-        case GET_PAYMENT_DETAILS_SUCCESS:
-            return {
-                ...state,
-                isLoading: false,
-                paymentDetails: action.payload,
-                error: null
-            };
-
-        // Failure Cases
         case WITHDRAWAL_FAILURE:
         case WITHDRAWAL_PROCEED_FAILURE:
         case GET_WITHDRAWAL_HISTORY_FAILURE:
-        case ADD_PAYMENT_DETAILS_FAILURE:
-        case GET_PAYMENT_DETAILS_FAILURE:
+        case GET_WITHDRAWAL_REQUEST_FAILURE:
             return {
                 ...state,
-                isLoading: false,
+                loading: false,
                 error: action.error
             };
 
@@ -100,4 +78,4 @@ const reducer = (state = initialState, action) => {
     }
 };
 
-export default reducer;
+export default withdrawalReducer;

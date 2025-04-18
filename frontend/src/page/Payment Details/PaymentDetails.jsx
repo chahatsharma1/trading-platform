@@ -1,40 +1,40 @@
-import React, { useState } from 'react';
+import React, {useEffect} from 'react';
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import PaymentDetailsForm from "@/page/Payment Details/PaymentDetailsForm.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {getPaymentDetails} from "@/page/State/Withdrawal/Action.js";
 
 const PaymentDetails = () => {
-    const [paymentDetails, setPaymentDetails] = useState({
-        accountHolder: "Chahat Sharma",
-        ifsc: "YESB0000007",
-        accountNumber: "************1651",
-        bankName: "YES BANK"
-    });
+    const dispatch=useDispatch();
+    const{withdrawal} = useSelector(store => store)
 
-    const isEmpty = paymentDetails || paymentDetails.accountHolder;
+    useEffect(() => {
+        dispatch(getPaymentDetails({jwt: localStorage.getItem("jwt")}))
+    }, []);
 
     return (
         <div className="min-h-screen py-10 px-4 flex justify-center bg-[#0F172A] text-[#F1F5F9]">
             <div className="w-full max-w-2xl">
                 <h1 className="text-2xl font-semibold text-[#F1F5F9] mb-6">Payment Details</h1>
 
-                {!isEmpty ? (
+                {withdrawal.paymentDetails ? (
                     <Card className="rounded-xl border border-[#1E293B] bg-[#1E293B] p-6 space-y-4 shadow-md">
                         <div className="text-lg font-semibold text-[#F1F5F9]">
-                            {paymentDetails.bankName}
+                            {withdrawal.paymentDetails.bankName}
                             <p>
                                 <span className="font-medium text-[#94A3B8] text-sm">
-                                    A/c No. : {paymentDetails.accountNumber}
+                                    A/c No. : {withdrawal.paymentDetails.accountNo?.replace(/\d(?=\d{4})/g, '*')}
                                 </span>
                             </p>
                         </div>
                         <div className="text-sm text-[#CBD5E1] space-y-1">
                             <p>
-                                <span className="font-medium text-[#94A3B8]">A/C Holder</span> : {paymentDetails.accountHolder}
+                                <span className="font-medium text-[#94A3B8]">A/C Holder</span> : {withdrawal.paymentDetails.accountHolderName}
                             </p>
                             <p>
-                                <span className="font-medium text-[#94A3B8]">IFSC</span> : {paymentDetails.ifsc}
+                                <span className="font-medium text-[#94A3B8]">IFSC</span> : {withdrawal.paymentDetails.ifscCode}
                             </p>
                         </div>
                     </Card>

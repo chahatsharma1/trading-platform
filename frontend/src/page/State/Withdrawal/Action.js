@@ -26,6 +26,7 @@ export const withdrawRequest = ({amount, jwt}) => async (dispatch) => {
                 Authorization: `Bearer ${jwt}`}
         });
         dispatch({ type: WITHDRAWAL_SUCCESS, payload: response.data });
+        console.log(response.data)
     } catch (error) {
         dispatch({ type: WITHDRAWAL_FAILURE, error: error.message });
     }
@@ -51,6 +52,7 @@ export const getWithdrawalHistory = ({jwt}) => async (dispatch) => {
             headers: { Authorization: `Bearer ${jwt}` }
         });
         dispatch({ type: GET_WITHDRAWAL_HISTORY_SUCCESS, payload: response.data });
+        console.log(response.data);
     } catch (error) {
         dispatch({ type: GET_WITHDRAWAL_HISTORY_FAILURE, error: error.message });
     }
@@ -75,7 +77,6 @@ export const addPaymentDetails = ({paymentDetails, jwt}) => async (dispatch) => 
             headers: { Authorization: `Bearer ${jwt}` }
         });
         dispatch({ type: ADD_PAYMENT_DETAILS_SUCCESS, payload: response.data });
-        console.log(response.data, "it did");
     } catch (error) {
         dispatch({ type: ADD_PAYMENT_DETAILS_FAILURE, error: error.message });
     }
@@ -88,6 +89,7 @@ export const getPaymentDetails = ({jwt}) => async (dispatch) => {
             headers: { Authorization: `Bearer ${jwt}` }
         });
         dispatch({ type: GET_PAYMENT_DETAILS_SUCCESS, payload: res.data });
+        console.log(res.data);
     } catch (error) {
         dispatch({ type: GET_PAYMENT_DETAILS_FAILURE, error: error.message });
     }

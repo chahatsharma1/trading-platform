@@ -12,7 +12,7 @@ const PaymentDetails = () => {
         bankName: "YES BANK"
     });
 
-    const isEmpty = !paymentDetails || !paymentDetails.accountHolder;
+    const isEmpty = paymentDetails || paymentDetails.accountHolder;
 
     return (
         <div className="min-h-screen py-10 px-4 flex justify-center bg-[#0F172A] text-[#F1F5F9]">

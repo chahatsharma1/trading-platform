@@ -4,8 +4,11 @@ import { Label } from "@/components/ui/label.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { Landmark } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog.jsx";
+import {useDispatch, useSelector} from "react-redux";
 
 const WithdrawalForm = () => {
+    const dispatch=useDispatch();
+    const {wallet}= useSelector(store => store);
     const [amount, setAmount] = React.useState('');
 
     const handleSubmit = (e) => {

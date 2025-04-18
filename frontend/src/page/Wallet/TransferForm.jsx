@@ -3,8 +3,13 @@ import { Input } from "@/components/ui/input.jsx";
 import { Label } from "@/components/ui/label.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { DialogClose } from "@/components/ui/dialog.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {transferMoney} from "@/page/State/Wallet/Action.js";
 
 const TransferForm = () => {
+
+    const dispatch=useDispatch();
+    const {wallet}= useSelector(store => store);
     const [formData, setFormData] = React.useState({
         amount: '',
         walletId: '',
@@ -16,15 +21,21 @@ const TransferForm = () => {
     };
 
     const handleSubmit = () => {
+        const { walletId, amount, purpose } = formData;
+
+        console.log(walletId, amount);
+        dispatch(transferMoney({
+            jwt: localStorage.getItem('jwt'),
+            walletId,
+            reqData: {amount, purpose}
+        }));
+
         console.log(formData);
     };
 
+
     return (
         <div className="text-[#F1F5F9] bg-[#1E293B] p-6 space-y-6 rounded-lg">
-            <div className="text-center text-lg font-semibold">
-                Wallet Transfer
-            </div>
-
             <div className="text-center space-y-2">
                 <Label className="text-slate-300">Enter transfer amount</Label>
                 <Input

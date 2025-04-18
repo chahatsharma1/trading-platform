@@ -20,12 +20,13 @@ export const getUserWallet = (jwt) => async (dispatch) => {
 export const getWalletTransactions = ({jwt}) => async (dispatch) => {
     dispatch({ type: GET_WALLET_TRANSACTIONS_REQUEST });
     try {
-        const response = await api.get("/wallet/transactions", {
+        const response = await api.get("/transaction", {
             headers: {
                 Authorization: `Bearer ${jwt}` ,
             },
         });
         dispatch({ type: GET_WALLET_TRANSACTIONS_SUCCESS, payload: response.data });
+        console.log(response.data);
     } catch (error) {
         console.log("error", error)
         dispatch({ type: GET_WALLET_TRANSACTIONS_FAILURE, payload: error.response?.data?.message || error.message });

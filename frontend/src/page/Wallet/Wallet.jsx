@@ -7,7 +7,7 @@ import WithdrawalForm from "@/page/Withdrawal/WithdrawalForm.jsx";
 import TransferForm from "@/page/Wallet/TransferForm.jsx";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar.jsx";
 import {useDispatch, useSelector} from "react-redux";
-import {depositMoney, getUserWallet} from "@/page/State/Wallet/Action.js";
+import {depositMoney, getUserWallet, getWalletTransactions} from "@/page/State/Wallet/Action.js";
 import {useLocation, useNavigate} from "react-router-dom";
 
 function useQuery(){
@@ -20,8 +20,18 @@ const Wallet = () => {
     const query=useQuery();
     const orderId = query.get("order_id");
     const navigate = useNavigate();
+
+    const formatTransactionType = (type) => {
+        return type
+            .toLowerCase()
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    };
+
     useEffect(() => {
         handleFetchUserWallet()
+        handleFetchUserWalletTransaction()
     }, []);
 
     useEffect(() => {
@@ -33,6 +43,10 @@ const Wallet = () => {
     const handleFetchUserWallet=() => {
         dispatch(getUserWallet(localStorage.getItem("jwt")))
     }
+
+    const handleFetchUserWalletTransaction= () => {
+        dispatch(getWalletTransactions({jwt: localStorage.getItem("jwt")}))
+    };
     return (
         <div className="min-h-screen py-10 px-4 flex justify-center bg-[#0F172A] text-[#F1F5F9]">
             <div className="w-full max-w-4xl">
@@ -44,7 +58,7 @@ const Wallet = () => {
                                 <div>
                                     <CardTitle className="text-2xl font-semibold">My Wallet</CardTitle>
                                     <div className="flex items-center gap-2 text-sm text-slate-400">
-                                        <span>#A234F</span>
+                                        <span>#{wallet.userWallet.id}</span>
                                         <CopyIcon size={14} className="cursor-pointer hover:text-slate-300" />
                                     </div>
                                 </div>
@@ -97,24 +111,24 @@ const Wallet = () => {
                 <div className="py-5 pt-10">
                     <div className="flex gap-2 items-center pb-5">
                         <h1 className="text-2xl font-semibold">History</h1>
-                        <HistoryIcon className="h-7 w-7 p-0 cursor-pointer hover:text-white text-slate-400" />
+                        <HistoryIcon onClick={handleFetchUserWalletTransaction} className="h-7 w-7 p-0 cursor-pointer hover:text-white text-slate-400" />
                     </div>
                     <div className="space-y-5">
-                        {[1, 1, 1, 1].map((item, i) => (
+                        {wallet.transactions.map((item, i) => (
                             <Card key={i} className="px-5 py-4 bg-[#1E293B] border border-[#334155] text-[#F1F5F9]">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-5">
                                         <Avatar className="bg-[#334155]">
                                             <AvatarFallback>
-                                                <ShuffleIcon className="text-white" />
+                                                <ShuffleIcon className="text-[#0F172A]" size={18} strokeWidth={2.5} />
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="space-y-1 text-left">
-                                            <h1 className="font-bold text-lg">Buy Asset</h1>
-                                            <p className="text-sm text-slate-400">10/04/2015</p>
+                                            <h1 className="font-bold text-lg">{formatTransactionType(item.walletTransactionType)}</h1>
+                                            <p className="text-sm text-slate-400">{item.localDate}</p>
                                         </div>
                                     </div>
-                                    <p className="text-green-400 font-semibold">₹999</p>
+                                    <p className="text-green-400 font-semibold">₹ {item.amount}</p>
                                 </div>
                             </Card>
                         ))}

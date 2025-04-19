@@ -7,13 +7,7 @@ import { DotIcon, MessageCircle, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input.jsx";
 import { getCoinList, getTop50Coins } from "@/page/State/Coin/Action.js";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    Pagination,
-    PaginationContent, PaginationEllipsis,
-    PaginationItem,
-    PaginationLink, PaginationNext,
-    PaginationPrevious
-} from "@/components/ui/pagination.jsx";
+import {Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious} from "@/components/ui/pagination.jsx";
 
 const Home = () => {
     const dispatch = useDispatch();
@@ -22,15 +16,32 @@ const Home = () => {
     const [activeCategory, setActiveCategory] = useState("all");
     const [inputValue, setInputValue] = useState("");
     const [isBotRelease, setIsBotRelease] = useState(false);
+    const [messages, setMessages] = useState([]);
+
+
+    const handleKeyPress = async (event) => {
+        if (event.key === "Enter" && inputValue.trim()) {
+            const userMessage = inputValue;
+            setInputValue("");
+            setMessages(prev => [...prev, { type: "user", text: userMessage }]);
+
+            try {
+                const res = await fetch("http://localhost:8080/chatbot", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: userMessage }),
+                });
+
+                const data = await res.text();
+                setMessages(prev => [...prev, { type: "bot", text: data }]);
+            } catch (err) {
+                setMessages(prev => [...prev, { type: "bot", text: "Error talking to Gemini." }]);
+            }
+        }
+    };
 
     const handleBotRelease = () => setIsBotRelease(!isBotRelease);
     const handleChange = (e) => setInputValue(e.target.value);
-    const handleKeyPress = (event) => {
-        if (event.key === "Enter") {
-            console.log(inputValue);
-            setInputValue("");
-        }
-    };
 
     useEffect(() => {
         if (activeCategory === "top50") {
@@ -125,21 +136,14 @@ const Home = () => {
                             </Button>
                         </div>
                         <div className="h-[76%] flex flex-col overflow-y-auto gap-1 px-5 py-2 scroll-container">
-                            <div className="self-start pb-5 w-auto">
-                                <div className="px-5 py-2 rounded-md bg-[#3B82F6] text-white">
-                                    <p>Hi, Chahat</p>
-                                    <p>You can ask crypto related questions</p>
-                                    <p>like price, market cap and more.</p>
-                                </div>
-                            </div>
-
-                            {[1, 1, 1, 1].map((item, i) => (
-                                <div key={i} className={`${i % 2 === 0 ? "self-start" : "self-end"} pb-5 w-auto`}>
-                                    <div className="px-5 py-2 rounded-md bg-[#1E293B] text-white border border-gray-600">
-                                        <p>{i % 2 === 0 ? "Question" : "Answer"}</p>
+                            {messages.map((msg, i) => (
+                                <div key={i} className={`${msg.type === "bot" ? "self-start" : "self-end"} pb-5 w-auto`}>
+                                    <div className={`px-5 py-2 rounded-md ${msg.type === "bot" ? "bg-[#3B82F6]" : "bg-[#1E293B] border border-gray-600"} text-white whitespace-pre-line`}>
+                                        <p>{msg.text}</p>
                                     </div>
                                 </div>
                             ))}
+
                         </div>
                         <div className="h-[12%] border-t border-gray-700">
                             <Input

@@ -4,7 +4,6 @@ import com.chahat.trading_platform.domain.OrderStatus;
 import com.chahat.trading_platform.domain.OrderType;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

@@ -128,7 +128,9 @@ const Wallet = () => {
                                             <p className="text-sm text-slate-400">{item.localDate}</p>
                                         </div>
                                     </div>
-                                    <p className="text-green-400 font-semibold">₹ {item.amount}</p>
+                                    <p className={`font-semibold ${["WITHDRAWAL", "TRANSFER", "BUY_ASSET"].includes(item.walletTransactionType) ? "text-red-500" : "text-green-400"}`}>
+                                        {["WITHDRAWAL", "TRANSFER", "BUY_ASSET"].includes(item.walletTransactionType) ? "-₹" : "₹"} {item.amount}
+                                    </p>
                                 </div>
                             </Card>
                         ))}

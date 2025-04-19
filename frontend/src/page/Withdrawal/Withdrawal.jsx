@@ -9,7 +9,7 @@ const Withdrawal = () => {
 
     useEffect(() => {
         dispatch(getWithdrawalHistory({jwt: localStorage.getItem("jwt")}))
-    });
+    },[]);
     return (
         <div className="p-5 lg:p-20 min-h-screen bg-[#0F172A] text-[#F1F5F9]">
             <h1 className="font-bold text-3xl mb-6">Withdrawal</h1>

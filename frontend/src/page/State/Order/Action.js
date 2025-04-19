@@ -10,7 +10,7 @@ export const payOrder = ({orderData, jwt, amount}) => async (dispatch) => {
             }
         );
         dispatch({ type: PAY_ORDER_SUCCESS, payload: response.data, amount});
-        console.log(response)
+        console.log(response.data)
     } catch (error) {
         dispatch({
             type: PAY_ORDER_FAILURE,

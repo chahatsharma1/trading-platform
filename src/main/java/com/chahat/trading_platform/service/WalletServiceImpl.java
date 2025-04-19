@@ -33,7 +33,6 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     public Wallet addBalance(Wallet wallet, Long amount) {
-        System.out.println(wallet.getBalance());
         BigDecimal balance = wallet.getBalance();
         BigDecimal newBalance = balance.add(BigDecimal.valueOf(amount));
         wallet.setBalance(newBalance);
@@ -43,6 +42,24 @@ public class WalletServiceImpl implements WalletService{
 
         return wallet;
     }
+
+    @Override
+    public Wallet deductBalance(Wallet wallet, Long amount) throws Exception {
+        BigDecimal currentBalance = wallet.getBalance();
+        BigDecimal deduction = BigDecimal.valueOf(amount);
+
+        if (currentBalance.compareTo(deduction) < 0) {
+            throw new Exception("Insufficient balance for withdrawal");
+        }
+
+        wallet.setBalance(currentBalance.subtract(deduction));
+        walletRepository.save(wallet);
+
+        transactionService.createTransaction(wallet, deduction, WalletTransactionType.WITHDRAWAL);
+
+        return wallet;
+    }
+
 
     @Override
     public Wallet findByID(Long id) throws Exception {

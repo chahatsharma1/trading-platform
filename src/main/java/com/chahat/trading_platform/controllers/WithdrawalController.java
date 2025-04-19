@@ -32,7 +32,7 @@ public class WithdrawalController {
         Wallet wallet = walletService.getUserWallet(user);
 
         Withdrawal withdrawal = withdrawalService.requestWithdrawal(amount, user);
-        walletService.addBalance(wallet, -withdrawal.getAmount());
+        walletService.deductBalance(wallet, withdrawal.getAmount());
         return new ResponseEntity<>(withdrawal, HttpStatus.OK);
     }
 

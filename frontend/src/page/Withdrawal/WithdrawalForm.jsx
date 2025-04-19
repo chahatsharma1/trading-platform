@@ -1,27 +1,31 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Input } from "@/components/ui/input.jsx";
 import { Label } from "@/components/ui/label.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { Landmark } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog.jsx";
 import {useDispatch, useSelector} from "react-redux";
-import {withdrawRequest} from "@/page/State/Withdrawal/Action.js";
+import {getPaymentDetails, withdrawRequest} from "@/page/State/Withdrawal/Action.js";
 
 const WithdrawalForm = () => {
     const dispatch=useDispatch();
     const {wallet, withdrawal}= useSelector(store => store);
     const [amount, setAmount] = React.useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = () => {
         dispatch(withdrawRequest({amount, jwt: localStorage.getItem("jwt")}))
         console.log(amount);
     };
+
+    useEffect(() => {
+        dispatch(getPaymentDetails({jwt: localStorage.getItem("jwt")}))
+    }, []);
 
     return (
         <div className="text-[#F1F5F9] bg-[#1E293B] p-6 space-y-6 rounded-xl">
             <div className="bg-[#334155] p-4 rounded-lg flex justify-between items-center">
                 <span className="text-sm text-slate-300">Available balance</span>
-                <span className="text-[#F1F5F9] font-bold text-lg">₹ {wallet.userWallet.balance}</span>
+                <span className="text-[#F1F5F9] font-bold text-lg">₹ {wallet.userWallet?.balance}</span>
             </div>
 
             <div className="text-center space-y-2">
@@ -40,8 +44,8 @@ const WithdrawalForm = () => {
                     <div className="flex items-center space-x-3">
                         <Landmark size={20} className="text-slate-300" />
                         <div>
-                            <div className="font-semibold text-[#F1F5F9]">{withdrawal.paymentDetails.bankName}</div>
-                            <div className="text-xs text-slate-400">{withdrawal.paymentDetails.accountNo?.replace(/\d(?=\d{4})/g, '*')}</div>
+                            <div className="font-semibold text-[#F1F5F9]">{withdrawal.paymentDetails?.bankName}</div>
+                            <div className="text-xs text-slate-400">{withdrawal.paymentDetails?.accountNo?.replace(/\d(?=\d{4})/g, '*')}</div>
                         </div>
                     </div>
                 </div>

@@ -65,7 +65,7 @@ const StockDetails = () => {
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent className="bg-[#1E293B] border-none text-[#F1F5F9]">
                     <DialogHeader>
-                        <DialogTitle className="text-[#F1F5F9]">Trade {coin.coinDetails.name}</DialogTitle>
+                        <DialogTitle className="text-[#F1F5F9]">Trade {coin.coinDetails?.name}</DialogTitle>
                     </DialogHeader>
                     <div className="text-sm text-[#94A3B8]">
                         <TradingForm />

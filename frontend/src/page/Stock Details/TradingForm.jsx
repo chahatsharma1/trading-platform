@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserWallet } from "@/page/State/Wallet/Action.js";
+import {getAssetDetails} from "@/page/State/Asset/Action.js";
+import {payOrder} from "@/page/State/Order/Action.js";
 
 const TradingForm = () => {
     const dispatch = useDispatch();
@@ -10,7 +12,7 @@ const TradingForm = () => {
     const [amount, setAmount] = useState("");
     const [quantity, setQuantity] = useState(0);
 
-    const { coin, wallet } = useSelector((store) => store);
+    const { coin, wallet, asset } = useSelector((store) => store);
 
     const toggleMode = () => setIsBuyMode((prev) => !prev);
 
@@ -30,6 +32,7 @@ const TradingForm = () => {
 
     useEffect(() => {
         dispatch(getUserWallet(localStorage.getItem("jwt")));
+        dispatch(getAssetDetails({coinId: coin.coinDetails.id, jwt:localStorage.getItem("jwt")}));
     }, []);
 
     const calculateBuyCost = (amount, price) => {
@@ -40,9 +43,9 @@ const TradingForm = () => {
 
     const handleTrade = () => {
         if (isBuyMode) {
-            // dispatch buy order logic
+            dispatch(payOrder({orderData: {coinId: coin.coinDetails?.id, quantity, orderType: "BUY"}, jwt: localStorage.getItem("jwt"), amount: amount}))
         } else {
-            // dispatch sell order logic
+            dispatch(payOrder({orderData: {coinId: coin.coinDetails?.id, quantity, orderType: "SELL"}, jwt: localStorage.getItem("jwt"), amount: amount}))
         }
     };
 
@@ -60,7 +63,6 @@ const TradingForm = () => {
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm">₹</span>
                     <Input
                         placeholder="Enter amount..."
-                        type="number"
                         value={amount}
                         onChange={handleChange}
                         className="pl-7 pr-3 bg-[#1E293B] text-[#F1F5F9] border border-[#334155] placeholder:text-[#94A3B8]"
@@ -105,11 +107,9 @@ const TradingForm = () => {
                 <span className="text-[#F1F5F9] font-medium">{isBuyMode ? "Buy" : "Sell"}</span>
             </div>
             <div className="flex justify-between text-sm">
-                <span className="text-[#94A3B8]">Wallet Amount</span>
-                <span className="text-xl font-semibold text-[#F1F5F9]">₹ {walletBalance}</span>
+                <span className="text-[#94A3B8]">{isBuyMode ? "Wallet Amount" : "Available Quantity"}</span>
+                <span className="text-xl font-semibold text-[#F1F5F9]">{isBuyMode ? `₹ ${walletBalance}` : `${asset.assetDetails?.quantity || 0} ${coin.coinDetails?.symbol?.toUpperCase()}`}</span>
             </div>
-
-            {/* Action Button */}
             <Button
                 onClick={handleTrade}
                 disabled={isInsufficient}

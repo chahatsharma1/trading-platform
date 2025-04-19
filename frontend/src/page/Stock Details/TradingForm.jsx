@@ -32,7 +32,7 @@ const TradingForm = () => {
 
     useEffect(() => {
         dispatch(getUserWallet(localStorage.getItem("jwt")));
-        dispatch(getAssetDetails({coinId: coin.coinDetails.id, jwt:localStorage.getItem("jwt")}));
+        dispatch(getAssetDetails({coinId: coin?.coinDetails?.id, jwt:localStorage.getItem("jwt")}));
     }, []);
 
     const calculateBuyCost = (amount, price) => {

@@ -114,7 +114,7 @@ const Wallet = () => {
                         <HistoryIcon onClick={handleFetchUserWalletTransaction} className="h-7 w-7 p-0 cursor-pointer hover:text-white text-slate-400" />
                     </div>
                     <div className="space-y-5">
-                        {wallet.transactions.map((item, i) => (
+                        {[...wallet.transactions].reverse().map((item, i) => (
                             <Card key={i} className="px-5 py-4 bg-[#1E293B] border border-[#334155] text-[#F1F5F9]">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-5">

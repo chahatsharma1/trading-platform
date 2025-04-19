@@ -6,6 +6,7 @@ import walletReducer from "@/page/State/Wallet/Reducer.js";
 import withdrawalReducer from "@/page/State/Withdrawal/Reducer.js";
 import orderReducer from "@/page/State/Order/Reducer.js";
 import assetReducer from "@/page/State/Asset/Reducer.js";
+import watchlistReducer from "@/page/State/Watchlist/Reducer.js";
 
 const rootReducer=combineReducers({
     auth:authReducer,
@@ -13,7 +14,8 @@ const rootReducer=combineReducers({
     wallet:walletReducer,
     withdrawal:withdrawalReducer,
     order:orderReducer,
-    asset:assetReducer
+    asset:assetReducer,
+    watchlist:watchlistReducer
 });
 
 export const store=legacy_createStore(rootReducer, applyMiddleware(thunk))

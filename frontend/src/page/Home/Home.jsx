@@ -3,68 +3,51 @@ import { Button } from "@/components/ui/button.jsx";
 import AssetTable from "@/page/Home/AssetTable.jsx";
 import StockChart from "@/page/Home/StockChart.jsx";
 import { Avatar, AvatarImage } from "@/components/ui/avatar.jsx";
-import { DotIcon, MessageCircle, XIcon } from "lucide-react";
-import { Input } from "@/components/ui/input.jsx";
+import { DotIcon } from "lucide-react";
 import { getCoinList, getTop50Coins } from "@/page/State/Coin/Action.js";
 import { useDispatch, useSelector } from "react-redux";
-import {Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious} from "@/components/ui/pagination.jsx";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination.jsx";
+import Chatbot from '@/page/Home/Chatbot.jsx';
 
 const Home = () => {
     const dispatch = useDispatch();
     const { coin } = useSelector(store => store);
-
     const [activeCategory, setActiveCategory] = useState("all");
-    const [inputValue, setInputValue] = useState("");
-    const [isBotRelease, setIsBotRelease] = useState(false);
-    const [messages, setMessages] = useState([]);
-
-
-    const handleKeyPress = async (event) => {
-        if (event.key === "Enter" && inputValue.trim()) {
-            const userMessage = inputValue;
-            setInputValue("");
-            setMessages(prev => [...prev, { type: "user", text: userMessage }]);
-
-            try {
-                const res = await fetch("http://localhost:8080/chatbot", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ prompt: userMessage }),
-                });
-
-                const data = await res.text();
-                setMessages(prev => [...prev, { type: "bot", text: data }]);
-            } catch (err) {
-                setMessages(prev => [...prev, { type: "bot", text: "Error talking to Gemini." }]);
-            }
-        }
-    };
-
-    const handleBotRelease = () => setIsBotRelease(!isBotRelease);
-    const handleChange = (e) => setInputValue(e.target.value);
 
     useEffect(() => {
         if (activeCategory === "top50") {
             dispatch(getTop50Coins());
+        } else {
+            dispatch(getCoinList(1));
         }
-    }, [activeCategory]);
-
-    useEffect(() => {
-        dispatch(getCoinList(1));
-    }, []);
+    }, [activeCategory, dispatch]);
 
     const categoryList = [
         { label: "All", value: "all" },
-        { label: "Top 50", value: "top50" },
-        { label: "Top Gainers", value: "topGainers" },
-        { label: "Top Losers", value: "topLosers" }
+        { label: "Top 50", value: "top50" }
     ];
 
+    const handlePageChange = (page) => {
+        if (activeCategory === 'all') {
+            if (page > 0) {
+                dispatch(getCoinList(page));
+            }
+        }
+    }
+
     return (
-        <div className="relative bg-[#0F172A] min-h-screen text-[#F1F5F9]">
-            <div className="lg:flex">
-                <div className="lg:w-[50%]">
-                    <div className="p-3 flex items-center gap-4">
+        <div className="relative bg-[#0F172A] h-screen text-[#F1F5F9] flex flex-col overflow-hidden">
+            <div className="flex flex-wrap lg:flex-nowrap flex-grow min-h-0">
+                <div className="w-full lg:w-[50%] p-3 flex flex-col overflow-hidden">
+                    <div className="p-3 flex items-center gap-4 flex-wrap flex-shrink-0">
                         {categoryList.map((item) => (
                             <Button
                                 key={item.value}
@@ -78,45 +61,53 @@ const Home = () => {
                         ))}
                     </div>
 
-                    <AssetTable
-                        coin={activeCategory === "all" ? coin.coinList : coin.top50}
-                        category={activeCategory}/>
-                    <div>
-                        <Pagination>
-                            <PaginationContent>
-                                <PaginationItem                                    m>
-                                    <PaginationPrevious href="#" />
-                                </PaginationItem>
-                                <PaginationItem>
-                                    <PaginationLink href="#">1</PaginationLink>
-                                </PaginationItem>
-                                <PaginationItem>
-                                    <PaginationEllipsis />
-                                </PaginationItem>
-                                <PaginationItem>
-                                    <PaginationNext href="#" />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
+                    <div className="flex-grow overflow-y-auto min-h-0 relative">
+                        <div className="pb-16">
+                            <AssetTable
+                                coin={activeCategory === "all" ? coin.coinList : activeCategory === "top50" ? coin.top50 : []}
+                                category={activeCategory}/>
+                        </div>
 
+                        <div className="sticky bottom-0 bg-[#0F172A] p-3 z-10">
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationPrevious href="#" onClick={() => handlePageChange(1)} />
+                                    </PaginationItem>
+                                    <PaginationItem>
+                                        <PaginationLink href="#" isActive onClick={() => handlePageChange(1)}>1</PaginationLink>
+                                    </PaginationItem>
+                                    <PaginationItem>
+                                        <PaginationLink href="#" onClick={() => handlePageChange(2)}>2</PaginationLink>
+                                    </PaginationItem>
+                                    <PaginationItem>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>
+                                    <PaginationItem>
+                                        <PaginationNext href="#" onClick={() => handlePageChange(3)} />
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        </div>
                     </div>
                 </div>
-
-                <div className="hidden lg:block lg:w-[50%] p-5">
-                    <StockChart coinId={"bitcoin"} />
-                    <div className="flex gap-5 items-center mt-6">
+                <div className="w-full lg:w-[50%] p-3 flex flex-col overflow-hidden">
+                    <div className="h-[74%]">
+                        <StockChart coinId={"bitcoin"} />
+                    </div>
+                    <div className="flex-shrink-0 mt-5 p-4 bg-[#1E293B] rounded-lg flex gap-5 items-center">
                         <Avatar>
                             <AvatarImage src="https://coin-images.coingecko.com/coins/images/1/standard/bitcoin.png?1696501400" />
                         </Avatar>
                         <div>
                             <div className="flex items-center gap-2 text-[#F1F5F9]">
-                                <p>BTC</p>
+                                <p className="font-semibold">BTC</p>
                                 <DotIcon className="text-[#38BDF8]" />
                                 <p>Bitcoin</p>
                             </div>
-                            <div className="flex items-end gap-2">
-                                <p className="text-lg font-bold">₹7,355,264</p>
-                                <p className="text-green-500">
+                            <div className="flex items-end gap-2 mt-1">
+                                <p className="text-xl font-bold">₹7,355,264</p>
+                                <p className="text-green-500 text-sm">
                                     <span>+70,606</span>
                                     <span> (0.96%) </span>
                                 </p>
@@ -125,45 +116,8 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-
-            <section className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-                {isBotRelease && (
-                    <div className="w-[20rem] md:w-[25rem] h-[70vh] bg-[#1E293B] rounded-xl shadow-lg overflow-hidden">
-                        <div className="flex justify-between items-center border-b px-6 h-[12%] bg-[#1E293B] text-[#F1F5F9]">
-                            <p className="font-medium">Chat Bot</p>
-                            <Button onClick={handleBotRelease} variant="ghost" size="icon" className="hover:bg-gray-700 rounded-full">
-                                <XIcon className="w-5 h-5 text-white" />
-                            </Button>
-                        </div>
-                        <div className="h-[76%] flex flex-col overflow-y-auto gap-1 px-5 py-2 scroll-container">
-                            {messages.map((msg, i) => (
-                                <div key={i} className={`${msg.type === "bot" ? "self-start" : "self-end"} pb-5 w-auto`}>
-                                    <div className={`px-5 py-2 rounded-md ${msg.type === "bot" ? "bg-[#3B82F6]" : "bg-[#1E293B] border border-gray-600"} text-white whitespace-pre-line`}>
-                                        <p>{msg.text}</p>
-                                    </div>
-                                </div>
-                            ))}
-
-                        </div>
-                        <div className="h-[12%] border-t border-gray-700">
-                            <Input
-                                className="w-full h-full bg-[#0F172A] text-white placeholder-gray-400 border-none focus:outline-none focus:ring-0"
-                                placeholder="Write Prompt"
-                                onChange={handleChange}
-                                value={inputValue}
-                                onKeyPress={handleKeyPress}
-                            />
-                        </div>
-                    </div>
-                )}
-
-                <Button onClick={handleBotRelease} className="h-[2.75rem] px-4 py-2 rounded-xl bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] text-white shadow-md hover:scale-105 transition-transform duration-300 ease-in-out">
-                    <MessageCircle className="w-5 h-5 mr-2 stroke-white rotate-[270deg]" />
-                    <span className="text-base font-medium tracking-wide">Chat Bot</span>
-                </Button>
-            </section>
+            <Chatbot />
         </div>
     );
 };
-
 export default Home;

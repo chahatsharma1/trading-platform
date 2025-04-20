@@ -75,10 +75,9 @@ const StockDetails = () => {
                 </div>
             </div>
 
-            <div>
+            <div className="h-[500px] mt-4">
                 <StockChart coinId={id} />
             </div>
-
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent className="bg-[#1E293B] border-none text-[#F1F5F9]">
                     <DialogHeader>

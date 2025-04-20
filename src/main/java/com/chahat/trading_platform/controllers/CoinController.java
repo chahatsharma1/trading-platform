@@ -41,7 +41,7 @@ public class CoinController {
     @GetMapping("/search")
     ResponseEntity<JsonNode> searchCoin(@RequestParam("coin") String coin) throws JsonProcessingException {
         String searchedCoin = coinService.searchCoin(coin);
-        JsonNode jsonNode = objectMapper.readTree(coin);
+        JsonNode jsonNode = objectMapper.readTree(searchedCoin);
         return ResponseEntity.ok(jsonNode);
     }
 

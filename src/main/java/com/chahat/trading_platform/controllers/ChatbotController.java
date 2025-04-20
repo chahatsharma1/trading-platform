@@ -1,6 +1,10 @@
 package com.chahat.trading_platform.controllers;
 
+import com.chahat.trading_platform.service.CoinService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,30 +19,84 @@ import java.util.Map;
 @RequestMapping("/chatbot")
 public class ChatbotController {
 
+    @Autowired
+    private CoinService coinService;
+
     @Value("${GEMINI_API_KEY}")
     private String apiKey;
 
+    private final HttpClient client = HttpClient.newHttpClient();
+
     @PostMapping
     public ResponseEntity<String> getResponse(@RequestBody Map<String, String> payload) {
-        String prompt = payload.get("prompt");
+        String prompt = payload.get("prompt").toLowerCase();
 
-        String response = callGeminiAPI(prompt);
-        return ResponseEntity.ok(response);
+        // Check if the prompt contains keywords related to coin details (price, market cap, volume)
+        if (prompt.contains("price") || prompt.contains("market cap") || prompt.contains("volume")) {
+            String coinName = extractCoinName(prompt);
+            if (coinName != null) {
+                try {
+                    // Fetch coin data as JSON string
+                    String coinDataJson = coinService.getCoinDetails(coinName);
+
+                    // Parse the JSON to extract relevant details
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode coinData = objectMapper.readTree(coinDataJson);
+
+                    String name = coinData.get("name").asText();
+                    String symbol = coinData.get("symbol").asText().toUpperCase();
+
+                    // Assuming the data you want is under "market_data"
+                    JsonNode marketData = coinData.get("market_data");
+
+                    // Check if market data is present and extract price, market cap, and volume
+                    double price = marketData != null ? marketData.get("current_price").get("inr").asDouble() : 0.0;
+                    double marketCap = marketData != null ? marketData.get("market_cap").get("inr").asDouble() : 0.0;
+                    double volume = marketData != null ? marketData.get("total_volume").get("inr").asDouble() : 0.0;
+
+                    // Build the response message
+                    String response = String.format(
+                            "🪙 %s (%s) is currently priced at ₹ %,.2f.\n" +
+                                    "📊 Market Cap: ₹ %,.2f\n" +
+                                    "🔁 24h Volume: ₹ %,.2f",
+                            name, symbol, price, marketCap, volume
+                    );
+
+                    return ResponseEntity.ok(response);
+
+                } catch (Exception e) {
+                    return ResponseEntity.ok("⚠️ Failed to get coin data: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.ok("❗ Please specify a valid coin name like Bitcoin, Ethereum, etc.");
+            }
+        } else {
+            // If the query is not related to coin details, call Gemini API
+            String response = callGeminiAPI(prompt);
+            return ResponseEntity.ok(response);
+        }
+    }
+
+
+    private String extractCoinName(String prompt) {
+        String[] knownCoins = {"bitcoin", "ethereum", "dogecoin", "cardano", "solana", "bnb"};
+        for (String coin : knownCoins) {
+            if (prompt.contains(coin)) return coin;
+        }
+        return null;
     }
 
     private String callGeminiAPI(String prompt) {
         try {
-            HttpClient client = HttpClient.newHttpClient();
-
             String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey;
 
             String body = """
-                {
-                  "contents": [{
-                    "parts": [{"text": "%s"}]
-                  }]
-                }
-            """.formatted(prompt);
+            {
+              "contents": [{
+                "parts": [{"text": "%s"}]
+              }]
+            }
+        """.formatted(prompt);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(endpoint))
@@ -47,24 +105,30 @@ public class ChatbotController {
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            String responseBody = response.body();
 
-            JSONObject obj = new JSONObject(response.body());
+            // Log the entire response for debugging purposes
+            System.out.println("Gemini API Response: " + responseBody);
 
-            if (!obj.has("candidates")) {
-                return "Gemini API Error: " + obj.optJSONObject("error").optString("message", "Unknown error");
+            // Parse the response JSON
+            JSONObject obj = new JSONObject(responseBody);
+
+            // Check if "candidates" field exists in the response
+            if (obj.has("candidates")) {
+                return obj
+                        .getJSONArray("candidates")
+                        .getJSONObject(0)
+                        .getJSONObject("content")
+                        .getJSONArray("parts")
+                        .getJSONObject(0)
+                        .getString("text");
+            } else {
+                // Handle the case when "candidates" is not found
+                return "⚠️ Sorry, no content found in Gemini response.";
             }
 
-            return obj
-                    .getJSONArray("candidates")
-                    .getJSONObject(0)
-                    .getJSONObject("content")
-                    .getJSONArray("parts")
-                    .getJSONObject(0)
-                    .getString("text");
-
         } catch (Exception e) {
-            e.printStackTrace();
-            return "Sorry, something went wrong.";
+            return "⚠️ Sorry, something went wrong with Gemini: " + e.getMessage();
         }
     }
 }

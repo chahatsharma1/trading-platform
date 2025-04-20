@@ -6,7 +6,7 @@ import { getAllOrdersForUser } from "@/page/State/Order/Action.js";
 
 const Activity = () => {
     const dispatch = useDispatch();
-    const { order } = useSelector(store => store);
+    const {orders} = useSelector(store => store.order);
 
     useEffect(() => {
         dispatch(getAllOrdersForUser({ jwt: localStorage.getItem("jwt") }))
@@ -43,7 +43,7 @@ const Activity = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {order.order.map((item, index) => {
+                    {orders?.map((item, index) => {
                         const { date, time } = formatDate(item.timeStamp);
                         const buyPrice = item.orderItem?.buyPrice || 0;
                         const sellPrice = item.orderItem?.sellPrice || 0;

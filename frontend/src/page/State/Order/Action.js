@@ -10,7 +10,6 @@ export const payOrder = ({orderData, jwt, amount}) => async (dispatch) => {
             }
         );
         dispatch({ type: PAY_ORDER_SUCCESS, payload: response.data, amount});
-        console.log(response.data)
     } catch (error) {
         dispatch({
             type: PAY_ORDER_FAILURE,
@@ -28,7 +27,6 @@ export const getOrderById = (orderId, jwt) => async (dispatch) => {
             },
         });
         dispatch({ type: GET_ORDER_SUCCESS, payload: response.data });
-        console.log(response.data)
     } catch (error) {
         dispatch({
             type: GET_ORDER_FAILURE,
@@ -49,7 +47,6 @@ export const getAllOrdersForUser = ({jwt, orderType, assetsSymbol}) => async (di
             }
         });
         dispatch({ type: GET_ALL_ORDERS_SUCCESS, payload: response.data });
-        console.log(response.data)
     } catch (error) {
         dispatch({
             type: GET_ALL_ORDERS_FAILURE,

@@ -1,123 +1,160 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from "@/components/ui/button.jsx";
-import AssetTable from "@/page/Home/AssetTable.jsx";
+import { useEffect, useState } from "react";
 import StockChart from "@/page/Home/StockChart.jsx";
-import { Avatar, AvatarImage } from "@/components/ui/avatar.jsx";
-import { DotIcon } from "lucide-react";
-import { getCoinList, getTop50Coins } from "@/page/State/Coin/Action.js";
+import AssetTable from "@/page/Home/AssetTable.jsx";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination.jsx";
-import Chatbot from '@/page/Home/Chatbot.jsx';
+import { getCoinList, getTop50Coins } from "@/page/State/Coin/Action.js";
+import { Button } from "@/components/ui/button";
+import Chatbot from "@/page/Home/Chatbot.jsx";
 
 const Home = () => {
     const dispatch = useDispatch();
-    const { coin } = useSelector(store => store);
+    const { coinList, top50 } = useSelector((store) => store.coin);
     const [activeCategory, setActiveCategory] = useState("all");
+    const [selectedCoinId, setSelectedCoinId] = useState("bitcoin"); // Default to bitcoin or any other coin ID
+    const [currentPage, setCurrentPage] = useState(1); // For pagination
 
     useEffect(() => {
-        if (activeCategory === "top50") {
-            dispatch(getTop50Coins());
-        } else {
-            dispatch(getCoinList(1));
-        }
-    }, [activeCategory, dispatch]);
+        dispatch(getCoinList(currentPage)); // Pass currentPage to get the coins of that page
+        dispatch(getTop50Coins());
+    }, [dispatch, currentPage]);
 
-    const categoryList = [
-        { label: "All", value: "all" },
-        { label: "Top 50", value: "top50" }
-    ];
+    const coinToDisplay = activeCategory === "all" ? coinList : top50;
 
-    const handlePageChange = (page) => {
-        if (activeCategory === 'all') {
-            if (page > 0) {
-                dispatch(getCoinList(page));
-            }
-        }
-    }
+    // Get the coin details for the selected coin
+    const coinDetails = coinToDisplay.find((coin) => coin.id === selectedCoinId) || {
+        id: "bitcoin", // Default to Bitcoin in case no coin is selected
+        name: "Bitcoin",
+        image: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png",
+        symbol: "btc",
+        current_price: 2950000,
+        market_cap: "58T",
+        total_volume: "12T",
+        price_change_24h: 25000,
+    };
+
+    const handleRowClick = (coinId) => {
+        setSelectedCoinId(coinId); // Set the selected coin ID when a row is clicked
+    };
+
+    const handleActiveCategory = (category) => {
+        setActiveCategory(category);
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage(currentPage + 1);
+    };
 
     return (
-        <div className="relative bg-[#0F172A] h-screen text-[#F1F5F9] flex flex-col overflow-hidden">
-            <div className="flex flex-wrap lg:flex-nowrap flex-grow min-h-0">
-                <div className="w-full lg:w-[50%] p-3 flex flex-col overflow-hidden">
-                    <div className="p-3 flex items-center gap-4 flex-wrap flex-shrink-0">
-                        {categoryList.map((item) => (
-                            <Button
-                                key={item.value}
-                                onClick={() => setActiveCategory(item.value)}
-                                className={`rounded-full px-4 py-2 border transition-colors duration-200 text-sm
-                                    ${activeCategory === item.value
+        <div className="bg-[#0F172A] min-h-screen p-4 text-[#F1F5F9]">
+            <div className="flex flex-col xl:flex-row gap-4 h-[calc(90vh-2rem)]">
+                {/* LEFT SECTION */}
+                <div className="w-full xl:w-[55%] flex flex-col overflow-hidden">
+                    <div className="mb-4 text-[#F1F5F9] flex items-center gap-4 shrink-0">
+                        <Button
+                            onClick={() => handleActiveCategory("all")}
+                            className={`text-sm rounded-xl px-4 py-2 border transition-colors duration-200 ${
+                                activeCategory === "all"
                                     ? "bg-[#3B82F6] text-white border-transparent cursor-default hover:bg-[#3B82F6]"
-                                    : "bg-[#1E293B] text-[#94A3B8] border-[#334155] hover:bg-[#334155] hover:text-white"}`}>
-                                {item.label}
-                            </Button>
-                        ))}
+                                    : "bg-transparent text-[#F1F5F9] border-[#334155] hover:bg-[#334155] hover:text-white"
+                            }`}
+                        >
+                            All Coins
+                        </Button>
+                        <Button
+                            onClick={() => handleActiveCategory("top50")}
+                            className={`text-sm rounded-xl px-4 py-2 border transition-colors duration-200 ${
+                                activeCategory === "top50"
+                                    ? "bg-[#3B82F6] text-white border-transparent cursor-default hover:bg-[#3B82F6]"
+                                    : "bg-transparent text-[#F1F5F9] border-[#334155] hover:bg-[#334155] hover:text-white"
+                            }`}
+                        >
+                            Top 50
+                        </Button>
+
+                        {/* Pagination Controls (Only Visible when 'Top 50' is not selected) */}
+                        {activeCategory !== "top50" && (
+                            <div className="ml-auto flex items-center space-x-4">
+                                <Button
+                                    onClick={handlePrevPage}
+                                    disabled={currentPage === 1}
+                                    className="text-sm rounded-xl px-4 py-2 border transition-colors duration-200 bg-[#334155] text-white hover:bg-[#475569]"
+                                >
+                                    Previous
+                                </Button>
+                                <span className="text-sm text-[#F1F5F9]">Page {currentPage}</span>
+                                <Button
+                                    onClick={handleNextPage}
+                                    className="text-sm rounded-xl px-4 py-2 border transition-colors duration-200 bg-[#334155] text-white hover:bg-[#475569]"
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="flex-grow overflow-y-auto min-h-0 relative">
-                        <div className="pb-16">
-                            <AssetTable
-                                coin={activeCategory === "all" ? coin.coinList : activeCategory === "top50" ? coin.top50 : []}
-                                category={activeCategory}/>
-                        </div>
-
-                        <div className="sticky bottom-0 bg-[#0F172A] p-3 z-10">
-                            <Pagination>
-                                <PaginationContent>
-                                    <PaginationItem>
-                                        <PaginationPrevious href="#" onClick={() => handlePageChange(1)} />
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink href="#" isActive onClick={() => handlePageChange(1)}>1</PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink href="#" onClick={() => handlePageChange(2)}>2</PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationEllipsis />
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationNext href="#" onClick={() => handlePageChange(3)} />
-                                    </PaginationItem>
-                                </PaginationContent>
-                            </Pagination>
-                        </div>
+                    <div className="overflow-y-auto flex-grow">
+                        <AssetTable
+                            coin={coinToDisplay}
+                            category={activeCategory}
+                            onRowClick={(coin) => handleRowClick(coin.id)}
+                        />
                     </div>
                 </div>
-                <div className="w-full lg:w-[50%] p-3 flex flex-col overflow-hidden">
-                    <div className="h-[74%]">
-                        <StockChart coinId={"bitcoin"} />
-                    </div>
-                    <div className="flex-shrink-0 mt-5 p-4 bg-[#1E293B] rounded-lg flex gap-5 items-center">
-                        <Avatar>
-                            <AvatarImage src="https://coin-images.coingecko.com/coins/images/1/standard/bitcoin.png?1696501400" />
-                        </Avatar>
-                        <div>
-                            <div className="flex items-center gap-2 text-[#F1F5F9]">
-                                <p className="font-semibold">BTC</p>
-                                <DotIcon className="text-[#38BDF8]" />
-                                <p>Bitcoin</p>
+
+                {/* RIGHT SECTION */}
+                <div className="w-full xl:w-[45%] flex flex-col gap-4 overflow-y-auto">
+                    <StockChart coinId={coinDetails.id} />
+                    <Card className="bg-[#1E293B] text-[#F1F5F9] p-4 rounded-2xl shadow-none border border-transparent">
+                        <CardContent className="flex items-center justify-between gap-4 p-0">
+                            {/* Coin Image + Name */}
+                            <div className="flex items-center gap-3">
+                                <Avatar>
+                                    <AvatarImage className="w-12 h-12" src={coinDetails.image} />
+                                </Avatar>
+                                <div>
+                                    <h2 className="text-lg font-semibold">{coinDetails.name}</h2>
+                                    <p className="uppercase text-xs text-gray-400">{coinDetails.symbol}</p>
+                                </div>
                             </div>
-                            <div className="flex items-end gap-2 mt-1">
-                                <p className="text-xl font-bold">₹7,355,264</p>
-                                <p className="text-green-500 text-sm">
-                                    <span>+70,606</span>
-                                    <span> (0.96%) </span>
-                                </p>
+
+                            {/* Coin Stats Grid */}
+                            <div className="grid grid-cols-4 gap-x-6 text-sm flex-grow justify-end">
+                                <div>
+                                    <p className="text-gray-400">Price</p>
+                                    <p>₹ {coinDetails.current_price.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-400">Market Cap</p>
+                                    <p>{coinDetails.market_cap}</p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-400">24h Change</p>
+                                    <p
+                                        className={
+                                            coinDetails.price_change_24h >= 0
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                        }
+                                    >
+                                        ₹ {coinDetails.price_change_24h.toFixed(2)}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
-            <Chatbot />
+            <div className="fixed bottom-4 right-4 z-10">
+                <Chatbot />
+            </div>
         </div>
     );
 };
+
 export default Home;

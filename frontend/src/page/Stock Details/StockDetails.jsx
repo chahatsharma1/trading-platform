@@ -43,7 +43,7 @@ const StockDetails = () => {
                             <p className="text-sm text-[#94A3B8]">{coin.coinDetails?.name}</p>
                         </div>
                         <p className="text-2xl font-bold text-[#F1F5F9]">
-                            ₹ {coin.coinDetails?.market_data.current_price.inr}
+                            ₹ {coin.coinDetails?.market_data.current_price.inr.toLocaleString()}
                         </p>
                         <p className={`text-sm ${coin.coinDetails?.market_data.price_change_24h_in_currency.inr >= 0
                             ? 'text-green-500'

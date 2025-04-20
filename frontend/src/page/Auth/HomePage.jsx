@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getTop50Coins } from "@/page/State/Coin/Action.js";
 
 const isTokenValid = (token) => {
     if (!token) return false;
@@ -10,12 +12,19 @@ const isTokenValid = (token) => {
         const expiry = decoded.exp * 1000;
         return Date.now() < expiry;
     } catch (e) {
+        console.log("Login Failed", e.get())
         return false;
     }
 };
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const {top50} = useSelector((state) => state.coin);
+
+    useEffect(() => {
+        dispatch(getTop50Coins());
+    }, [dispatch]);
 
     const handleLoginClick = () => {
         const token = localStorage.getItem("jwt");
@@ -26,9 +35,11 @@ const HomePage = () => {
         }
     };
 
+    const selectedCoins = top50?.slice(0, 3);
+
     return (
         <div className="min-h-screen bg-[#0F172A] text-[#F1F5F9] flex flex-col">
-            {/* Header / Hero Section */}
+
             <header className="px-6 py-10 text-center bg-[#1E293B] shadow-sm">
                 <h1 className="text-4xl font-extrabold mb-2 tracking-tight">
                     Welcome to <span className="text-slate-300">TradeX</span>
@@ -42,36 +53,39 @@ const HomePage = () => {
                     </Link>
                     <Button
                         onClick={handleLoginClick}
-                        className="bg-[#3B82F6] text-white hover:bg-[#2563EB]"
-                    >
+                        className="bg-[#3B82F6] text-white hover:bg-[#2563EB]">
                         Login
                     </Button>
                 </div>
             </header>
 
-            {/* Market Snapshot */}
             <section className="px-6 py-10 border-b border-[#334155] bg-[#0F172A]">
                 <h2 className="text-2xl font-semibold mb-6 text-center">Live Market Snapshot</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-                    <div className="border rounded-lg p-5 bg-[#1E293B] shadow-sm border-[#334155]">
-                        <h3 className="font-semibold text-slate-300">Bitcoin (BTC)</h3>
-                        <p className="text-xl font-bold">₹6,851,107</p>
-                        <p className="text-sm text-red-500">(↓ 0.95%)</p>
-                    </div>
-                    <div className="border rounded-lg p-5 bg-[#1E293B] shadow-sm border-[#334155]">
-                        <h3 className="font-semibold text-slate-300">Ethereum (ETH)</h3>
-                        <p className="text-xl font-bold">₹345,200</p>
-                        <p className="text-sm text-green-500">(↑ 1.12%)</p>
-                    </div>
-                    <div className="border rounded-lg p-5 bg-[#1E293B] shadow-sm border-[#334155]">
-                        <h3 className="font-semibold text-slate-300">Solana (SOL)</h3>
-                        <p className="text-xl font-bold">₹13,440</p>
-                        <p className="text-sm text-red-500">(↓ 0.45%)</p>
-                    </div>
+                    {selectedCoins?.map((coin) => (
+                        <div
+                            key={coin.id}
+                            className="border rounded-lg p-5 bg-[#1E293B] shadow-sm border-[#334155]">
+                            <h3 className="font-semibold text-slate-300">
+                                {coin.name} ({coin.symbol.toUpperCase()})
+                            </h3>
+                            <p className="text-xl font-bold">
+                                ₹ {coin.current_price.toLocaleString()}
+                            </p>
+                            <p
+                                className={`text-sm ${
+                                    coin.price_change_percentage_24h >= 0
+                                        ? "text-green-500"
+                                        : "text-red-500"
+                                }`}>
+                                ({coin.price_change_percentage_24h >= 0 ? "↑" : "↓"}{" "}
+                                {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%)
+                            </p>
+                        </div>
+                    ))}
                 </div>
             </section>
 
-            {/* Features Section */}
             <section className="px-6 py-14 bg-[#1E293B]">
                 <h2 className="text-2xl font-semibold mb-8 text-center">Why Choose TradeX?</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
@@ -90,7 +104,6 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* CTA Footer */}
             <footer className="mt-auto px-6 py-10 bg-[#0F172A] border-t border-[#334155] text-center">
                 <h3 className="text-xl font-medium mb-3">Ready to start trading with TradeX?</h3>
                 <Link to="/signup">
@@ -101,5 +114,4 @@ const HomePage = () => {
         </div>
     );
 };
-
 export default HomePage;

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button.jsx";
-import { Avatar, AvatarImage } from "@/components/ui/avatar.jsx";
 import { MessageCircle, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input.jsx";
 
@@ -106,10 +105,10 @@ const Chatbot = () => {
                             onKeyPress={handleKeyPress}/>
                         <Button
                             onClick={handleButtonClick}
-                            className="p-3 bg-[#38BDF8] text-white rounded-full hover:scale-105 transition-transform duration-300 flex-shrink-0"
+                            className="py-2 px-6 bg-[#3B82F6] text-white rounded-lg hover:bg-[#2563eb] transition-all duration-300 ease-in-out flex-shrink-0"
                             aria-label="Send message"
                             disabled={isLoading || !inputValue.trim()}>
-                            <span className="text-xl">↩️</span>
+                            Enter
                         </Button>
                     </div>
                 </div>

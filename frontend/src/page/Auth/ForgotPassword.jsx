@@ -11,14 +11,12 @@ const ForgotPassword = () => {
 
     const handleSendResetLink = () => {
         if (!email) return;
-        // Send OTP via API
         setShowOtpDialog(true);
     };
 
     const handleOtpVerify = () => {
         console.log("Verifying OTP:", otp);
         setShowOtpDialog(false);
-        // Redirect on success
     };
 
     return (
@@ -77,12 +75,10 @@ const ForgotPassword = () => {
                             maxLength={6}
                             value={otp}
                             onChange={(e) => setOtp(e.target.value)}
-                            className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500 tracking-widest text-center"
-                        />
+                            className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500 tracking-widest text-center"/>
                         <Button
                             className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]"
-                            onClick={handleOtpVerify}
-                        >
+                            onClick={handleOtpVerify}>
                             Verify OTP
                         </Button>
                     </div>
@@ -91,5 +87,4 @@ const ForgotPassword = () => {
         </div>
     );
 };
-
 export default ForgotPassword;

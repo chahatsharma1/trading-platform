@@ -71,7 +71,6 @@ public class ChatbotController {
                 return ResponseEntity.ok("❗ Please specify a valid coin name like Bitcoin, Ethereum, etc.");
             }
         } else {
-            // If the query is not related to coin details, call Gemini API
             String response = callGeminiAPI(prompt);
             return ResponseEntity.ok(response);
         }

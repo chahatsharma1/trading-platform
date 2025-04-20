@@ -95,7 +95,6 @@ export const getCoinDetails = (coinId, jwt) => async (dispatch) => {
     }
 };
 
-// 6. Search coin by keyword
 export const searchCoin = (coin, jwt) => async (dispatch) => {
     dispatch({ type: SEARCH_COIN_REQUEST });
     try {

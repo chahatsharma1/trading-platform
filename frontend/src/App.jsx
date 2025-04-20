@@ -21,14 +21,18 @@ import { useEffect } from "react";
 import { getUser } from "@/page/State/Auth/Action.js";
 
 function App() {
-    const { auth } = useSelector(store => store);
+    const {user, jwt} = useSelector(store => store.auth);
     const dispatch = useDispatch();
 
-    const isLoggedIn = Boolean(auth?.user);
+    const isLoggedIn = Boolean(user);
 
     useEffect(() => {
-        dispatch(getUser(auth.jwt || localStorage.getItem("jwt")));
-    }, [auth.jwt, dispatch]);
+        const token = jwt || localStorage.getItem("jwt");
+        if (token) {
+            dispatch(getUser(token));
+        }
+    }, [jwt, dispatch]);
+
 
     return (
         <>

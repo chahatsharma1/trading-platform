@@ -1,18 +1,8 @@
 import React, { useState } from "react";
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet.jsx";
+import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,} from "@/components/ui/sheet.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { Menu, SearchIcon } from "lucide-react";
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from "@/components/ui/avatar.jsx";
+import {Avatar, AvatarFallback, AvatarImage,} from "@/components/ui/avatar.jsx";
 import Sidebar from "@/page/Navbar/Sidebar.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,10 +13,10 @@ const Navbar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { auth } = useSelector((store) => store);
+    const { user } = useSelector((store) => store.auth);
     const [query, setQuery] = useState("");
 
-    if (location.pathname === "/") {
+    if (location.pathname === "/" || location.pathname === "/login" || location.pathname === "/signup" || location.pathname === "/forgot-password") {
         return null;
     }
 
@@ -97,7 +87,7 @@ const Navbar = () => {
             <div className="ml-auto">
                 <Avatar onClick={() => navigate("/profile")} className="cursor-pointer">
                     <AvatarFallback className="bg-gray-700 text-white">
-                        {auth?.user?.fullName[0].toUpperCase()}
+                        {user?.fullName[0].toUpperCase()}
                     </AvatarFallback>
                 </Avatar>
             </div>

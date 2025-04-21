@@ -6,11 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 const Portfolio = () => {
     const dispatch = useDispatch();
-    const { asset } = useSelector(store => store);
+    const {userAssets} = useSelector(store => store.asset);
 
     useEffect(() => {
         dispatch(getUserAssets({ jwt: localStorage.getItem("jwt") }));
-    }, []);
+    }, [dispatch]);
 
     return (
         <div className="p-5 lg:p-20 bg-[#0F172A] min-h-screen text-[#F1F5F9]">
@@ -19,15 +19,15 @@ const Portfolio = () => {
                 <Table className="w-full text-sm bg-[#1E293B]">
                     <TableHeader>
                         <TableRow className="pointer-events-none bg-[#1E293B] border-b border-[#334155]">
-                            <TableHead>Asset</TableHead>
-                            <TableHead>Symbol</TableHead>
-                            <TableHead>Buy Price</TableHead>
-                            <TableHead>Quantity</TableHead>
-                            <TableHead>Total Invested</TableHead>
+                            <TableHead className="text-[#F1F5F9]">Asset</TableHead>
+                            <TableHead className="text-[#F1F5F9]">Symbol</TableHead>
+                            <TableHead className="text-[#F1F5F9]">Buy Price</TableHead>
+                            <TableHead className="text-[#F1F5F9]">Quantity</TableHead>
+                            <TableHead className="text-[#F1F5F9]">Total Invested</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {asset.userAssets.map((item, index) => (
+                        {userAssets?.map((item, index) => (
                             <TableRow
                                 key={index}
                                 className="hover:bg-[#3B82F6]/10 border-b border-[#334155] transition-all duration-150">

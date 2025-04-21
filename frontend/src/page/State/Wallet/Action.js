@@ -10,9 +10,7 @@ export const getUserWallet = (jwt) => async (dispatch) => {
             },
         });
         dispatch({ type: GET_USER_WALLET_SUCCESS, payload: response.data });
-        console.log(response.data);
     } catch (error) {
-        console.log("error", error)
         dispatch({ type: GET_USER_WALLET_FAILURE, payload: error.response?.data?.message || error.message });
     }
 };
@@ -26,9 +24,7 @@ export const getWalletTransactions = ({jwt}) => async (dispatch) => {
             },
         });
         dispatch({ type: GET_WALLET_TRANSACTIONS_SUCCESS, payload: response.data });
-        console.log(response.data);
     } catch (error) {
-        console.log("error", error)
         dispatch({ type: GET_WALLET_TRANSACTIONS_FAILURE, payload: error.response?.data?.message || error.message });
     }
 };
@@ -46,9 +42,7 @@ export const depositMoney = ({jwt, orderId, navigate}) => async (dispatch) => {
         });
         dispatch({ type: DEPOSIT_MONEY_SUCCESS, payload: response.data });
         navigate("/wallet")
-        console.log(response.data);
     } catch (error) {
-        console.log("error", error)
         dispatch({ type: DEPOSIT_MONEY_FAILURE, payload: error.response?.data?.message || error.message });
     }
 };

@@ -3,13 +3,12 @@ import { Input } from "@/components/ui/input.jsx";
 import { Label } from "@/components/ui/label.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { DialogClose } from "@/components/ui/dialog.jsx";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {transferMoney} from "@/page/State/Wallet/Action.js";
 
 const TransferForm = () => {
 
     const dispatch=useDispatch();
-    const {wallet}= useSelector(store => store);
     const [formData, setFormData] = React.useState({
         amount: '',
         walletId: '',
@@ -22,15 +21,11 @@ const TransferForm = () => {
 
     const handleSubmit = () => {
         const { walletId, amount, purpose } = formData;
-
-        console.log(walletId, amount);
         dispatch(transferMoney({
             jwt: localStorage.getItem('jwt'),
             walletId,
             reqData: {amount, purpose}
         }));
-
-        console.log(formData);
     };
 
 
@@ -72,8 +67,7 @@ const TransferForm = () => {
             <DialogClose className="w-full">
                 <Button
                     onClick={handleSubmit}
-                    className="w-full mt-4 text-md font-semibold py-6 rounded-lg bg-[#3B82F6] text-white hover:bg-[#2563EB]"
-                >
+                    className="w-full mt-4 text-md font-semibold py-6 rounded-lg bg-[#3B82F6] text-white hover:bg-[#2563EB]">
                     Send
                 </Button>
             </DialogClose>

@@ -20,9 +20,15 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    private String dob;
+    private String nationality;
+    private String address;
+    private String city;
+    private String postcode;
+    private String country;
+
     @Embedded
     private TwoFactorAuth twoFactorAuth = new TwoFactorAuth();
 
     private USER_ROLE userRole = USER_ROLE.ROLE_CUSTOMER;
-
 }

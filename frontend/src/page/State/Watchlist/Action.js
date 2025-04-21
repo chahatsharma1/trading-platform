@@ -9,7 +9,6 @@ export const getUserWatchlist = (jwt) => async (dispatch) => {
                 Authorization: `Bearer ${jwt}`,}
         });
         dispatch({type: GET_USER_WATCHLIST_SUCCESS, payload: response.data});
-        console.log(response.data)
     } catch (error) {
         dispatch({
             type: GET_USER_WATCHLIST_FAILURE,
@@ -27,7 +26,6 @@ export const addCoinToWatchlist = (coinId, jwt) => async (dispatch) => {
             }
         });
         dispatch({type: ADD_COIN_TO_WATCHLIST_SUCCESS, payload: response.data});
-        console.log(response.data)
     } catch (error) {
         dispatch({
             type: ADD_COIN_TO_WATCHLIST_FAILURE,

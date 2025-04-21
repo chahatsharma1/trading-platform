@@ -5,6 +5,7 @@ import com.chahat.trading_platform.domain.VerificationType;
 import com.chahat.trading_platform.model.TwoFactorAuth;
 import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.repository.UserRepository;
+import com.chahat.trading_platform.request.UpdateUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,15 +39,6 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User findUserById(Long id) throws Exception {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isEmpty()){
-            throw new Exception("User Not Found");
-        }
-        return optionalUser.get();
-    }
-
-    @Override
     public User enableTwoFactorAuth(VerificationType verificationType, String sendTo, User user) {
         TwoFactorAuth twoFactorAuth = new TwoFactorAuth();
         twoFactorAuth.setEnabled(true);
@@ -60,6 +52,18 @@ public class UserServiceImpl implements UserService{
     @Override
     public User updatePassword(User user, String newPassword) {
         user.setPassword(newPassword);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User updateUser(UpdateUserRequest request, User user){
+        user.setDob(request.getDob());
+        user.setNationality(request.getNationality());
+        user.setAddress(request.getAddress());
+        user.setCity(request.getCity());
+        user.setPostcode(request.getPostcode());
+        user.setCountry(request.getCountry());
+
         return userRepository.save(user);
     }
 }

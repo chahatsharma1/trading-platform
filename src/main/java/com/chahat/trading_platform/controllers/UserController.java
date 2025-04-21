@@ -5,6 +5,7 @@ import com.chahat.trading_platform.model.ForgotPasswordToken;
 import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.model.VerificationCode;
 import com.chahat.trading_platform.request.ForgotPasswordRequest;
+import com.chahat.trading_platform.request.UpdateUserRequest;
 import com.chahat.trading_platform.request.VerifyOTPRequest;
 import com.chahat.trading_platform.response.ApiResponse;
 import com.chahat.trading_platform.response.AuthResponse;
@@ -116,5 +117,12 @@ public class UserController {
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         }
         throw new Exception("Wrong OTP");
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<User> updateUserProfile(@RequestBody UpdateUserRequest request, @RequestHeader("Authorization") String jwt) throws Exception {
+        User user = userService.findUserByJWT(jwt);
+        User updatedUser = userService.updateUser(request, user);
+        return ResponseEntity.ok(updatedUser);
     }
 }

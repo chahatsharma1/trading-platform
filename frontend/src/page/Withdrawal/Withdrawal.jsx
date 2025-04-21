@@ -5,11 +5,11 @@ import {getWithdrawalHistory} from "@/page/State/Withdrawal/Action.js";
 
 const Withdrawal = () => {
     const dispatch=useDispatch();
-    const {withdrawal}= useSelector(store => store);
+    const {history}= useSelector(store => store.withdrawal);
 
     useEffect(() => {
         dispatch(getWithdrawalHistory({jwt: localStorage.getItem("jwt")}))
-    },[]);
+    },[dispatch]);
     return (
         <div className="p-5 lg:p-20 min-h-screen bg-[#0F172A] text-[#F1F5F9]">
             <h1 className="font-bold text-3xl mb-6">Withdrawal</h1>
@@ -23,7 +23,7 @@ const Withdrawal = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {withdrawal.history.map((item, index) => (
+                    {history?.map((item, index) => (
                         <TableRow key={index} className="border-b border-[#334155] hover:bg-[#334155]">
                             <TableCell className="text-[#F1F5F9]">
                                 <p>{new Date(item.date).toLocaleString('en-IN', {

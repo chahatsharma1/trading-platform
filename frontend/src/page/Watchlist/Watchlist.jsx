@@ -10,7 +10,7 @@ import {useNavigate} from "react-router-dom";
 const Watchlist = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { watchlist } = useSelector(store => store);
+    const {items} = useSelector(store => store.watchlist);
 
     useEffect(() => {
         dispatch(getUserWatchlist(localStorage.getItem("jwt")));
@@ -38,8 +38,8 @@ const Watchlist = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {watchlist.items?.length > 0 ? (
-                            watchlist.items.map((item, index) => (
+                        {items?.length > 0 ? (
+                            items.map((item, index) => (
                                 <TableRow
                                     onClick={() => navigate(`/market/${item.id}`)}
                                     key={index}
@@ -56,10 +56,10 @@ const Watchlist = () => {
                                         <span>{item.name}</span>
                                     </TableCell>
                                     <TableCell className="text-[#F1F5F9]">{item.symbol?.toUpperCase()}</TableCell>
-                                    <TableCell className="text-[#F1F5F9]">{item.total_volume?.toLocaleString()}</TableCell>
-                                    <TableCell className="text-[#F1F5F9]">{item.market_cap?.toLocaleString()}</TableCell>
+                                    <TableCell className="text-[#F1F5F9]">{item?.total_volume}</TableCell>
+                                    <TableCell className="text-[#F1F5F9]">{item?.market_cap}</TableCell>
                                     <TableCell className={`text-sm ${item.price_change_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                        ₹ {item.price_change_24h?.toFixed(4)}
+                                        ₹ {item.price_change_24h?.toFixed(2)}
                                     </TableCell>
                                     <TableCell className="text-[#F1F5F9]">₹ {item.current_price?.toLocaleString()}</TableCell>
                                     <TableCell className="text-center">

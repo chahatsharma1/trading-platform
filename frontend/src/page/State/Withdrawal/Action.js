@@ -1,21 +1,4 @@
-import {
-    WITHDRAWAL_REQUEST,
-    WITHDRAWAL_SUCCESS,
-    WITHDRAWAL_FAILURE,
-    WITHDRAWAL_PROCEED_REQUEST,
-    WITHDRAWAL_PROCEED_SUCCESS,
-    WITHDRAWAL_PROCEED_FAILURE,
-    GET_WITHDRAWAL_HISTORY_REQUEST,
-    GET_WITHDRAWAL_HISTORY_SUCCESS,
-    GET_WITHDRAWAL_HISTORY_FAILURE,
-    ADD_PAYMENT_DETAILS_REQUEST,
-    ADD_PAYMENT_DETAILS_SUCCESS,
-    ADD_PAYMENT_DETAILS_FAILURE,
-    GET_PAYMENT_DETAILS_REQUEST,
-    GET_PAYMENT_DETAILS_SUCCESS,
-    GET_PAYMENT_DETAILS_FAILURE,
-    GET_WITHDRAWAL_REQUEST_REQUEST, GET_WITHDRAWAL_REQUEST_SUCCESS, GET_WITHDRAWAL_REQUEST_FAILURE
-} from './actionType';
+import {WITHDRAWAL_REQUEST, WITHDRAWAL_SUCCESS, WITHDRAWAL_FAILURE, WITHDRAWAL_PROCEED_REQUEST, WITHDRAWAL_PROCEED_SUCCESS, WITHDRAWAL_PROCEED_FAILURE, GET_WITHDRAWAL_HISTORY_REQUEST, GET_WITHDRAWAL_HISTORY_SUCCESS, GET_WITHDRAWAL_HISTORY_FAILURE, ADD_PAYMENT_DETAILS_REQUEST, ADD_PAYMENT_DETAILS_SUCCESS, ADD_PAYMENT_DETAILS_FAILURE, GET_PAYMENT_DETAILS_REQUEST, GET_PAYMENT_DETAILS_SUCCESS, GET_PAYMENT_DETAILS_FAILURE, GET_WITHDRAWAL_REQUEST_REQUEST, GET_WITHDRAWAL_REQUEST_SUCCESS, GET_WITHDRAWAL_REQUEST_FAILURE} from './actionType';
 import api from "@/config/api.js";
 
 export const withdrawRequest = ({amount, jwt}) => async (dispatch) => {
@@ -26,7 +9,6 @@ export const withdrawRequest = ({amount, jwt}) => async (dispatch) => {
                 Authorization: `Bearer ${jwt}`}
         });
         dispatch({ type: WITHDRAWAL_SUCCESS, payload: response.data });
-        console.log(response.data)
     } catch (error) {
         dispatch({ type: WITHDRAWAL_FAILURE, error: error.message });
     }
@@ -35,7 +17,7 @@ export const withdrawRequest = ({amount, jwt}) => async (dispatch) => {
 export const proceedWithdrawal = ({id, jwt, accept}) => async (dispatch) => {
     dispatch({ type: WITHDRAWAL_PROCEED_REQUEST });
     try {
-        const response = await api.patch(`/withdrawal/admin/${id}/proceed/${accept}`, null, {
+        const response = await api.patch(`/admin/proceed/${id}/${accept}`, null, {
             headers: {
                 Authorization: `Bearer ${jwt}`}
         });
@@ -52,7 +34,6 @@ export const getWithdrawalHistory = ({jwt}) => async (dispatch) => {
             headers: { Authorization: `Bearer ${jwt}` }
         });
         dispatch({ type: GET_WITHDRAWAL_HISTORY_SUCCESS, payload: response.data });
-        console.log(response.data);
     } catch (error) {
         dispatch({ type: GET_WITHDRAWAL_HISTORY_FAILURE, error: error.message });
     }
@@ -61,10 +42,11 @@ export const getWithdrawalHistory = ({jwt}) => async (dispatch) => {
 export const getAllWithdrawalRequest = ({jwt}) => async (dispatch) => {
     dispatch({ type: GET_WITHDRAWAL_REQUEST_REQUEST });
     try {
-        const response = await api.get('/withdrawal/admin', {
+        const response = await api.get('admin', {
             headers: { Authorization: `Bearer ${jwt}` }
         });
         dispatch({ type: GET_WITHDRAWAL_REQUEST_SUCCESS, payload: response.data });
+        console.log(response.data)
     } catch (error) {
         dispatch({ type: GET_WITHDRAWAL_REQUEST_FAILURE, error: error.message });
     }
@@ -89,7 +71,18 @@ export const getPaymentDetails = ({jwt}) => async (dispatch) => {
             headers: { Authorization: `Bearer ${jwt}` }
         });
         dispatch({ type: GET_PAYMENT_DETAILS_SUCCESS, payload: res.data });
-        console.log(res.data);
+    } catch (error) {
+        dispatch({ type: GET_PAYMENT_DETAILS_FAILURE, error: error.message });
+    }
+};
+
+export const deletePaymentDetails = ({jwt}) => async (dispatch) => {
+    dispatch({ type: GET_PAYMENT_DETAILS_REQUEST });
+    try {
+        const res = await api.delete('/payment/deleteDetails', {
+            headers: { Authorization: `Bearer ${jwt}` }
+        });
+        dispatch({ type: GET_PAYMENT_DETAILS_SUCCESS, payload: res.data });
     } catch (error) {
         dispatch({ type: GET_PAYMENT_DETAILS_FAILURE, error: error.message });
     }

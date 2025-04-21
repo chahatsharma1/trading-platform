@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DialogClose } from "@/components/ui/dialog.jsx";
-import {useDispatch} from "react-redux";
-import {addPaymentDetails} from "@/page/State/Withdrawal/Action.js";
+import { useDispatch } from "react-redux";
+import { addPaymentDetails } from "@/page/State/Withdrawal/Action.js";
 
-const PaymentDetailsForm = () => {
+const PaymentDetailsForm = ({ onSuccess }) => {
     const dispatch = useDispatch();
     const [form, setForm] = useState({
         accountHolderName: '',
@@ -19,10 +18,10 @@ const PaymentDetailsForm = () => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        dispatch(addPaymentDetails({paymentDetails: form, jwt: localStorage.getItem("jwt")}))
-        console.log("Submitted", form);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await dispatch(addPaymentDetails({ paymentDetails: form, jwt: localStorage.getItem("jwt") }));
+        if (onSuccess) onSuccess();  // Notify parent
     };
 
     return (
@@ -37,7 +36,6 @@ const PaymentDetailsForm = () => {
                     className="mt-1 bg-[#1E293B] border border-[#334155] text-[#F1F5F9] placeholder-[#94A3B8]"
                 />
             </div>
-
             <div>
                 <Label className="text-[#F1F5F9]">IFSC Code</Label>
                 <Input
@@ -48,19 +46,16 @@ const PaymentDetailsForm = () => {
                     className="mt-1 bg-[#1E293B] border border-[#334155] text-[#F1F5F9] placeholder-[#94A3B8]"
                 />
             </div>
-
             <div>
                 <Label className="text-[#F1F5F9]">Account Number</Label>
                 <Input
                     name="accountNo"
-                    type="password"
                     placeholder="Enter your account number"
                     value={form.accountNo}
                     onChange={handleChange}
                     className="mt-1 bg-[#1E293B] border border-[#334155] text-[#F1F5F9] placeholder-[#94A3B8]"
                 />
             </div>
-
             <div>
                 <Label className="text-[#F1F5F9]">Bank Name</Label>
                 <Input
@@ -71,13 +66,12 @@ const PaymentDetailsForm = () => {
                     className="mt-1 bg-[#1E293B] border border-[#334155] text-[#F1F5F9] placeholder-[#94A3B8]"
                 />
             </div>
-            <DialogClose className="w-full">
-                <Button
-                    type="submit"
-                    className="w-full bg-[#3B82F6] hover:bg-[#2563EB] text-white rounded-xl py-2 text-sm font-medium">
-                    Submit
-                </Button>
-            </DialogClose>
+            <Button
+                type="submit"
+                className="w-full bg-[#3B82F6] hover:bg-[#2563EB] text-white rounded-xl py-2 text-sm font-medium"
+            >
+                Submit
+            </Button>
         </form>
     );
 };

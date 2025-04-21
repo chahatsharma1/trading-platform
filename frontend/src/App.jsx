@@ -19,6 +19,7 @@ import ForgotPassword from "@/page/Auth/ForgotPassword.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getUser } from "@/page/State/Auth/Action.js";
+import AdminWithdrawal from "@/page/Admin/AdminWithdrawal.jsx";
 
 function App() {
     const {user, jwt} = useSelector(store => store.auth);
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/admin" element={<AdminWithdrawal />} />
 
                 {/* Protected Routes */}
                 {isLoggedIn && (

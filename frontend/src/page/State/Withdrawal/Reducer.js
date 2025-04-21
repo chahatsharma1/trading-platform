@@ -5,6 +5,7 @@ const initialState = {
     withdrawal: null,
     withdrawalProceedData: null,
     history: [],
+    requests: [],
     paymentDetails: null,
     error: null
 };

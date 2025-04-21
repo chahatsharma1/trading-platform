@@ -20,7 +20,6 @@ const TopupForm = () => {
     };
 
     const handleSubmit = () => {
-        console.log(amount, paymentMethod);
         dispatch(paymentHandler(localStorage.getItem("jwt"), amount, paymentMethod));
     };
 

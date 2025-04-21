@@ -38,19 +38,28 @@ const TopupForm = () => {
             <div>
                 <h1 className="pb-1">Select Payment Method</h1>
                 <RadioGroup onValueChange={handlePaymentMethodChange} className="flex gap-4" defaultValue="RAZORPAY">
-                    <Label htmlFor="razorpay" className="flex items-center space-x-4 border p-3 px-5 rounded-md cursor-pointer bg-[#0F172A] text-[#F1F5F9] border-[#334155] hover:bg-[#3B82F6]">
+                    <Label
+                        htmlFor="razorpay"
+                        className="flex items-center space-x-4 border p-3 px-5 rounded-md cursor-pointer bg-[#334155] text-[#F1F5F9] border-[#334155] hover:bg-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <RadioGroupItem value="RAZORPAY" id="razorpay" />
                         <div className="w-32 h-10 flex items-center justify-center bg-white rounded-md">
                             <img src="src/assets/razorpay.png" alt="Razorpay" className="h-full object-contain" />
                         </div>
                     </Label>
 
-                    <Label htmlFor="stripe" className="flex items-center space-x-4 border p-3 px-5 rounded-md cursor-pointer bg-[#0F172A] text-[#F1F5F9] border-[#334155] hover:bg-[#3B82F6]">
+                    <Label
+                        htmlFor="stripe"
+                        className="flex items-center space-x-4 border p-3 px-5 rounded-md cursor-pointer bg-[#334155] text-[#F1F5F9] border-[#334155] hover:bg-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <RadioGroupItem value="STRIPE" id="stripe" />
                         <div className="w-32 h-10 flex items-center justify-center bg-white rounded-md">
                             <img src="src/assets/stripe.png" alt="Stripe" className="h-full object-contain" />
                         </div>
                     </Label>
+
                 </RadioGroup>
             </div>
 

@@ -50,7 +50,6 @@ const WithdrawalForm = () => {
                 </div>
             </div>
 
-            {/* Removed the DialogClose component here */}
             <Button
                 onClick={handleSubmit}
                 className="w-full mt-4 text-md font-semibold py-6 rounded-lg bg-[#3B82F6] text-white hover:bg-[#2563EB]">

@@ -40,14 +40,12 @@ function App() {
             {isLoggedIn && <Navbar />}
 
             <Routes>
-                {/* Public Routes */}
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/admin" element={<AdminWithdrawal />} />
 
-                {/* Protected Routes */}
                 {isLoggedIn && (
                     <>
                         <Route path="/home" element={<Home />} />

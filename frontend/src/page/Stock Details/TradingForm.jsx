@@ -80,7 +80,6 @@ const TradingForm = () => {
                 )}
             </div>
 
-            {/* Coin Info */}
             <div className="flex items-center gap-3">
                 <img
                     src={coin.coinDetails?.image.large}
@@ -100,8 +99,6 @@ const TradingForm = () => {
                     </p>
                 </div>
             </div>
-
-            {/* Order Info */}
             <div className="flex justify-between text-sm">
                 <span className="text-[#94A3B8]">Order Type</span>
                 <span className="text-[#F1F5F9] font-medium">{isBuyMode ? "Buy" : "Sell"}</span>
@@ -122,7 +119,6 @@ const TradingForm = () => {
                 {isBuyMode ? "BUY" : "SELL"}
             </Button>
 
-            {/* Toggle Sell/Buy */}
             <p
                 onClick={toggleMode}
                 className="text-center text-sm text-sky-400 cursor-pointer hover:underline"

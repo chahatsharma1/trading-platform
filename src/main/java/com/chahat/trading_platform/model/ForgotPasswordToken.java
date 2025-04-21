@@ -10,7 +10,7 @@ public class ForgotPasswordToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private String Id;
+    private Long Id;
 
     @OneToOne
     private User user;

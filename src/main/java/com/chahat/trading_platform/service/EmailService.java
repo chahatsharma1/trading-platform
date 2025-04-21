@@ -2,6 +2,7 @@ package com.chahat.trading_platform.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
+    @Autowired
     private JavaMailSender javaMailSender;
 
     public void sendOtpMail(String email, String otp) throws MessagingException {
@@ -18,7 +20,7 @@ public class EmailService {
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, "utf-8");
 
         String subject = "Verify OTP";
-        String text = "Your Verification is" + otp + ".";
+        String text = "Your Verification is " + otp + ".";
 
         mimeMessageHelper.setSubject(subject);
         mimeMessageHelper.setText(text);

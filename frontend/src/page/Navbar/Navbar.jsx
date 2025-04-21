@@ -29,7 +29,7 @@ const Navbar = () => {
 
     return (
         <div className="px-2 py-3 z-50 bg-[#0F172A] text-[#F1F5F9] sticky top-0 left-0 right-0 flex items-center border-b border-gray-700 relative">
-            {/* LEFT - Menu & Logo */}
+
             <div className="flex items-center gap-3">
                 <Sheet>
                     <SheetTrigger asChild>
@@ -68,7 +68,6 @@ const Navbar = () => {
                 </p>
             </div>
 
-            {/* CENTER - Search bar */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
                 <div className="relative">
                     <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -83,7 +82,6 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* RIGHT - Avatar */}
             <div className="ml-auto">
                 <Avatar onClick={() => navigate("/profile")} className="cursor-pointer">
                     <AvatarFallback className="bg-gray-700 text-white">

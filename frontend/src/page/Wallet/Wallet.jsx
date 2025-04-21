@@ -67,7 +67,7 @@ const Wallet = () => {
                                 <div>
                                     <CardTitle className="text-2xl font-semibold">My Wallet</CardTitle>
                                     <div className="flex items-center gap-2 text-sm text-slate-400">
-                                        <span>#{userWallet?.id}</span>
+                                        <span>Wallet ID : {userWallet?.id}</span>
                                         <CopyIcon size={14} className="cursor-pointer hover:text-slate-300" />
                                     </div>
                                 </div>

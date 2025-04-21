@@ -6,15 +6,10 @@ import { getTop50Coins } from "@/page/State/Coin/Action.js";
 
 const isTokenValid = (token) => {
     if (!token) return false;
-    try {
-        const [, payload] = token.split(".");
-        const decoded = JSON.parse(atob(payload));
-        const expiry = decoded.exp * 1000;
-        return Date.now() < expiry;
-    } catch (e) {
-        console.log("Login Failed", e.get())
-        return false;
-    }
+    const [, payload] = token.split(".");
+    const decoded = JSON.parse(atob(payload));
+    const expiry = decoded.exp * 1000;
+    return Date.now() < expiry;
 };
 
 const HomePage = () => {

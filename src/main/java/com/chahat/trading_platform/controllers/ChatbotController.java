@@ -31,34 +31,29 @@ public class ChatbotController {
     public ResponseEntity<String> getResponse(@RequestBody Map<String, String> payload) {
         String prompt = payload.get("prompt").toLowerCase();
 
-        // Check if the prompt contains keywords related to coin details (price, market cap, volume)
         if (prompt.contains("price") || prompt.contains("market cap") || prompt.contains("volume")) {
             String coinName = extractCoinName(prompt);
             if (coinName != null) {
                 try {
-                    // Fetch coin data as JSON string
                     String coinDataJson = coinService.getCoinDetails(coinName);
 
-                    // Parse the JSON to extract relevant details
                     ObjectMapper objectMapper = new ObjectMapper();
                     JsonNode coinData = objectMapper.readTree(coinDataJson);
 
                     String name = coinData.get("name").asText();
                     String symbol = coinData.get("symbol").asText().toUpperCase();
 
-                    // Assuming the data you want is under "market_data"
                     JsonNode marketData = coinData.get("market_data");
 
-                    // Check if market data is present and extract price, market cap, and volume
                     double price = marketData != null ? marketData.get("current_price").get("inr").asDouble() : 0.0;
                     double marketCap = marketData != null ? marketData.get("market_cap").get("inr").asDouble() : 0.0;
                     double volume = marketData != null ? marketData.get("total_volume").get("inr").asDouble() : 0.0;
 
-                    // Build the response message
                     String response = String.format(
-                            "🪙 %s (%s) is currently priced at ₹ %,.2f.\n" +
-                                    "📊 Market Cap: ₹ %,.2f\n" +
-                                    "🔁 24h Volume: ₹ %,.2f",
+                            """
+                                    🪙 %s (%s) is currently priced at ₹ %,.2f.
+                                    📊 Market Cap: ₹ %,.2f
+                                    🔁 24h Volume: ₹ %,.2f""",
                             name, symbol, price, marketCap, volume
                     );
 
@@ -106,13 +101,8 @@ public class ChatbotController {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             String responseBody = response.body();
 
-            // Log the entire response for debugging purposes
-            System.out.println("Gemini API Response: " + responseBody);
 
-            // Parse the response JSON
             JSONObject obj = new JSONObject(responseBody);
-
-            // Check if "candidates" field exists in the response
             if (obj.has("candidates")) {
                 return obj
                         .getJSONArray("candidates")
@@ -122,7 +112,6 @@ public class ChatbotController {
                         .getJSONObject(0)
                         .getString("text");
             } else {
-                // Handle the case when "candidates" is not found
                 return "⚠️ Sorry, no content found in Gemini response.";
             }
 

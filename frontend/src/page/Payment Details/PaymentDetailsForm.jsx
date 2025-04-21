@@ -21,7 +21,7 @@ const PaymentDetailsForm = ({ onSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         await dispatch(addPaymentDetails({ paymentDetails: form, jwt: localStorage.getItem("jwt") }));
-        if (onSuccess) onSuccess();  // Notify parent
+        if (onSuccess) onSuccess();
     };
 
     return (

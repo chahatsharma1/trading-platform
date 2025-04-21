@@ -6,7 +6,6 @@ import com.chahat.trading_platform.repository.TwoFactorOTPRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class TwoFactorOTPServiceImpl implements TwoFactorOTPService {
@@ -16,12 +15,8 @@ public class TwoFactorOTPServiceImpl implements TwoFactorOTPService {
 
     @Override
     public TwoFactorOTP createTwoFactorOTP(User user, String otp, String jwt) {
-        UUID uuid = UUID.randomUUID();
-
-        String id = uuid.toString();
 
         TwoFactorOTP twoFactorOTP = new TwoFactorOTP();
-        twoFactorOTP.setId(id);
         twoFactorOTP.setOTP(otp);
         twoFactorOTP.setUser(user);
         twoFactorOTP.setJwt(jwt);

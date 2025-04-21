@@ -30,7 +30,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order createOrder(User user, OrderItem orderItem, OrderType orderType) {
         double price = orderItem.getCoin().getCurrentPrice() * orderItem.getQuantity();
-        System.out.println(price);
 
         Order order = new Order();
         order.setUser(user);

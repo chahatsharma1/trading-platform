@@ -9,8 +9,6 @@ import com.chahat.trading_platform.request.UpdateUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class UserServiceImpl implements UserService{
 
@@ -50,9 +48,17 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User updatePassword(User user, String newPassword) {
+    public void disableTwoFactorAuth(User user) {
+        TwoFactorAuth twoFactorAuth = new TwoFactorAuth();
+        twoFactorAuth.setEnabled(false);
+        user.setTwoFactorAuth(twoFactorAuth);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updatePassword(User user, String newPassword) {
         user.setPassword(newPassword);
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override

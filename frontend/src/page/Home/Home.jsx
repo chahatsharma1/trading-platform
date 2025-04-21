@@ -12,19 +12,18 @@ const Home = () => {
     const dispatch = useDispatch();
     const { coinList, top50 } = useSelector((store) => store.coin);
     const [activeCategory, setActiveCategory] = useState("all");
-    const [selectedCoinId, setSelectedCoinId] = useState("bitcoin"); // Default to bitcoin or any other coin ID
-    const [currentPage, setCurrentPage] = useState(1); // For pagination
+    const [selectedCoinId, setSelectedCoinId] = useState("bitcoin");
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
-        dispatch(getCoinList(currentPage)); // Pass currentPage to get the coins of that page
+        dispatch(getCoinList(currentPage));
         dispatch(getTop50Coins());
     }, [dispatch, currentPage]);
 
     const coinToDisplay = activeCategory === "all" ? coinList : top50;
 
-    // Get the coin details for the selected coin
     const coinDetails = coinToDisplay.find((coin) => coin.id === selectedCoinId) || {
-        id: "bitcoin", // Default to Bitcoin in case no coin is selected
+        id: "bitcoin",
         name: "Bitcoin",
         image: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png",
         symbol: "btc",
@@ -35,7 +34,7 @@ const Home = () => {
     };
 
     const handleRowClick = (coinId) => {
-        setSelectedCoinId(coinId); // Set the selected coin ID when a row is clicked
+        setSelectedCoinId(coinId);
     };
 
     const handleActiveCategory = (category) => {
@@ -53,7 +52,6 @@ const Home = () => {
     return (
         <div className="bg-[#0F172A] min-h-screen p-4 text-[#F1F5F9]">
             <div className="flex flex-col xl:flex-row gap-4 h-[calc(90vh-2rem)]">
-                {/* LEFT SECTION */}
                 <div className="w-full xl:w-[55%] flex flex-col overflow-hidden">
                     <div className="mb-4 text-[#F1F5F9] flex items-center gap-4 shrink-0">
                         <Button
@@ -77,7 +75,6 @@ const Home = () => {
                             Top 50
                         </Button>
 
-                        {/* Pagination Controls (Only Visible when 'Top 50' is not selected) */}
                         {activeCategory !== "top50" && (
                             <div className="ml-auto flex items-center space-x-4">
                                 <Button
@@ -107,12 +104,11 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* RIGHT SECTION */}
                 <div className="w-full xl:w-[45%] flex flex-col gap-4 overflow-y-auto">
                     <StockChart coinId={coinDetails.id} />
                     <Card className="bg-[#1E293B] text-[#F1F5F9] p-4 rounded-2xl shadow-none border border-transparent">
                         <CardContent className="flex items-center justify-between gap-4 p-0">
-                            {/* Coin Image + Name */}
+
                             <div className="flex items-center gap-3">
                                 <Avatar>
                                     <AvatarImage className="w-12 h-12" src={coinDetails.image} />
@@ -123,7 +119,6 @@ const Home = () => {
                                 </div>
                             </div>
 
-                            {/* Coin Stats Grid */}
                             <div className="grid grid-cols-4 gap-x-6 text-sm flex-grow justify-end">
                                 <div>
                                     <p className="text-gray-400">Price</p>

@@ -67,7 +67,7 @@ public class Coin {
     private BigDecimal maxSupply;
 
     @JsonProperty("ath")
-    private BigDecimal ath; // All-time high
+    private BigDecimal ath;
 
     @JsonProperty("ath_change_percentage")
     private BigDecimal athChangePercentage;
@@ -76,16 +76,13 @@ public class Coin {
     private LocalDateTime athDate;
 
     @JsonProperty("atl")
-    private BigDecimal atl; // All-time low
+    private BigDecimal atl;
 
     @JsonProperty("atl_change_percentage")
     private BigDecimal atlChangePercentage;
 
     @JsonProperty("atl_date")
     private LocalDateTime atlDate;
-//
-//    @JsonProperty("roi")
-//    private Object roi; // Placeholder as the type is null in the data
 
     @JsonProperty("last_updated")
     private LocalDateTime lastUpdated;

@@ -32,8 +32,8 @@ const PaymentDetails = () => {
     };
 
     const handleSuccess = () => {
-        setOpen(false); // Close dialog
-        fetchPaymentDetails(); // Refetch data
+        setOpen(false);
+        fetchPaymentDetails();
     };
 
     return (

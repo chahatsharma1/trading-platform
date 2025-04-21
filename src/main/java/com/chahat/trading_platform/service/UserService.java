@@ -9,6 +9,7 @@ public interface UserService {
     User findUserByJWT(String jwt) throws Exception;
     User findUserByEmail(String email) throws Exception;
     User enableTwoFactorAuth(VerificationType verificationType, String sendTo, User user);
-    User updatePassword(User user, String newPassword);
+    void disableTwoFactorAuth(User user);
+    void updatePassword(User user, String newPassword);
     User updateUser(UpdateUserRequest request, User user);
 }

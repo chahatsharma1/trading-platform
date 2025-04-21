@@ -19,7 +19,7 @@ const AdminWithdrawal = () => {
     const handleProceedWithdrawal = (id, accept) => {
         dispatch(proceedWithdrawal({ id, jwt: localStorage.getItem("jwt"), accept }))
             .then(() => {
-                fetchWithdrawals(); // Refresh list after response
+                fetchWithdrawals();
             });
     };
 

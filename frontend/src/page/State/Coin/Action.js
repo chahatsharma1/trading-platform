@@ -31,20 +31,16 @@ export const getCoinList = (page) => async (dispatch) => {
     }
 };
 
-// 2. Fetch top 50 coins
 export const getTop50Coins = () => async (dispatch) => {
     dispatch({ type: FETCH_TOP_50_COINS_REQUEST });
     try {
         const response = await axios.get(`${API_BASE_URL}/coins/top50`);
         dispatch({ type: FETCH_TOP_50_COINS_SUCCESS, payload:response.data});
-        console.log("top 50", response.data)
     } catch (error) {
-        console.log("error", error)
         dispatch({ type: FETCH_TOP_50_COINS_FAILURE, payload: error.message });
     }
 };
 
-// 3. Fetch market chart by coin ID and duration
 export const getMarketChart = (coinId, days, jwt) => async (dispatch) => {
     dispatch({ type: FETCH_MARKET_CHART_REQUEST });
     try {
@@ -59,26 +55,21 @@ export const getMarketChart = (coinId, days, jwt) => async (dispatch) => {
         }));
 
         dispatch({ type: FETCH_MARKET_CHART_SUCCESS, payload: formatted });
-        console.log("data", response.data);
     } catch (error) {
-        console.log("error", error)
         dispatch({ type: FETCH_MARKET_CHART_FAILURE, payload: error.message });
     }
 };
 
-// 4. Fetch coin by ID
 export const getCoinById = (coinId) => async (dispatch) => {
     dispatch({ type: FETCH_COIN_BY_ID_REQUEST });
     try {
         const response = await axios.get(`${API_BASE_URL}/coins/${coinId}`);
         dispatch({ type: FETCH_COIN_BY_ID_SUCCESS, payload: response.data });
     } catch (error) {
-        console.log("error", error)
         dispatch({ type: FETCH_COIN_BY_ID_FAILURE, payload: error.message });
     }
 };
 
-// 5. Fetch coin details (can be same as getCoinById or a more detailed endpoint)
 export const getCoinDetails = (coinId, jwt) => async (dispatch) => {
     dispatch({ type: FETCH_COIN_DETAILS_REQUEST });
     try {
@@ -88,9 +79,7 @@ export const getCoinDetails = (coinId, jwt) => async (dispatch) => {
             }
         });
         dispatch({ type: FETCH_COIN_DETAILS_SUCCESS, payload: response.data });
-        console.log("coin details", response.data)
     } catch (error) {
-        console.log("error", error)
         dispatch({ type: FETCH_COIN_DETAILS_FAILURE, payload: error.message });
     }
 };
@@ -104,9 +93,7 @@ export const searchCoin = (coin, jwt) => async (dispatch) => {
             }
         });
         dispatch({ type: SEARCH_COIN_SUCCESS, payload: response.data.coins });
-        console.log("search coin", response.data.coins)
     } catch (error) {
-        console.log("error", error)
         dispatch({ type: SEARCH_COIN_FAILURE, payload: error.message });
     }
 };

@@ -74,6 +74,14 @@ public class UserController {
         return new ResponseEntity<>("OTP Successfully Sent", HttpStatus.OK);
     }
 
+    @PostMapping("/disable-two-factor")
+    public ResponseEntity<String> disableTwoFactorAuth(@RequestHeader("Authorization") String jwt) throws Exception {
+        User user = userService.findUserByJWT(jwt);
+        userService.disableTwoFactorAuth(user);
+        return new ResponseEntity<>("Two Factor Disabled", HttpStatus.OK);
+    }
+
+
     @PostMapping("/forgot-password/send-otp")
     public ResponseEntity<AuthResponse> sendForgotPasswordOTP(@RequestBody ForgotPasswordRequest req) throws Exception {
         User user = userService.findUserByEmail(req.getSendTo());

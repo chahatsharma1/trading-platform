@@ -8,5 +8,5 @@ public class AuthResponse {
     private boolean status;
     private String message;
     private boolean isTwoFactorAuthEnable;
-    private String session;
+    private Long session;
 }

@@ -24,7 +24,6 @@ const Signup = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         dispatch(register(formData));
-        console.log(formData); // Optional: for debugging
     };
 
     return (

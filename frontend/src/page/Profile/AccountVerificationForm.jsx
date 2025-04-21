@@ -1,19 +1,30 @@
-import React, { useState, useRef } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { Button } from "@/components/ui/button.jsx";
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog.jsx";
+import { Input } from "@/components/ui/input.jsx";
+import { sendVerificationOtp, verifyOtp } from "@/page/State/Auth/Action.js";
 
-const AccountVerificationForm = ({ closeParentDialog }) => {
-    const [email, setEmail] = useState("chahats@gmail.com");
+const AccountVerificationForm = ({ closeParentDialog, userEmail}) => {
     const [otpDialogOpen, setOtpDialogOpen] = useState(false);
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const inputRefs = useRef([]);
+    const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    const handleSendOtp = () => {
-        setOtpDialogOpen(true);
-        setTimeout(() => {
-            inputRefs.current[0]?.focus();
-        }, 100);
+    const handleSendOtp = async () => {
+        setLoading(true);
+        setError("");
+        try {
+            await dispatch(sendVerificationOtp(localStorage.getItem("jwt"), "EMAIL"));
+            setOtpDialogOpen(true);
+            setTimeout(() => inputRefs.current[0]?.focus(), 100);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleChangeOtp = (index, value) => {
@@ -21,10 +32,7 @@ const AccountVerificationForm = ({ closeParentDialog }) => {
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
-
-        if (value && index < 5) {
-            inputRefs.current[index + 1]?.focus();
-        }
+        if (value && index < 5) inputRefs.current[index + 1]?.focus();
     };
 
     const handleKeyDown = (index, event) => {
@@ -33,12 +41,19 @@ const AccountVerificationForm = ({ closeParentDialog }) => {
         }
     };
 
-    const handleVerifyOtp = () => {
+    const handleVerifyOtp = async () => {
         const enteredOtp = otp.join("");
-        console.log("Verifying OTP:", enteredOtp);
-
-        setOtpDialogOpen(false);
-        closeParentDialog();
+        setLoading(true);
+        setError("");
+        try {
+            await dispatch(verifyOtp(localStorage.getItem("jwt"), enteredOtp));
+            setOtpDialogOpen(false);
+            closeParentDialog();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -46,8 +61,8 @@ const AccountVerificationForm = ({ closeParentDialog }) => {
             <div className="space-y-4 text-[#F1F5F9]">
                 <div className="space-y-1">
                     <p className="text-sm text-[#94A3B8] font-medium">Sending OTP to</p>
-                    <div className="bg-[#1E293B] text-[#F1F5F9] px-3 py-2 rounded-md text-sm font-semibold border border-[#334155]">
-                        {email}
+                    <div className="bg-[#1E293B] text-[#F1F5F9] px-4 py-3 rounded-md text-sm font-semibold border border-[#334155] max-w-full break-words">
+                        {userEmail}
                     </div>
                 </div>
 
@@ -55,15 +70,18 @@ const AccountVerificationForm = ({ closeParentDialog }) => {
                     type="button"
                     onClick={handleSendOtp}
                     className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB] rounded-xl py-2 text-sm font-medium"
+                    disabled={loading}
                 >
-                    Send OTP
+                    {loading ? "Sending OTP..." : "Send OTP"}
                 </Button>
+                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
             </div>
 
             <Dialog open={otpDialogOpen} onOpenChange={setOtpDialogOpen}>
                 <DialogContent className="bg-[#0F172A] text-[#F1F5F9]">
                     <DialogHeader>
                         <DialogTitle className="text-[#F1F5F9]">Verify OTP</DialogTitle>
+                        <DialogDescription/>
                     </DialogHeader>
                     <div className="flex justify-center gap-2 mt-4">
                         {otp.map((digit, index) => (
@@ -81,9 +99,11 @@ const AccountVerificationForm = ({ closeParentDialog }) => {
                     <Button
                         onClick={handleVerifyOtp}
                         className="w-full mt-6 bg-[#3B82F6] text-white hover:bg-[#2563EB] rounded-xl py-2 text-sm font-medium"
+                        disabled={loading}
                     >
-                        Verify OTP
+                        {loading ? "Verifying OTP..." : "Verify OTP"}
                     </Button>
+                    {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                 </DialogContent>
             </Dialog>
         </>

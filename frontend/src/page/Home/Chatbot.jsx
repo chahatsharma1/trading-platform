@@ -26,10 +26,6 @@ const Chatbot = () => {
                     body: JSON.stringify({ prompt: userMessage }),
                 });
 
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-
                 const data = await res.text();
                 setMessages(prev => [...prev, { type: "bot", text: data }]);
             } catch (err) {
@@ -68,7 +64,7 @@ const Chatbot = () => {
                     </div>
 
                     <div ref={chatRef} className="h-[76%] flex flex-col overflow-y-auto gap-1 px-5 py-2 scroll-container">
-                        {messages.length === 0 && !isLoading && ( // Show prompts only if not loading and no messages
+                        {messages.length === 0 && !isLoading && (
                             <div className="text-sm text-gray-400 mt-2">
                                 💡 Try asking:
                                 <ul className="list-disc ml-4 mt-1">
@@ -80,8 +76,8 @@ const Chatbot = () => {
                         )}
 
                         {messages.map((msg, i) => (
-                            <div key={i} className={`${msg.type === "bot" ? "self-start" : "self-end"} pb-5 w-auto max-w-[90%]`}> {/* Added max-width */}
-                                <div className={`px-5 py-2 rounded-lg ${msg.type === "bot" ? "bg-[#3B82F6]" : "bg-[#1E293B] border border-gray-600"} text-white whitespace-pre-line break-words`}> {/* Added rounded-lg, break-words */}
+                            <div key={i} className={`${msg.type === "bot" ? "self-start" : "self-end"} pb-5 w-auto max-w-[90%]`}>
+                                <div className={`px-5 py-2 rounded-lg ${msg.type === "bot" ? "bg-[#3B82F6]" : "bg-[#1E293B] border border-gray-600"} text-white whitespace-pre-line break-words`}>
                                     <p>{msg.text}</p>
                                 </div>
                             </div>

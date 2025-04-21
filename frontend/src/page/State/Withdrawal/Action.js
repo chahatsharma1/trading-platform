@@ -46,7 +46,6 @@ export const getAllWithdrawalRequest = ({jwt}) => async (dispatch) => {
             headers: { Authorization: `Bearer ${jwt}` }
         });
         dispatch({ type: GET_WITHDRAWAL_REQUEST_SUCCESS, payload: response.data });
-        console.log(response.data)
     } catch (error) {
         dispatch({ type: GET_WITHDRAWAL_REQUEST_FAILURE, error: error.message });
     }

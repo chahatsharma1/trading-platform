@@ -12,44 +12,45 @@ import { addCoinToWatchlist } from "@/page/State/Watchlist/Action.js";
 import { existInWatchlist } from "@/utils/existInWatchlist.js";
 
 const StockDetails = () => {
-    const {coin, watchlist} = useSelector(store => store);
+    const {items} = useSelector(store => store.watchlist);
+    const {coinDetails} = useSelector(store => store.coin);
     const [dialogOpen, setDialogOpen] = useState(false);
     const dispatch = useDispatch();
     const { id } = useParams();
 
     useEffect(() => {
         dispatch(getCoinDetails(id, localStorage.getItem("jwt")));
-    }, [id]);
+    }, [id, dispatch]);
 
     const handleAddToWatchlist = () => {
-        dispatch(addCoinToWatchlist(coin?.coinDetails?.id, localStorage.getItem("jwt")));
+        dispatch(addCoinToWatchlist(coinDetails?.id, localStorage.getItem("jwt")));
     };
 
-    const isInWatchlist = existInWatchlist(watchlist.items, coin?.coinDetails);
+    const isInWatchlist = existInWatchlist(items, coinDetails);
 
     return (
         <div className="p-5 min-h-screen bg-[#0F172A] text-[#F1F5F9]">
             <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-4">
                     <Avatar>
-                        <AvatarImage src={coin.coinDetails?.image.large} />
+                        <AvatarImage src={coinDetails?.image.large} />
                     </Avatar>
                     <div>
                         <div className="flex items-center gap-2">
                             <p className="text-lg font-semibold text-[#F1F5F9]">
-                                {coin.coinDetails?.symbol.toUpperCase()}
+                                {coinDetails?.symbol.toUpperCase()}
                             </p>
                             <DotIcon className="text-[#94A3B8]" />
-                            <p className="text-sm text-[#94A3B8]">{coin.coinDetails?.name}</p>
+                            <p className="text-sm text-[#94A3B8]">{coinDetails?.name}</p>
                         </div>
                         <p className="text-2xl font-bold text-[#F1F5F9]">
-                            ₹ {coin.coinDetails?.market_data.current_price.inr.toLocaleString()}
+                            ₹ {coinDetails?.market_data.current_price.inr.toLocaleString()}
                         </p>
-                        <p className={`text-sm ${coin.coinDetails?.market_data.price_change_24h_in_currency.inr >= 0
+                        <p className={`text-sm ${coinDetails?.market_data.price_change_24h_in_currency.inr >= 0
                             ? 'text-green-500'
                             : 'text-red-500'}`}>
-                            ₹{coin.coinDetails?.market_data.price_change_24h_in_currency.inr.toFixed(2)}
-                            ({coin.coinDetails?.market_data.price_change_percentage_24h_in_currency.inr.toFixed(2)}%)
+                            ₹{coinDetails?.market_data.price_change_24h_in_currency.inr.toFixed(2)}
+                            ({coinDetails?.market_data.price_change_percentage_24h_in_currency.inr.toFixed(2)}%)
                         </p>
                     </div>
                 </div>
@@ -81,7 +82,7 @@ const StockDetails = () => {
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent className="bg-[#1E293B] border-none text-[#F1F5F9]">
                     <DialogHeader>
-                        <DialogTitle className="text-[#F1F5F9]">Trade {coin.coinDetails?.name}</DialogTitle>
+                        <DialogTitle className="text-[#F1F5F9]">Trade {coinDetails?.name}</DialogTitle>
                     </DialogHeader>
                     <div className="text-sm text-[#94A3B8]">
                         <TradingForm />

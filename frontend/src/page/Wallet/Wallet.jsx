@@ -85,8 +85,14 @@ const Wallet = () => {
                                 <div>
                                     <CardTitle className="text-2xl font-semibold">My Wallet</CardTitle>
                                     <div className="flex items-center gap-2 text-sm text-slate-400">
-                                        <span>Wallet ID : {userWallet?.id}</span>
-                                        <CopyIcon size={14} className="cursor-pointer hover:text-slate-300" />
+                                        {userWallet ? (
+                                            <>
+                                                <span>Wallet ID : {userWallet.id}</span>
+                                                <CopyIcon size={14} className="cursor-pointer hover:text-slate-300" />
+                                            </>
+                                        ) : (
+                                            <span className="text-yellow-400">No wallet found. Add money to create your wallet.</span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -95,7 +101,9 @@ const Wallet = () => {
                     </CardHeader>
 
                     <CardContent className="pt-6">
-                        <div className="text-3xl font-bold text-white">₹ {userWallet?.balance}</div>
+                        <div className="text-3xl font-bold text-white">
+                            {userWallet ? `₹ ${userWallet.balance}` : "No Wallet Yet"}
+                        </div>
                         <div className="flex gap-5 mt-8 flex-wrap">
                             {formDialogs.map(({ icon, label, form }, idx) => (
                                 <Dialog key={idx}>
@@ -128,26 +136,30 @@ const Wallet = () => {
                         <HistoryIcon onClick={handleFetchUserWalletTransaction} className="h-7 w-7 p-0 cursor-pointer hover:text-white text-slate-400" />
                     </div>
                     <div className="space-y-5">
-                        {[...transactions]?.reverse().map((item, i) => (
-                            <Card key={i} className="px-5 py-4 bg-[#1E293B] border border-[#334155] text-[#F1F5F9]">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-5">
-                                        <Avatar className="bg-[#334155]">
-                                            <AvatarFallback>
-                                                <ShuffleIcon className="text-[#0F172A]" size={18} strokeWidth={2.5} />
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div className="space-y-1 text-left">
-                                            <h1 className="font-bold text-lg">{formatTransactionType(item.walletTransactionType)}</h1>
-                                            <p className="text-sm text-slate-400">{item.localDate}</p>
+                        {transactions?.length === 0 ? (
+                            <p className="text-center text-slate-400">No transactions yet. Add money or start trading to see history here.</p>
+                        ) : (
+                            [...transactions].reverse().map((item, i) => (
+                                <Card key={i} className="px-5 py-4 bg-[#1E293B] border border-[#334155] text-[#F1F5F9]">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-5">
+                                            <Avatar className="bg-[#334155]">
+                                                <AvatarFallback>
+                                                    <ShuffleIcon className="text-[#0F172A]" size={18} strokeWidth={2.5} />
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="space-y-1 text-left">
+                                                <h1 className="font-bold text-lg">{formatTransactionType(item.walletTransactionType)}</h1>
+                                                <p className="text-sm text-slate-400">{item.localDate}</p>
+                                            </div>
                                         </div>
+                                        <p className={`font-semibold ${["WITHDRAWAL", "TRANSFER", "BUY_ASSET"].includes(item.walletTransactionType) ? "text-red-500" : "text-green-400"}`}>
+                                            {["WITHDRAWAL", "TRANSFER", "BUY_ASSET"].includes(item.walletTransactionType) ? "-₹" : "₹"} {item.amount}
+                                        </p>
                                     </div>
-                                    <p className={`font-semibold ${["WITHDRAWAL", "TRANSFER", "BUY_ASSET"].includes(item.walletTransactionType) ? "text-red-500" : "text-green-400"}`}>
-                                        {["WITHDRAWAL", "TRANSFER", "BUY_ASSET"].includes(item.walletTransactionType) ? "-₹" : "₹"} {item.amount}
-                                    </p>
-                                </div>
-                            </Card>
-                        ))}
+                                </Card>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

@@ -1,11 +1,14 @@
 # Use the official OpenJDK base image
-FROM openjdk:21-jdk-slim
+FROM openjdk:17-jdk-slim
 
 # Set the working directory in the container
 WORKDIR /app
 
 # Copy the local code to the container
 COPY . /app
+
+# Make the mvnw script executable
+RUN chmod +x ./mvnw
 
 # Run the build command (Maven)
 RUN ./mvnw clean package

@@ -12,8 +12,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -125,28 +123,24 @@ public class CoinServiceImpl implements CoinService{
 
     @Override
     public String getTop50CoinsByMarketCapRank() {
-        String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&order=market_cap_desc&per_page=50&page=1&sparkline=false";
+        String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&per_page=50";
 
         RestTemplate restTemplate = new RestTemplate();
 
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.set("User-Agent", "Mozilla/5.0"); // Add this line to bypass Cloudflare
-            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    + "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    + "Chrome/113.0.0.0 Safari/537.36");
+            headers.set("Accept", "application/json");
 
             HttpEntity<String> entity = new HttpEntity<>(headers);
-
             ResponseEntity<String> responseEntity = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    String.class
-            );
+                    url, HttpMethod.GET, entity, String.class);
 
             return responseEntity.getBody();
-
         } catch (RestClientException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Error fetching data from CoinGecko: " + e.getMessage());
         }
     }
 

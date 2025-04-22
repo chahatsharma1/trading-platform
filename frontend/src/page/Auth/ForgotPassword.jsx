@@ -17,24 +17,16 @@ const ForgotPassword = () => {
 
     const handleSendResetLink = async () => {
         if (!email) return;
-        try {
-            const session = await dispatch(sendForgotPasswordOTP(email));
-            setSessionId(session);
-            setShowOtpDialog(true);
-        } catch (err) {
-            console.error("Failed to send OTP:", err.message);
-        }
+        const session = await dispatch(sendForgotPasswordOTP(email));
+        setSessionId(session);
+        setShowOtpDialog(true);
     };
 
     const handleOtpVerify = async () => {
-        try {
-            await dispatch(verifyForgotPasswordOTP(sessionId, otp, newPassword));
-            setShowOtpDialog(false);
-            navigate("/login");
-        } catch (err) {
-            console.error("OTP verification failed:", err.message);
-        }
-    }
+        await dispatch(verifyForgotPasswordOTP(sessionId, otp, newPassword));
+        setShowOtpDialog(false);
+        navigate("/login");
+    };
 
     return (
         <div className="min-h-screen bg-[#0F172A] flex items-center justify-center px-4">

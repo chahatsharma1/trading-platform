@@ -56,6 +56,24 @@ const Wallet = () => {
         dispatch(getWalletTransactions({ jwt: localStorage.getItem("jwt") }));
     };
 
+    const formDialogs = [
+        {
+            icon: <UploadIcon size={24} className="text-white" />,
+            label: "Add Money",
+            form: <TopupForm />
+        },
+        {
+            icon: <UploadIcon size={24} className="text-white" />,
+            label: "Withdraw",
+            form: <WithdrawalForm />
+        },
+        {
+            icon: <ShuffleIcon size={24} className="text-white" />,
+            label: "Transfer",
+            form: <TransferForm />
+        }
+    ];
+
     return (
         <div className="min-h-screen py-10 px-4 flex justify-center bg-[#0F172A] text-[#F1F5F9]">
             <div className="w-full max-w-4xl">
@@ -79,23 +97,7 @@ const Wallet = () => {
                     <CardContent className="pt-6">
                         <div className="text-3xl font-bold text-white">₹ {userWallet?.balance}</div>
                         <div className="flex gap-5 mt-8 flex-wrap">
-                            {[
-                                {
-                                    icon: <UploadIcon size={24} className="text-white" />,
-                                    label: "Add Money",
-                                    form: <TopupForm />
-                                },
-                                {
-                                    icon: <UploadIcon size={24} className="text-white" />,
-                                    label: "Withdraw",
-                                    form: <WithdrawalForm/>
-                                },
-                                {
-                                    icon: <ShuffleIcon size={24} className="text-white" />,
-                                    label: "Transfer",
-                                    form: <TransferForm/>
-                                }
-                            ].map(({ icon, label, form }, idx) => (
+                            {formDialogs.map(({ icon, label, form }, idx) => (
                                 <Dialog key={idx}>
                                     <DialogTrigger asChild>
                                         <div className="w-28 h-28 flex flex-col justify-center items-center rounded-xl border border-[#334155] bg-[#0F172A] hover:bg-[#1E293B] hover:scale-105 transition-transform cursor-pointer shadow-sm">
@@ -104,12 +106,14 @@ const Wallet = () => {
                                         </div>
                                     </DialogTrigger>
                                     <DialogClose>
-                                        <DialogContent className="bg-[#1E293B] border-none text-[#F1F5F9]">
-                                        <DialogHeader>
-                                            <DialogTitle>{label}</DialogTitle>
-                                            <DialogDescription />
-                                        </DialogHeader>
-                                        {form}
+                                        <DialogContent className="bg-[#1E293B] border-none text-[#F1F5F9] w-full max-w-[550px] rounded-2xl">
+                                            <DialogHeader>
+                                                <DialogTitle>{label}</DialogTitle>
+                                                <DialogDescription />
+                                            </DialogHeader>
+                                            <div className="flex justify-center">
+                                                <div className="w-full max-w-[550px]">{form}</div>
+                                            </div>
                                         </DialogContent>
                                     </DialogClose>
                                 </Dialog>

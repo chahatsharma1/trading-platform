@@ -3,13 +3,13 @@ import { Input } from "@/components/ui/input.jsx";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group.jsx";
 import { Label } from "@/components/ui/label.jsx";
 import { Button } from "@/components/ui/button.jsx";
-import {useDispatch} from "react-redux";
-import {paymentHandler} from "@/page/State/Wallet/Action.js";
+import { useDispatch } from "react-redux";
+import { paymentHandler } from "@/page/State/Wallet/Action.js";
 
 const TopupForm = () => {
     const [amount, setAmount] = React.useState('');
-    const [paymentMethod, setPaymentMethod] = React.useState("RAZORPAY");
-    const dispatch=useDispatch();
+    const [paymentMethod, setPaymentMethod] = React.useState("DOMESTIC");
+    const dispatch = useDispatch();
 
     const handlePaymentMethodChange = (value) => {
         setPaymentMethod(value);
@@ -24,42 +24,48 @@ const TopupForm = () => {
     };
 
     return (
-        <div className="pt-10 space-y-5 bg-[#1E293B] text-[#F1F5F9] p-6 rounded-lg">
+        <div className="pt-10 space-y-5 bg-[#1E293B] text-[#F1F5F9] p-6 rounded-lg w-full max-w-[550px]">
             <div>
                 <h1 className="pb-1">Enter Amount</h1>
                 <Input
+                    onClick={(e) => e.stopPropagation()}
                     onChange={handleChange}
                     value={amount}
                     className="py-7 text-lg bg-[#0F172A] text-[#F1F5F9] placeholder:text-slate-400 border border-[#334155] focus:ring-0"
-                    placeholder="₹10000"
+                    placeholder="Enter Amount"
                 />
             </div>
 
             <div>
-                <h1 className="pb-1">Select Payment Method</h1>
-                <RadioGroup onValueChange={handlePaymentMethodChange} className="flex gap-4" defaultValue="RAZORPAY">
+                <h1 className="pb-1">Select Payment Type</h1>
+                <RadioGroup onValueChange={handlePaymentMethodChange} className="flex gap-4 w-full" defaultValue="DOMESTIC">
                     <Label
-                        htmlFor="razorpay"
-                        className="flex items-center space-x-4 border p-3 px-5 rounded-md cursor-pointer bg-[#334155] text-[#F1F5F9] border-[#334155] hover:bg-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        htmlFor="domestic"
+                        className="flex items-center space-x-4 border p-3 px-5 rounded-md cursor-pointer bg-[#334155] text-[#F1F5F9] border-[#334155] hover:bg-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <RadioGroupItem value="RAZORPAY" id="razorpay" />
-                        <div className="w-32 h-10 flex items-center justify-center bg-white rounded-md">
-                            <img src="src/assets/razorpay.png" alt="Razorpay" className="h-full object-contain" />
+                        <RadioGroupItem value="DOMESTIC" id="domestic" />
+                        <div className="flex items-center gap-3">
+                            <div className="w-20 h-10 flex items-center justify-center">
+                                <img src="src/assets/stripe.png" alt="Stripe" className="h-full object-contain" />
+                            </div>
+                            <span>(INR)</span>
                         </div>
                     </Label>
 
                     <Label
-                        htmlFor="stripe"
-                        className="flex items-center space-x-4 border p-3 px-5 rounded-md cursor-pointer bg-[#334155] text-[#F1F5F9] border-[#334155] hover:bg-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        htmlFor="international"
+                        className="flex items-center space-x-4 border p-3 px-5 rounded-md cursor-pointer bg-[#334155] text-[#F1F5F9] border-[#334155] hover:bg-[#3B82F6] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <RadioGroupItem value="STRIPE" id="stripe" />
-                        <div className="w-32 h-10 flex items-center justify-center bg-white rounded-md">
-                            <img src="src/assets/stripe.png" alt="Stripe" className="h-full object-contain" />
+                        <RadioGroupItem value="INTERNATIONAL" id="international" />
+                        <div className="flex items-center gap-2">
+                            <div className="w-20 h-10 flex items-center justify-center">
+                                <img src="src/assets/stripe.png" alt="Stripe" className="h-full object-contain" />
+                            </div>
+                            <span>(USD)</span>
                         </div>
                     </Label>
-
                 </RadioGroup>
             </div>
 
@@ -71,5 +77,6 @@ const TopupForm = () => {
         </div>
     );
 };
+
 
 export default TopupForm;

@@ -27,24 +27,16 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const result = await dispatch(login({ ...formData, navigate }));
+        const result = await dispatch(login({ ...formData, navigate }));
 
-            if (result?.twoFactorAuthEnable) {
-                setSessionId(result.session);
-                setShowOtpDialog(true);
-            }
-        } catch (err) {
-            console.error("Login failed:", err);
+        if (result?.twoFactorAuthEnable) {
+            setSessionId(result.session);
+            setShowOtpDialog(true);
         }
     };
 
     const handleOtpVerify = async () => {
-        try {
-            await dispatch(verifyLoginOtp(otp, sessionId, navigate));
-        } catch (err) {
-            console.error("OTP verification failed:", err);
-        }
+        await dispatch(verifyLoginOtp(otp, sessionId, navigate));
     };
 
     return (

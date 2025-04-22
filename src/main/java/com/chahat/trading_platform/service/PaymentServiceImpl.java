@@ -6,14 +6,10 @@ import com.chahat.trading_platform.model.PaymentOrder;
 import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.repository.PaymentOrderRepository;
 import com.chahat.trading_platform.response.PaymentResponse;
-import com.razorpay.PaymentLink;
-import com.razorpay.RazorpayClient;
-import com.razorpay.RazorpayException;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,12 +22,6 @@ public class PaymentServiceImpl implements PaymentService{
 
     @Value("${stripe.api.key}")
     private String stripeSecretKey;
-
-    @Value("${razorpay.api.key}")
-    private String razorPayApiKey;
-
-    @Value("${razorpay.api.secret}")
-    private String razorPaySecretKey;
 
     @Override
     public PaymentOrder createOrder(User user, Long amount, PaymentMethod paymentMethod) {
@@ -56,12 +46,6 @@ public class PaymentServiceImpl implements PaymentService{
 
         if (paymentOrder.getStatus().equals(PaymentOrderStatus.PENDING)) {
 
-            if (paymentOrder.getPaymentMethod().equals(PaymentMethod.RAZORPAY)) {
-                paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
-                paymentOrderRepository.save(paymentOrder);
-                return true;
-            }
-
             paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
             paymentOrderRepository.save(paymentOrder);
             return true;
@@ -69,44 +53,8 @@ public class PaymentServiceImpl implements PaymentService{
         return false;
     }
 
-
     @Override
-    public PaymentResponse createRazorPayPaymentLink(User user, Long amount, Long orderId) throws RazorpayException {
-        try {
-
-            RazorpayClient razorpay = new RazorpayClient(razorPayApiKey, razorPaySecretKey);
-
-            JSONObject paymentLinkRequest = new JSONObject();
-            paymentLinkRequest.put("amount", amount);
-            paymentLinkRequest.put("currency", "INR");
-
-            JSONObject customer = new JSONObject();
-            customer.put("name", user.getFullName());
-            customer.put("email", user.getEmail());
-
-            JSONObject notify = new JSONObject();
-            notify.put("email", true);
-            paymentLinkRequest.put("notify", notify);
-
-            paymentLinkRequest.put("reminder_enable", true);
-
-            paymentLinkRequest.put("callback_url", "http://localhost:8080/wallet?order_id=" + orderId);
-            paymentLinkRequest.put("callback_method", "get");
-
-            PaymentLink payment = razorpay.paymentLink.create(paymentLinkRequest);
-
-            String paymentLinkUrl = payment.get("short_url");
-
-            PaymentResponse response = new PaymentResponse();
-            response.setPaymentUrl(paymentLinkUrl);
-            return response;
-        } catch (RazorpayException e){
-            throw new RazorpayException(e.getMessage());
-        }
-    }
-
-    @Override
-    public PaymentResponse createStripePaymentLink(User user, Long amount, Long orderId) throws StripeException {
+    public PaymentResponse createStripePaymentLink(User user, Long amount, Long orderId, String currency) throws StripeException {
         Stripe.apiKey = stripeSecretKey;
 
         SessionCreateParams params = SessionCreateParams.builder()
@@ -117,7 +65,7 @@ public class PaymentServiceImpl implements PaymentService{
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setQuantity(1L)
                         .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
-                                .setCurrency("USD")
+                                .setCurrency(currency)
                                 .setUnitAmount(amount * 100)
                                 .setProductData(SessionCreateParams
                                         .LineItem

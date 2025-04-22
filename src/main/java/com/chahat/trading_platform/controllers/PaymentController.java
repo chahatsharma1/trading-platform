@@ -24,16 +24,11 @@ public class PaymentController {
     @PostMapping("/{paymentMethod}/amount/{amount}")
     public ResponseEntity<PaymentResponse> paymentHandler(@PathVariable PaymentMethod paymentMethod, @PathVariable Long amount, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJWT(jwt);
+        String currency = paymentMethod.equals(PaymentMethod.DOMESTIC) ? "INR" : "USD";
+        Long finalAmount = paymentMethod.equals(PaymentMethod.DOMESTIC) ? amount : amount * 85;
 
-        PaymentResponse paymentResponse;
-
-        if (paymentMethod.equals(PaymentMethod.RAZORPAY)){
-            PaymentOrder order = paymentService.createOrder(user, amount , paymentMethod);
-            paymentResponse = paymentService.createRazorPayPaymentLink(user, amount, order.getId());
-        } else {
-            PaymentOrder order = paymentService.createOrder(user, amount * 82 , paymentMethod);
-            paymentResponse = paymentService.createStripePaymentLink(user, amount, order.getId());
-        }
+        PaymentOrder order = paymentService.createOrder(user, finalAmount , paymentMethod);
+        PaymentResponse paymentResponse = paymentService.createStripePaymentLink(user, amount, order.getId(), currency);
         return new ResponseEntity<>(paymentResponse, HttpStatus.CREATED);
     }
 }

@@ -6,8 +6,6 @@ import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.repository.AssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -17,23 +15,18 @@ public class AssetServiceImpl implements AssetService{
     private AssetRepository assetRepository;
 
     @Override
-    public Asset createAsset(User user, Coin coin, double quantity) {
+    public void createAsset(User user, Coin coin, double quantity) {
         Asset asset = new Asset();
         asset.setUser(user);
         asset.setCoin(coin);
         asset.setQuantity(quantity);
         asset.setBuyPrice(coin.getCurrentPrice());
-        return assetRepository.save(asset);
+        assetRepository.save(asset);
     }
 
     @Override
     public Asset getAssetById(Long assetId) {
         return assetRepository.findById(assetId).orElseThrow(() -> new RuntimeException("Asset Not Found"));
-    }
-
-    @Override
-    public Asset getAssetByUserIdAndAssetId(Long userID, Long assetId) {
-        return assetRepository.findByUserIdAndId(userID, assetId);
     }
 
     @Override

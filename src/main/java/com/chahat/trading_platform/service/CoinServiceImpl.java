@@ -6,15 +6,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -126,20 +125,31 @@ public class CoinServiceImpl implements CoinService{
 
     @Override
     public String getTop50CoinsByMarketCapRank() {
-        String url = "https://api.coingecko.com/api/v3/coins/markets/?vs_currency=inr&per_pages=50";
+        String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&order=market_cap_desc&per_page=50&page=1&sparkline=false";
 
         RestTemplate restTemplate = new RestTemplate();
 
         try {
             HttpHeaders headers = new HttpHeaders();
-            HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-            ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            headers.set("User-Agent", "Mozilla/5.0"); // Add this line to bypass Cloudflare
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<String> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
+
             return responseEntity.getBody();
 
-        } catch (RestClientException e){
+        } catch (RestClientException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
+
 
     @Override
     public String getTrendingCoins() {

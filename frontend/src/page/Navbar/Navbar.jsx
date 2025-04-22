@@ -49,7 +49,7 @@ const Navbar = () => {
                             <SheetTitle>
                                 <div className="text-3xl flex justify-center items-center h-1">
                                     <Avatar className="w-15 h-10 mt-10">
-                                        <AvatarImage src="src/assets/logo.png" />
+                                        <AvatarImage src="/brand.png"/>
                                     </Avatar>
                                     <div className="mt-10 ml-2">
                                         <span className="font-bold text-gray-300">TradeX</span>

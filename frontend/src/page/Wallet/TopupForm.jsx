@@ -47,7 +47,7 @@ const TopupForm = () => {
                         <RadioGroupItem value="DOMESTIC" id="domestic" />
                         <div className="flex items-center gap-3">
                             <div className="w-20 h-10 flex items-center justify-center">
-                                <img src="src/assets/stripe.png" alt="Stripe" className="h-full object-contain" />
+                                <img src="/stripe.png" alt="Stripe" className="h-full object-contain" />
                             </div>
                             <span>(INR)</span>
                         </div>
@@ -61,7 +61,7 @@ const TopupForm = () => {
                         <RadioGroupItem value="INTERNATIONAL" id="international" />
                         <div className="flex items-center gap-2">
                             <div className="w-20 h-10 flex items-center justify-center">
-                                <img src="src/assets/stripe.png" alt="Stripe" className="h-full object-contain" />
+                                <img src="/stripe.png" alt="Stripe" className="h-full object-contain" />
                             </div>
                             <span>(USD)</span>
                         </div>

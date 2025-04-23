@@ -3,10 +3,8 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-.env
+application.properties
 
-
-### STS ###
 .apt_generated
 .classpath
 .factorypath
@@ -15,12 +13,10 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
 .idea
 *.iws
 *.iml
 *.ipr
 
-# Ignore frontend dependencies and build files
 frontend/node_modules/
 frontend/build/

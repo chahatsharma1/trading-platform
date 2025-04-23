@@ -1,13 +1,5 @@
-FROM openjdk:21-jdk-slim
-
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
-
-COPY . /app
-
-RUN chmod +x ./mvnw
-
-RUN ./mvnw clean package
-
+COPY target/trading-platform-0.0.1-SNAPSHOT.jar /app/trading-platform.jar
 EXPOSE 8080
-
-ENTRYPOINT ["java", "-Xmx256m", "-Xms128m", "-Dserver.port=8080", "-jar", "target/trading-platform-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "/app/trading-platform.jar"]

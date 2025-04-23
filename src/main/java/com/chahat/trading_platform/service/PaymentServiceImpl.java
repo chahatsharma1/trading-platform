@@ -23,6 +23,9 @@ public class PaymentServiceImpl implements PaymentService{
     @Value("${stripe.api.key}")
     private String stripeSecretKey;
 
+    @Value(("${frontend.url}"))
+    private String frontend;
+
     @Override
     public PaymentOrder createOrder(User user, Long amount, PaymentMethod paymentMethod) {
         PaymentOrder paymentOrder = new PaymentOrder();
@@ -60,8 +63,8 @@ public class PaymentServiceImpl implements PaymentService{
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:5173/wallet?order_id=" + orderId)
-                .setCancelUrl("http://localhost:8080/payment/cancel")
+                .setSuccessUrl(frontend + "/wallet?order_id=" + orderId)
+                .setCancelUrl(frontend + "/payment/cancel")
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setQuantity(1L)
                         .setPriceData(SessionCreateParams.LineItem.PriceData.builder()

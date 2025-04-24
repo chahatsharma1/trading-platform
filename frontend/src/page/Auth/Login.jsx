@@ -18,6 +18,9 @@ const Login = () => {
     const [showOtpDialog, setShowOtpDialog] = useState(false);
     const [sessionId, setSessionId] = useState("");
 
+    const [loginLoading, setLoginLoading] = useState(false); 
+    const [errorMessage, setErrorMessage] = useState("");
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -27,16 +30,25 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoginLoading(true);
+        setErrorMessage("");
         const result = await dispatch(login({ ...formData, navigate }));
 
         if (result?.twoFactorAuthEnable) {
             setSessionId(result.session);
             setShowOtpDialog(true);
+        } else {
+            setLoginLoading(false);
         }
     };
 
     const handleOtpVerify = async () => {
-        await dispatch(verifyLoginOtp(otp, sessionId, navigate));
+        setErrorMessage("");
+        try {
+            await dispatch(verifyLoginOtp(otp, sessionId, navigate));
+        } catch (error) {
+            setErrorMessage(error.response?.data?.message || "Invalid OTP. Please try again.");
+        }
     };
 
     return (
@@ -77,7 +89,7 @@ const Login = () => {
                     </Link>
                 </div>
                 <Button type="submit" className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]">
-                    Login
+                    {loginLoading ? "Logging in..." : "Login"}
                 </Button>
 
                 <p className="text-sm text-center text-[#F1F5F9]">
@@ -88,7 +100,7 @@ const Login = () => {
 
             {showOtpDialog && (
                 <div className="fixed inset-0 bg-[#0F172A] bg-opacity-90 flex items-center justify-center z-50">
-                <div className="bg-[#1E293B] p-6 rounded-xl shadow-lg space-y-4 w-full max-w-sm">
+                    <div className="bg-[#1E293B] p-6 rounded-xl shadow-lg space-y-4 w-full max-w-sm">
                         <h2 className="text-xl font-bold text-[#F1F5F9] text-center">Enter OTP</h2>
                         <Input
                             type="text"
@@ -98,9 +110,12 @@ const Login = () => {
                             className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500"
                             maxLength={6}
                         />
+                        {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
                         <div className="flex justify-end space-x-2">
                             <Button onClick={() => setShowOtpDialog(false)} className="bg-gray-600 text-white hover:bg-gray-500">Cancel</Button>
-                            <Button onClick={handleOtpVerify} className="bg-[#3B82F6] text-white hover:bg-[#2563EB]">Verify</Button>
+                            <Button onClick={handleOtpVerify} className="bg-[#3B82F6] text-white hover:bg-[#2563EB]">
+                                Verify
+                            </Button>
                         </div>
                     </div>
                 </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button.jsx";
 import { MessageCircle, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input.jsx";
+import {API_BASE_URL} from "@/config/api.js";
 
 const Chatbot = () => {
     const [inputValue, setInputValue] = useState("");
@@ -20,7 +21,7 @@ const Chatbot = () => {
             setIsLoading(true);
 
             try {
-                const res = await fetch("http://localhost:8080/chatbot", {
+                const res = await fetch(`${API_BASE_URL}/chatbot`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ prompt: userMessage }),

@@ -2,30 +2,47 @@ import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {Link, useNavigate} from "react-router-dom";
-import {useDispatch} from "react-redux";
-import {sendForgotPasswordOTP, verifyForgotPasswordOTP} from "@/page/State/Auth/Action.js";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { sendForgotPasswordOTP, verifyForgotPasswordOTP } from "@/page/State/Auth/Action.js";
 
 const ForgotPassword = () => {
     const dispatch = useDispatch();
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [showOtpDialog, setShowOtpDialog] = useState(false);
     const [otp, setOtp] = useState('');
     const [sessionId, setSessionId] = useState(null);
     const [newPassword, setNewPassword] = useState('');
+    const [sendingOtp, setSendingOtp] = useState(false);
+    const [otpError, setOtpError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
 
     const handleSendResetLink = async () => {
         if (!email) return;
-        const session = await dispatch(sendForgotPasswordOTP(email));
-        setSessionId(session);
-        setShowOtpDialog(true);
+        setSendingOtp(true);
+        try {
+            const session = await dispatch(sendForgotPasswordOTP(email));
+            setSessionId(session);
+            setShowOtpDialog(true);
+        } catch (error) {
+            alert("Failed to send OTP. Please try again.");
+        }
+        setSendingOtp(false);
     };
 
     const handleOtpVerify = async () => {
-        await dispatch(verifyForgotPasswordOTP(sessionId, otp, newPassword));
-        setShowOtpDialog(false);
-        navigate("/login");
+        setOtpError('');
+        try {
+            await dispatch(verifyForgotPasswordOTP(sessionId, otp, newPassword));
+            setSuccessMessage("Password changed successfully!");
+            setTimeout(() => {
+                setShowOtpDialog(false);
+                navigate("/login");
+            }, 1500);
+        } catch (error) {
+            setOtpError("Invalid OTP or password. Please try again.");
+        }
     };
 
     return (
@@ -52,8 +69,9 @@ const ForgotPassword = () => {
                 <Button
                     className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]"
                     onClick={handleSendResetLink}
+                    disabled={sendingOtp}
                 >
-                    Send OTP
+                    {sendingOtp ? 'Sending OTP...' : 'Send OTP'}
                 </Button>
 
                 <p className="text-sm text-center text-[#F1F5F9]">
@@ -70,16 +88,17 @@ const ForgotPassword = () => {
                     </DialogHeader>
                     <div className="space-y-4">
                         <p className="text-sm text-[#F1F5F9] text-center">
-                            Enter the 6-digit OTP sent to <span
-                            className="font-medium text-[#38BDF8]">{email}</span>
+                            Enter the 6-digit OTP sent to <span className="font-medium text-[#38BDF8]">{email}</span>
                         </p>
+
                         <Input
                             type="text"
                             placeholder="Enter 6-digit OTP"
                             maxLength={6}
                             value={otp}
                             onChange={(e) => setOtp(e.target.value)}
-                            className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500 tracking-widest text-center"/>
+                            className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500 tracking-widest text-center"
+                        />
                         <Input
                             type="password"
                             placeholder="Enter new password"
@@ -87,6 +106,9 @@ const ForgotPassword = () => {
                             onChange={(e) => setNewPassword(e.target.value)}
                             className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500 tracking-widest text-center"
                         />
+
+                        {otpError && <p className="text-red-500 text-sm text-center">{otpError}</p>}
+                        {successMessage && <p className="text-green-400 text-sm text-center">{successMessage}</p>}
 
                         <Button
                             className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]"
@@ -99,4 +121,5 @@ const ForgotPassword = () => {
         </div>
     );
 };
+
 export default ForgotPassword;

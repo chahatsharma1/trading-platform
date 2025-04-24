@@ -52,7 +52,7 @@ const Home = () => {
     return (
         <div className="bg-[#0F172A] min-h-screen p-4 text-[#F1F5F9]">
             <div className="flex flex-col xl:flex-row gap-4 h-[calc(90vh-2rem)]">
-                <div className="w-full xl:w-[55%] flex flex-col overflow-hidden">
+                <div className="w-full xl:w-[55%] flex flex-col min-h-0">
                     <div className="mb-4 text-[#F1F5F9] flex items-center gap-4 shrink-0">
                         <Button
                             onClick={() => handleActiveCategory("all")}
@@ -95,7 +95,7 @@ const Home = () => {
                         )}
                     </div>
 
-                    <div className="overflow-y-auto flex-grow">
+                    <div className="flex-grow overflow-auto min-h-0">
                         <AssetTable
                             coin={coinToDisplay}
                             category={activeCategory}
@@ -104,7 +104,7 @@ const Home = () => {
                     </div>
                 </div>
 
-                <div className="w-full xl:w-[45%] flex flex-col gap-4 overflow-y-auto">
+                <div className="w-full xl:w-[45%] flex flex-col gap-4 overflow-y-auto min-h-0">
                     <StockChart coinId={coinDetails.id} />
                     <Card className="bg-[#1E293B] text-[#F1F5F9] p-4 rounded-2xl shadow-none border border-transparent">
                         <CardContent className="flex items-center justify-between gap-4 p-0">

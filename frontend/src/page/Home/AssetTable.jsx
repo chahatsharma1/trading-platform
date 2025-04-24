@@ -26,6 +26,7 @@ const AssetTable = ({ coin, category, onRowClick }) => {
                             <TableRow
                                 key={coinItem.id}
                                 onClick={() => onRowClick(coinItem)}
+                                title="Click coin name to view info, or row to view chart & details"
                                 className="cursor-pointer hover:bg-[#334155] transition-colors"
                             >
                                 <TableCell className="font-medium flex items-center gap-2 whitespace-nowrap overflow-hidden">

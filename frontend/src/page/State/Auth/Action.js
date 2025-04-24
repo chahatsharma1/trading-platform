@@ -1,24 +1,6 @@
 import axios from "axios";
-import {
-    FORGOT_PASSWORD_FAILURE,
-    FORGOT_PASSWORD_REQUEST,
-    FORGOT_PASSWORD_SUCCESS,
-    GET_USER_FAILURE,
-    GET_USER_REQUEST,
-    GET_USER_SUCCESS,
-    LOGIN_FAILURE,
-    LOGIN_REQUEST,
-    LOGIN_SUCCESS,
-    LOGOUT,
-    REGISTER_FAILURE,
-    REGISTER_REQUEST,
-    REGISTER_SUCCESS, SEND_VERIFICATION_OTP_FAILURE, SEND_VERIFICATION_OTP_REQUEST, SEND_VERIFICATION_OTP_SUCCESS,
-    VERIFY_OTP_FAILURE,
-    VERIFY_OTP_REQUEST,
-    VERIFY_OTP_SUCCESS
-} from "./ActionType";
+import {FORGOT_PASSWORD_FAILURE, FORGOT_PASSWORD_REQUEST, FORGOT_PASSWORD_SUCCESS, GET_USER_FAILURE, GET_USER_REQUEST, GET_USER_SUCCESS, LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS, SEND_VERIFICATION_OTP_FAILURE, SEND_VERIFICATION_OTP_REQUEST, SEND_VERIFICATION_OTP_SUCCESS, VERIFY_OTP_FAILURE, VERIFY_OTP_REQUEST, VERIFY_OTP_SUCCESS} from "./ActionType";
 import { API_BASE_URL } from "@/config/api.js";
-
 
 export const register = (userData) => async (dispatch) => {
     dispatch({ type: REGISTER_REQUEST });
@@ -28,8 +10,10 @@ export const register = (userData) => async (dispatch) => {
         const user = response.data;
         dispatch({ type: REGISTER_SUCCESS, payload: user.jwt });
         localStorage.setItem("jwt", user.jwt);
+        return Promise.resolve()
     } catch (error) {
         dispatch({ type: REGISTER_FAILURE, payload: error.message });
+        return Promise.reject();
     }
 };
 

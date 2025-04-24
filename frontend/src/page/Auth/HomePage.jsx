@@ -55,7 +55,7 @@ const HomePage = () => {
             </header>
 
             <section className="px-6 py-10 border-b border-[#334155] bg-[#0F172A]">
-                <h2 className="text-2xl font-semibold mb-6 text-center">Live Market Snapshot</h2>
+                <h2 className="text-2xl font-semibold mb-6 text-center">Live Market</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
                     {selectedCoins?.map((coin) => (
                         <div

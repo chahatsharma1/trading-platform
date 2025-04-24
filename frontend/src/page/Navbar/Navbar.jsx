@@ -24,6 +24,7 @@ const Navbar = () => {
         if (e.key === "Enter" && query.trim()) {
             dispatch(searchCoin(query, localStorage.getItem("jwt")));
             navigate(`/search?query=${query}`);
+            setQuery("");
         }
     };
 

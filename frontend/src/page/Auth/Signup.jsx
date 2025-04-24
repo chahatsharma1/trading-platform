@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux';
 import { register } from '../State/Auth/Action';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Signup = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
         password: ''
     });
+
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -21,9 +25,18 @@ const Signup = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        dispatch(register(formData));
+        try {
+            await dispatch(register(formData));
+            setDialogOpen(true);
+            setTimeout(() => {
+                setDialogOpen(false);
+                navigate("/login");
+            }, 2000);
+        } catch (error) {
+            console.error("Registration failed:", error);
+        }
     };
 
     return (
@@ -72,6 +85,15 @@ const Signup = () => {
                     <Link to="/login" className="text-[#38BDF8] underline hover:text-[#3B82F6]">Login</Link>
                 </p>
             </div>
+
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogContent className="bg-[#1E293B] text-[#F1F5F9]">
+                    <DialogHeader>
+                        <DialogTitle>Signup Successful.</DialogTitle>
+                        <p className="text-sm mt-2">Redirecting You to Login Page</p>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

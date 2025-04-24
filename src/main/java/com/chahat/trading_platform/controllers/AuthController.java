@@ -21,6 +21,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -126,14 +128,18 @@ public class AuthController {
     public ResponseEntity<AuthResponse> verifyLoginOtp(@PathVariable String otp, @RequestParam String id) throws Exception {
         TwoFactorOTP twoFactorOTP = twoFactorOTPService.findByID(id);
 
+        AuthResponse authResponse = new AuthResponse();
+
         if (twoFactorOTPService.verifyTwoFactorOTP(twoFactorOTP, otp)){
-            AuthResponse authResponse = new AuthResponse();
             authResponse.setMessage("Two Factor Authentication Verified");
             authResponse.setJwt(twoFactorOTP.getJwt());
             authResponse.setTwoFactorAuthEnable(true);
             return new ResponseEntity<>(authResponse, HttpStatus.OK);
 
         }
-        throw new Exception();
+
+        authResponse.setMessage("Invalid OTP. Please try again.");
+        authResponse.setTwoFactorAuthEnable(false);
+        return new ResponseEntity<>(authResponse, HttpStatus.UNAUTHORIZED);
     }
 }

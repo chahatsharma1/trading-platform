@@ -11,7 +11,6 @@ import StockDetails from "@/page/Stock Details/StockDetails.jsx";
 import Watchlist from "@/page/Watchlist/Watchlist.jsx";
 import Profile from "@/page/Profile/Profile.jsx";
 import SearchCoin from "@/page/Search/SearchCoin.jsx";
-import NotFound from "@/page/NotFound/NotFound.jsx";
 import HomePage from "@/page/Auth/HomePage.jsx";
 import Login from "@/page/Auth/Login.jsx";
 import Signup from "@/page/Auth/Signup.jsx";

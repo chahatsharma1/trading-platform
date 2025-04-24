@@ -64,7 +64,7 @@ public class PaymentServiceImpl implements PaymentService{
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl(frontend + "/wallet?order_id=" + orderId)
-                .setCancelUrl(frontend + "/payment/cancel")
+                .setCancelUrl(frontend + "/cancel")
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setQuantity(1L)
                         .setPriceData(SessionCreateParams.LineItem.PriceData.builder()

@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getUser } from "@/page/State/Auth/Action.js";
 import AdminWithdrawal from "@/page/Admin/AdminWithdrawal.jsx";
+import PaymentCancel from "@/page/Wallet/PaymentCancel.jsx";
 
 function App() {
     const {user, jwt} = useSelector(store => store.auth);
@@ -58,6 +59,7 @@ function App() {
                         <Route path="/watchlist" element={<Watchlist />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/search" element={<SearchCoin />} />
+                        <Route path="/cancel" element={<PaymentCancel />} />
                     </>
                 )}
 

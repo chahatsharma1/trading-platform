@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API_BASE_URL= "https://trading-backend-372239835267.asia-south1.run.app"
+export const API_BASE_URL= "http://localhost:8080"
 const api=axios.create({
     baseURL:API_BASE_URL,
         headers:{

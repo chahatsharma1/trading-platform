@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button.jsx";
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog.jsx";
 import { Input } from "@/components/ui/input.jsx";
-import { sendVerificationOtp, verifyOtp } from "@/page/State/Auth/Action.js";
+import {getUser, sendVerificationOtp, verifyOtp} from "@/page/State/Auth/Action.js";
 
 const AccountVerificationForm = ({ closeParentDialog, userEmail}) => {
     const [otpDialogOpen, setOtpDialogOpen] = useState(false);
@@ -47,6 +47,7 @@ const AccountVerificationForm = ({ closeParentDialog, userEmail}) => {
         setError("");
         try {
             await dispatch(verifyOtp(localStorage.getItem("jwt"), enteredOtp));
+            await dispatch(getUser(localStorage.getItem("jwt")))
             setOtpDialogOpen(false);
             closeParentDialog();
         } catch (err) {

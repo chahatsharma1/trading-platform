@@ -63,8 +63,7 @@ const Navbar = () => {
                 </Sheet>
                 <p
                     onClick={() => navigate("/home")}
-                    className="text-sm lg:text-base cursor-pointer text-[#F1F5F9]"
-                >
+                    className="text-sm lg:text-base cursor-pointer text-[#F1F5F9]">
                     TradeX
                 </p>
             </div>

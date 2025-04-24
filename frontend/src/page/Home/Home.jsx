@@ -95,7 +95,7 @@ const Home = () => {
                         )}
                     </div>
 
-                    <div className="flex-grow overflow-auto min-h-0">
+                    <div >
                         <AssetTable
                             coin={coinToDisplay}
                             category={activeCategory}

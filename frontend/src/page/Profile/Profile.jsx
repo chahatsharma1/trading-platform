@@ -13,7 +13,7 @@ import {
 import AccountVerificationForm from "@/page/Profile/AccountVerificationForm";
 import EditProfileForm from "@/page/Profile/EditProfileForm";
 import { useDispatch, useSelector } from "react-redux";
-import {disableTwoFactorAuth} from "@/page/State/Auth/Action.js";
+import {disableTwoFactorAuth, getUser} from "@/page/State/Auth/Action.js";
 
 const Profile = () => {
     const dispatch = useDispatch();
@@ -29,8 +29,9 @@ const Profile = () => {
         setIsProfileIncomplete(incompleteFields.length > 0);
     }, [user]);
 
-    const handleDisable = () => {
-        dispatch(disableTwoFactorAuth(localStorage.getItem("jwt")));
+    const handleDisable = async () => {
+        await dispatch(disableTwoFactorAuth(localStorage.getItem("jwt")));
+        await dispatch(getUser(localStorage.getItem("jwt")))
         setIsDisableDialogOpen(false);
     };
 

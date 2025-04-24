@@ -7,9 +7,9 @@ const AssetTable = ({ coin, category, onRowClick }) => {
     const navigate = useNavigate();
 
     return (
-        <div className="bg-[#1E293B] rounded-2xl shadow-md p-4 text-[#F1F5F9]">
+        <div className="bg-[#1E293B] rounded-2xl shadow-md p-2 text-[#F1F5F9]">
             <Table className="w-full table-fixed">
-                <ScrollArea className={`${category === "all" ? "h-[74vh]" : "h-[82vh]"}`}>
+                <ScrollArea className={`${category === "all" ? "h-[76vh]" : "h-[82vh]"}`}>
                     <TableHeader>
                         <TableRow className="hover:bg-transparent pointer-events-none">
                             <TableHead className="w-[200px] text-[#F1F5F9]">Coin</TableHead>

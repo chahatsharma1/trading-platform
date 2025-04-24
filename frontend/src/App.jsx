@@ -62,8 +62,6 @@ function App() {
                         <Route path="/cancel" element={<PaymentCancel />} />
                     </>
                 )}
-
-                <Route path="*" element={<NotFound />} />
             </Routes>
         </>
     );

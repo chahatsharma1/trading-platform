@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllWithdrawalRequest, proceedWithdrawal } from "@/page/State/Withdrawal/Action.js";
-import { logout } from "@/page/State/Auth/Action"; // Import logout action
+import { logout } from "@/page/State/Auth/Action";
 import { useNavigate } from "react-router-dom";
 
 const AdminWithdrawal = () => {

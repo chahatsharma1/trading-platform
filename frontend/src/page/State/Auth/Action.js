@@ -45,14 +45,14 @@ export const adminLogin = (adminData) => async (dispatch) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/auth/signin/admin`, adminData);
         const admin = response.data;
-
         dispatch({ type: ADMIN_LOGIN_SUCCESS, payload: admin.jwt });
-        console.log(response.data)
         localStorage.setItem("jwt", admin.jwt);
+        await dispatch(getUser(admin.jwt));
         adminData.navigate("/admin/dashboard");
+        return { error: false }; // 🟢 success
     } catch (error) {
-        console.log(error)
         dispatch({ type: ADMIN_LOGIN_FAILURE, payload: error.response?.data?.message || error.message });
+        return { error: true, message: error.response?.data?.message || "Admin login failed" };
     }
 };
 
@@ -65,16 +65,20 @@ export const login = (userData) => async (dispatch) => {
 
         if (user.twoFactorAuthEnable) {
             dispatch({ type: VERIFY_OTP_REQUEST });
-            return { session: user.session, twoFactorAuthEnable: true };
+            return { session: user.session, twoFactorAuthEnable: true, error: false };
         } else {
             dispatch({ type: LOGIN_SUCCESS, payload: user.jwt });
             localStorage.setItem("jwt", user.jwt);
+            await dispatch(getUser(user.jwt));
             userData.navigate("/home");
+            return { error: false };
         }
     } catch (error) {
         dispatch({ type: LOGIN_FAILURE, payload: error.message });
+        return { error: true, message: error.response?.data?.message || "User login failed" };
     }
 };
+
 
 export const verifyLoginOtp = (otp, sessionId, navigate) => async (dispatch) => {
     dispatch({ type: VERIFY_OTP_REQUEST });
@@ -83,6 +87,7 @@ export const verifyLoginOtp = (otp, sessionId, navigate) => async (dispatch) => 
         const response = await axios.post(`${API_BASE_URL}/auth/two-factor/otp/${otp}?id=${sessionId}`);
         dispatch({ type: VERIFY_OTP_SUCCESS, payload: response.data.jwt });
         localStorage.setItem("jwt", response.data.jwt);
+        await dispatch(getUser(response.data.jwt))
         navigate("/home");
     } catch (error) {
         dispatch({
@@ -118,7 +123,9 @@ export const getAllUsers = (jwt) => async (dispatch) => {
             },
         });
         dispatch({ type: FETCH_USERS_SUCCESS, payload: response.data });
+        console.log(response.data);
     } catch (error) {
+        console.log(error)
         dispatch({ type: FETCH_USERS_FAILURE, payload: error.message });
     }
 };

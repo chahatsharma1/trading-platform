@@ -123,8 +123,14 @@ const authReducer = (state = initialState, action) => {
         case FETCH_USERS_FAILURE:
             return { ...state, loading: false, error: action.payload };
 
-        case LOGOUT:
-            return initialState;
+        case 'LOGOUT':
+            return {
+                ...state,
+                jwt: null,
+                user: null,
+                loading: false,
+                error: null
+            };
 
         default:
             return state;

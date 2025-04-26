@@ -1,18 +1,24 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from "@/components/ui/input.jsx";
 import { Label } from "@/components/ui/label.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { Landmark } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPaymentDetails, withdrawRequest } from "@/page/State/Withdrawal/Action.js";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog.jsx"; // Assuming you have a Dialog component
 
 const WithdrawalForm = () => {
     const dispatch = useDispatch();
     const { userWallet } = useSelector(store => store.wallet);
     const { paymentDetails } = useSelector(store => store.withdrawal);
-    const [amount, setAmount] = React.useState('');
+    const [amount, setAmount] = useState('');
+    const [showDialog, setShowDialog] = useState(false);
 
     const handleSubmit = () => {
+        if (!paymentDetails) {
+            setShowDialog(true);
+            return;
+        }
         dispatch(withdrawRequest({ amount, jwt: localStorage.getItem("jwt") }));
     };
 
@@ -43,8 +49,12 @@ const WithdrawalForm = () => {
                     <div className="flex items-center space-x-3">
                         <Landmark size={20} className="text-slate-300" />
                         <div>
-                            <div className="font-semibold text-[#F1F5F9]">{paymentDetails?.bankName}</div>
-                            <div className="text-xs text-slate-400">{paymentDetails?.accountNo?.replace(/\d(?=\d{4})/g, '*')}</div>
+                            <div className="font-semibold text-[#F1F5F9]">
+                                {paymentDetails?.bankName || "No Bank Linked"}
+                            </div>
+                            <div className="text-xs text-slate-400">
+                                {paymentDetails?.accountNo ? paymentDetails.accountNo.replace(/\d(?=\d{4})/g, '*') : "N/A"}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -55,6 +65,25 @@ const WithdrawalForm = () => {
                 className="w-full mt-4 text-md font-semibold py-6 rounded-lg bg-[#3B82F6] text-white hover:bg-[#2563EB]">
                 Withdraw
             </Button>
+
+            <Dialog open={showDialog} onOpenChange={setShowDialog}>
+                <DialogContent className="bg-[#1E293B] border-[#334155] text-[#F1F5F9]">
+                    <DialogHeader>
+                        <DialogTitle>Payment Details Missing</DialogTitle>
+                    </DialogHeader>
+                    <div className="text-slate-300">
+                        Please add your payment details first to withdraw money.
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            onClick={() => setShowDialog(false)}
+                            className="mt-4 w-full bg-[#3B82F6] hover:bg-[#2563EB]"
+                        >
+                            Ok
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

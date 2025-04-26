@@ -3,16 +3,23 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserWallet } from "@/page/State/Wallet/Action.js";
-import {getAssetDetails} from "@/page/State/Asset/Action.js";
-import {payOrder} from "@/page/State/Order/Action.js";
+import { getAssetDetails } from "@/page/State/Asset/Action.js";
+import { payOrder } from "@/page/State/Order/Action.js";
 
-const TradingForm = () => {
+const TradingForm = ({ onTradeSuccess }) => {
     const dispatch = useDispatch();
     const [isBuyMode, setIsBuyMode] = useState(true);
     const [amount, setAmount] = useState("");
     const [quantity, setQuantity] = useState(0);
 
-    const { coin, wallet, asset } = useSelector((store) => store);
+    const {assetDetails} = useSelector((store) => store.asset);
+    const {userWallet} = useSelector((store) => store.wallet);
+    const {coinDetails} = useSelector(store => store.coin);
+
+    useEffect(() => {
+        dispatch(getUserWallet(localStorage.getItem("jwt")));
+        dispatch(getAssetDetails({ coinId: coinDetails?.id, jwt: localStorage.getItem("jwt") }));
+    }, []);
 
     const toggleMode = () => setIsBuyMode((prev) => !prev);
 
@@ -20,7 +27,7 @@ const TradingForm = () => {
         const inputAmount = e.target.value;
         setAmount(inputAmount);
 
-        const price = coin?.coinDetails?.market_data?.current_price?.inr;
+        const price = coinDetails?.market_data?.current_price?.inr;
         if (!price || isNaN(inputAmount) || inputAmount <= 0) {
             setQuantity(0);
             return;
@@ -30,30 +37,39 @@ const TradingForm = () => {
         setQuantity(volume);
     };
 
-    useEffect(() => {
-        dispatch(getUserWallet(localStorage.getItem("jwt")));
-        dispatch(getAssetDetails({coinId: coin?.coinDetails?.id, jwt:localStorage.getItem("jwt")}));
-    }, []);
-
     const calculateBuyCost = (amount, price) => {
         const volume = amount / price;
         const decimalPlaces = 6;
         return Number(volume.toFixed(decimalPlaces));
     };
 
-    const handleTrade = () => {
-        if (isBuyMode) {
-            dispatch(payOrder({orderData: {coinId: coin.coinDetails?.id, quantity, orderType: "BUY"}, jwt: localStorage.getItem("jwt"), amount: amount}))
-        } else {
-            dispatch(payOrder({orderData: {coinId: coin.coinDetails?.id, quantity, orderType: "SELL"}, jwt: localStorage.getItem("jwt"), amount: amount}))
+    const handleTrade = async () => {
+        try {
+            const orderType = isBuyMode ? "BUY" : "SELL";
+            await dispatch(payOrder({
+                orderData: { coinId: coinDetails?.id, quantity, orderType },
+                jwt: localStorage.getItem("jwt"),
+                amount: amount
+            }));
+
+            if (onTradeSuccess) {
+                const successMsg = isBuyMode
+                    ? `Successfully bought ${quantity} ${coinDetails?.symbol.toUpperCase()}!`
+                    : `Successfully sold ${quantity} ${coinDetails?.symbol.toUpperCase()}!`;
+
+                onTradeSuccess(successMsg);
+            }
+
+        } catch (error) {
+            console.error("Trade failed", error);
         }
     };
 
-    const price = coin?.coinDetails?.market_data?.current_price?.inr || 0;
-    const priceChange = coin?.coinDetails?.market_data?.price_change_24h_in_currency?.inr || 0;
-    const priceChangePercent = coin?.coinDetails?.market_data?.price_change_percentage_24h_in_currency?.inr || 0;
+    const price = coinDetails?.market_data?.current_price?.inr || 0;
+    const priceChange = coinDetails?.market_data?.price_change_24h_in_currency?.inr || 0;
+    const priceChangePercent = coinDetails?.market_data?.price_change_percentage_24h_in_currency?.inr || 0;
 
-    const walletBalance = wallet?.userWallet?.balance || 0;
+    const walletBalance = userWallet?.balance || 0;
     const isInsufficient = isBuyMode && Number(amount) > walletBalance;
 
     return (
@@ -70,7 +86,7 @@ const TradingForm = () => {
                 </div>
                 {isBuyMode && (
                     <div className="text-sm text-right text-[#94A3B8]">
-                        You will get: <span className="text-[#F1F5F9] font-medium">{quantity} {coin.coinDetails?.symbol.toUpperCase()}</span>
+                        You will get: <span className="text-[#F1F5F9] font-medium">{quantity} {coinDetails?.symbol?.toUpperCase()}</span>
                     </div>
                 )}
                 {isInsufficient && (
@@ -82,14 +98,14 @@ const TradingForm = () => {
 
             <div className="flex items-center gap-3">
                 <img
-                    src={coin.coinDetails?.image.large}
+                    src={coinDetails?.image.large}
                     alt="coin-logo"
                     className="w-6 h-6"
                 />
                 <div>
                     <div className="flex items-center gap-2">
-                        <p className="font-medium text-[#F1F5F9]">{coin.coinDetails?.symbol.toUpperCase()}</p>
-                        <span className="text-[#94A3B8]">• {coin.coinDetails?.name}</span>
+                        <p className="font-medium text-[#F1F5F9]">{coinDetails?.symbol?.toUpperCase()}</p>
+                        <span className="text-[#94A3B8]">• {coinDetails?.name}</span>
                     </div>
                     <p className="text-sm">
                         <span className="text-[#F1F5F9] font-semibold">₹ {price}</span>{' '}
@@ -99,31 +115,35 @@ const TradingForm = () => {
                     </p>
                 </div>
             </div>
+
             <div className="flex justify-between text-sm">
                 <span className="text-[#94A3B8]">Order Type</span>
                 <span className="text-[#F1F5F9] font-medium">{isBuyMode ? "Buy" : "Sell"}</span>
             </div>
+
             <div className="flex justify-between text-sm">
                 <span className="text-[#94A3B8]">{isBuyMode ? "Wallet Amount" : "Available Quantity"}</span>
-                <span className="text-xl font-semibold text-[#F1F5F9]">{isBuyMode ? `₹ ${walletBalance}` : `${asset.assetDetails?.quantity || 0} ${coin.coinDetails?.symbol?.toUpperCase()}`}</span>
+                <span className="text-xl font-semibold text-[#F1F5F9]">
+                    {isBuyMode
+                        ? `₹ ${walletBalance}`
+                        : `${assetDetails?.quantity || 0} ${coinDetails?.symbol?.toUpperCase()}`}
+                </span>
             </div>
+
             <Button
                 onClick={handleTrade}
                 disabled={isInsufficient}
                 className={`w-full rounded-md text-white ${
                     isInsufficient
                         ? "bg-gray-500 cursor-not-allowed"
-                        : "bg-[#3B82F6] hover:bg-[#2563EB]"
-                }`}
-            >
+                        : "bg-[#3B82F6] hover:bg-[#2563EB]"}`}>
                 {isBuyMode ? "BUY" : "SELL"}
             </Button>
 
             <p
                 onClick={toggleMode}
-                className="text-center text-sm text-sky-400 cursor-pointer hover:underline"
-            >
-                {isBuyMode ? "Or Sell" : "Or Buy"}
+                className="text-center text-sm underline text-[#94A3B8] cursor-pointer">
+                {isBuyMode ? " Or Sell" : "Or Buy"}
             </p>
         </div>
     );

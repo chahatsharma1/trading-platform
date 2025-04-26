@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { login, verifyLoginOtp } from "@/page/State/Auth/Action";
+import { adminLogin, login, verifyLoginOtp } from "@/page/State/Auth/Action";
+import { useNavigate, Link } from "react-router-dom";
 
-const Login = () => {
+const LoginPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState({
-        email: "",
-        password: ""
-    });
-
+    const [activeTab, setActiveTab] = useState('user');
+    const [formData, setFormData] = useState({ email: "", password: "" });
     const [otp, setOtp] = useState("");
-    const [showOtpDialog, setShowOtpDialog] = useState(false);
     const [sessionId, setSessionId] = useState("");
+    const [showOtpDialog, setShowOtpDialog] = useState(false);
 
     const [loginLoading, setLoginLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -32,12 +29,28 @@ const Login = () => {
         e.preventDefault();
         setLoginLoading(true);
         setErrorMessage("");
-        const result = await dispatch(login({ ...formData, navigate }));
 
-        if (result?.twoFactorAuthEnable) {
-            setSessionId(result.session);
-            setShowOtpDialog(true);
-        } else {
+        try {
+            let result;
+            if (activeTab === 'admin') {
+                result = await dispatch(adminLogin({ ...formData, navigate }));
+            } else {
+                result = await dispatch(login({ ...formData, navigate }));
+                if (result?.twoFactorAuthEnable) {
+                    setSessionId(result.session);
+                    setShowOtpDialog(true);
+                }
+            }
+
+            if (result?.error) {
+                setErrorMessage("Email or password is incorrect.");
+                setTimeout(() => setErrorMessage(""), 3000);
+            }
+        } catch (error) {
+            console.error(error);
+            setErrorMessage("Email or password is incorrect.");
+            setTimeout(() => setErrorMessage(""), 3000);
+        } finally {
             setLoginLoading(false);
         }
     };
@@ -53,58 +66,74 @@ const Login = () => {
 
     return (
         <div className="min-h-screen bg-[#0F172A] flex items-center justify-center px-4">
-            <form
-                onSubmit={handleSubmit}
-                className="w-full max-w-md bg-[#1E293B] shadow-md rounded-xl p-8 space-y-6"
-            >
+            <div className="w-full max-w-md bg-[#1E293B] shadow-md rounded-xl p-8 space-y-6">
+                <div className="flex justify-center space-x-4 mb-6">
+                    <button
+                        onClick={() => setActiveTab('user')}
+                        className={`text-lg font-semibold px-4 py-2 rounded-md ${
+                            activeTab === 'user'
+                                ? 'bg-[#3B82F6] text-white'
+                                : 'text-[#F1F5F9] hover:text-[#3B82F6]'
+                        }`}
+                    >
+                        User Login
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('admin')}
+                        className={`text-lg font-semibold px-4 py-2 rounded-md ${
+                            activeTab === 'admin'
+                                ? 'bg-[#3B82F6] text-white'
+                                : 'text-[#F1F5F9] hover:text-[#3B82F6]'
+                        }`}
+                    >
+                        Admin Login
+                    </button>
+                </div>
+
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-[#F1F5F9]">TradeX</h1>
-                    <p className="text-sm text-[#F1F5F9]">Secure Crypto Trading Platform</p>
+                    <p className="text-sm text-[#F1F5F9]">
+                        {activeTab === 'admin' ? 'Secure Crypto Trading Platform - Admin Login' : 'Secure Crypto Trading Platform - User Login'}
+                    </p>
                 </div>
 
-                <h2 className="text-xl font-semibold text-[#F1F5F9] text-center">Log in to Your Account</h2>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <Input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="Email"
+                        className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500"
+                        required
+                    />
+                    <Input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="Password"
+                        className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500"
+                        required
+                    />
 
-                <Input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Email"
-                    className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500"
-                    required
-                />
-                <Input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                    className="bg-[#1a1a1a] text-[#F1F5F9] border-gray-700 placeholder-gray-500"
-                    required
-                />
+                    <div className="text-right">
+                        <Link to="/forgot-password" className="text-sm text-[#38BDF8] hover:underline">
+                            Forgot password?
+                        </Link>
+                    </div>
 
-                <div className="text-right">
-                    <Link to="/forgot-password" className="text-sm text-[#38BDF8] hover:underline">
-                        Forgot password?
-                    </Link>
-                </div>
-                <Button type="submit" className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]">
-                    {loginLoading ? "Logging in..." : "Login"}
-                </Button>
+                    {errorMessage && (
+                        <p className="text-red-500 text-center">{errorMessage}</p>
+                    )}
 
-                <p className="text-sm text-center text-[#F1F5F9]">
-                    Don&apos;t have an account?{" "}
-                    <Link to="/signup" className="text-[#38BDF8] underline hover:text-[#3B82F6]">Sign up</Link>
-                </p>
-
-                <div className="text-center mt-4">
-                    <Link to="/admin/login">
-                        <Button className="w-full bg-[#FFD700] text-black hover:bg-[#FFC107]">
-                            Admin Login
-                        </Button>
-                    </Link>
-                </div>
-            </form>
+                    <Button
+                        type="submit"
+                        className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]">
+                        {loginLoading ? "Logging in..." : "Login"}
+                    </Button>
+                </form>
+            </div>
 
             {showOtpDialog && (
                 <div className="fixed inset-0 bg-[#0F172A] bg-opacity-90 flex items-center justify-center z-50">
@@ -132,4 +161,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default LoginPage;

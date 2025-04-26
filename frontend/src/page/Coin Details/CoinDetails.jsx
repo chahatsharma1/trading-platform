@@ -4,17 +4,18 @@ import { DotIcon, BookmarkIcon, BookmarkCheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import StockChart from "@/page/Home/StockChart.jsx";
-import TradingForm from "@/page/Stock Details/TradingForm.jsx";
+import TradingForm from "@/page/Coin Details/TradingForm.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getCoinDetails } from "@/page/State/Coin/Action.js";
 import { addCoinToWatchlist } from "@/page/State/Watchlist/Action.js";
 import { existInWatchlist } from "@/utils/existInWatchlist.js";
 
-const StockDetails = () => {
-    const {items} = useSelector(store => store.watchlist);
-    const {coinDetails} = useSelector(store => store.coin);
+const CoinDetails = () => {
+    const { items } = useSelector(store => store.watchlist);
+    const { coinDetails } = useSelector(store => store.coin);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [successMessage, setSuccessMessage] = useState(""); // Added
     const dispatch = useDispatch();
     const { id } = useParams();
 
@@ -26,10 +27,25 @@ const StockDetails = () => {
         dispatch(addCoinToWatchlist(coinDetails?.id, localStorage.getItem("jwt")));
     };
 
+    const handleTradeSuccess = (message) => {
+        setDialogOpen(false);
+        setSuccessMessage(message);
+        setTimeout(() => {
+            setSuccessMessage("");
+        }, 3000); // Clear success message after 3 seconds
+    };
+
     const isInWatchlist = existInWatchlist(items, coinDetails);
 
     return (
         <div className="p-5 min-h-screen bg-[#0F172A] text-[#F1F5F9]">
+
+            {successMessage && (
+                <div className="mb-4 p-3 bg-green-600 text-white rounded-lg text-center font-semibold">
+                    {successMessage}
+                </div>
+            )}
+
             <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-4">
                     <Avatar>
@@ -79,13 +95,14 @@ const StockDetails = () => {
             <div className="h-[500px] mt-4">
                 <StockChart coinId={id} />
             </div>
+
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent className="bg-[#1E293B] border-none text-[#F1F5F9]">
                     <DialogHeader>
                         <DialogTitle className="text-[#F1F5F9]">Trade {coinDetails?.name}</DialogTitle>
                     </DialogHeader>
                     <div className="text-sm text-[#94A3B8]">
-                        <TradingForm />
+                        <TradingForm onTradeSuccess={handleTradeSuccess} />
                     </div>
                 </DialogContent>
             </Dialog>
@@ -93,4 +110,4 @@ const StockDetails = () => {
     );
 };
 
-export default StockDetails;
+export default CoinDetails;

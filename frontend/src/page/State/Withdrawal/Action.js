@@ -17,7 +17,7 @@ export const withdrawRequest = ({amount, jwt}) => async (dispatch) => {
 export const proceedWithdrawal = ({id, jwt, accept}) => async (dispatch) => {
     dispatch({ type: WITHDRAWAL_PROCEED_REQUEST });
     try {
-        const response = await api.patch(`/admin/proceed/${id}/${accept}`, null, {
+        const response = await api.patch(`/admin/withdrawal/proceed/${id}/${accept}`, null, {
             headers: {
                 Authorization: `Bearer ${jwt}`}
         });
@@ -42,7 +42,7 @@ export const getWithdrawalHistory = ({jwt}) => async (dispatch) => {
 export const getAllWithdrawalRequest = ({jwt}) => async (dispatch) => {
     dispatch({ type: GET_WITHDRAWAL_REQUEST_REQUEST });
     try {
-        const response = await api.get('admin', {
+        const response = await api.get('/admin/withdrawal', {
             headers: { Authorization: `Bearer ${jwt}` }
         });
         dispatch({ type: GET_WITHDRAWAL_REQUEST_SUCCESS, payload: response.data });

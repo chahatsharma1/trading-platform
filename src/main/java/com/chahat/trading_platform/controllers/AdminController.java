@@ -9,8 +9,8 @@ import com.chahat.trading_platform.service.WithdrawalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -26,7 +26,8 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
-    @PatchMapping("/proceed/{id}/{accept}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("withdrawal/proceed/{id}/{accept}")
     public ResponseEntity<?> proceedWithdrawal(@PathVariable Long id, @PathVariable boolean accept, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJWT(jwt);
         Withdrawal withdrawal = withdrawalService.proceedWithWithdrawal(id, accept);
@@ -38,9 +39,9 @@ public class AdminController {
         return new ResponseEntity<>(withdrawal, HttpStatus.OK);
     }
 
-    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/withdrawal")
     public ResponseEntity<List<Withdrawal>> getWithdrawalRequest(@RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJWT(jwt);
         List<Withdrawal> withdrawals = withdrawalService.getAllWithdrawal();
         return new ResponseEntity<>(withdrawals, HttpStatus.OK);
     }

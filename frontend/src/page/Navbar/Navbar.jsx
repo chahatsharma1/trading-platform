@@ -16,7 +16,7 @@ const Navbar = () => {
     const { user } = useSelector((store) => store.auth);
     const [query, setQuery] = useState("");
 
-    if (location.pathname === "/" || location.pathname === "/login" || location.pathname === "/signup" || location.pathname === "/forgot-password") {
+    if (location.pathname === "/" || location.pathname === "/login" || location.pathname === "/signup" || location.pathname === "/forgot-password" || location.pathname.startsWith("/admin")) {
         return null;
     }
 

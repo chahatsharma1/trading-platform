@@ -6,24 +6,24 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-
 
 public class JWTProvider {
 
     private final static SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(JwtConstant.SECRET_KEY));
 
-
     public static String generateToken(Authentication auth){
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-        String roles = populateAuthorities(authorities);
+        List<String> roles = new ArrayList<>();
+        for (GrantedAuthority authority : authorities) {
+            roles.add(authority.getAuthority());
+        }
 
         return Jwts.builder()
                 .issuedAt(new Date())
                 .expiration(new Date(new Date().getTime() + 86400000))
                 .claim("email", auth.getName())
-                .claim("authorities", roles)
+                .claim("roles", roles)
                 .signWith(key)
                 .compact();
     }
@@ -32,17 +32,16 @@ public class JWTProvider {
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getBody();
+        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
 
-        String email = String.valueOf(claims.get("email"));
-        return email;
+        return String.valueOf(claims.get("email"));
     }
 
-    private static String populateAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        Set<String> auth = new HashSet<>();
-        for (GrantedAuthority ga : authorities){
-            auth.add(ga.getAuthority());
+    public static List<String> getRolesFromToken(String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
         }
-        return String.join(",", auth);
+        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+        return claims.get("roles", List.class);
     }
 }

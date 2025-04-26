@@ -1,5 +1,27 @@
 import axios from "axios";
-import {FORGOT_PASSWORD_FAILURE, FORGOT_PASSWORD_REQUEST, FORGOT_PASSWORD_SUCCESS, GET_USER_FAILURE, GET_USER_REQUEST, GET_USER_SUCCESS, LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS, SEND_VERIFICATION_OTP_FAILURE, SEND_VERIFICATION_OTP_REQUEST, SEND_VERIFICATION_OTP_SUCCESS, VERIFY_OTP_FAILURE, VERIFY_OTP_REQUEST, VERIFY_OTP_SUCCESS} from "./ActionType";
+import {
+    ADMIN_LOGIN_FAILURE,
+    ADMIN_LOGIN_REQUEST, ADMIN_LOGIN_SUCCESS, FETCH_USERS_FAILURE, FETCH_USERS_REQUEST, FETCH_USERS_SUCCESS,
+    FORGOT_PASSWORD_FAILURE,
+    FORGOT_PASSWORD_REQUEST,
+    FORGOT_PASSWORD_SUCCESS,
+    GET_USER_FAILURE,
+    GET_USER_REQUEST,
+    GET_USER_SUCCESS,
+    LOGIN_FAILURE,
+    LOGIN_REQUEST,
+    LOGIN_SUCCESS,
+    LOGOUT,
+    REGISTER_FAILURE,
+    REGISTER_REQUEST,
+    REGISTER_SUCCESS,
+    SEND_VERIFICATION_OTP_FAILURE,
+    SEND_VERIFICATION_OTP_REQUEST,
+    SEND_VERIFICATION_OTP_SUCCESS,
+    VERIFY_OTP_FAILURE,
+    VERIFY_OTP_REQUEST,
+    VERIFY_OTP_SUCCESS
+} from "./ActionType";
 import { API_BASE_URL } from "@/config/api.js";
 
 export const register = (userData) => async (dispatch) => {
@@ -14,6 +36,23 @@ export const register = (userData) => async (dispatch) => {
     } catch (error) {
         dispatch({ type: REGISTER_FAILURE, payload: error.message });
         return Promise.reject();
+    }
+};
+
+export const adminLogin = (adminData) => async (dispatch) => {
+    dispatch({ type: ADMIN_LOGIN_REQUEST });
+
+    try {
+        const response = await axios.post(`${API_BASE_URL}/auth/signin/admin`, adminData);
+        const admin = response.data;
+
+        dispatch({ type: ADMIN_LOGIN_SUCCESS, payload: admin.jwt });
+        console.log(response.data)
+        localStorage.setItem("jwt", admin.jwt);
+        adminData.navigate("/admin/dashboard");
+    } catch (error) {
+        console.log(error)
+        dispatch({ type: ADMIN_LOGIN_FAILURE, payload: error.response?.data?.message || error.message });
     }
 };
 
@@ -67,6 +106,20 @@ export const getUser = (jwt) => async (dispatch) => {
         dispatch({ type: GET_USER_SUCCESS, payload: user });
     } catch (error) {
         dispatch({ type: GET_USER_FAILURE, payload: error.message });
+    }
+};
+
+export const getAllUsers = (jwt) => async (dispatch) => {
+    dispatch({ type: FETCH_USERS_REQUEST });
+    try {
+        const response = await axios.get(`${API_BASE_URL}/users/all`, {
+            headers: {
+                Authorization: `Bearer ${jwt}`,
+            },
+        });
+        dispatch({ type: FETCH_USERS_SUCCESS, payload: response.data });
+    } catch (error) {
+        dispatch({ type: FETCH_USERS_FAILURE, payload: error.message });
     }
 };
 

@@ -20,12 +20,16 @@ import { useEffect } from "react";
 import { getUser } from "@/page/State/Auth/Action.js";
 import AdminWithdrawal from "@/page/Admin/AdminWithdrawal.jsx";
 import PaymentCancel from "@/page/Wallet/PaymentCancel.jsx";
+import AdminLogin from "@/page/Admin/AdminLogin.jsx";
+import AdminDashboard from "@/page/Admin/AdminDashboard.jsx";
+import UserPage from "@/page/Admin/UserPage.jsx";
 
 function App() {
     const {user, jwt} = useSelector(store => store.auth);
     const dispatch = useDispatch();
 
     const isLoggedIn = Boolean(user);
+    const isAdmin = user?.roles?.includes("ROLE_ADMIN");
 
     useEffect(() => {
         const token = jwt || localStorage.getItem("jwt");
@@ -44,7 +48,11 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/admin" element={<AdminWithdrawal />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/withdrawals" element={<AdminWithdrawal />} />
+                <Route path="/admin/users" element={<UserPage />} />
+
 
                 {isLoggedIn && (
                     <>

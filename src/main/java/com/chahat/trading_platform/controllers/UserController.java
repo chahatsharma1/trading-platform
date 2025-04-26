@@ -19,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -132,5 +134,11 @@ public class UserController {
         User user = userService.findUserByJWT(jwt);
         User updatedUser = userService.updateUser(request, user);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<User>> getAllUsers(@RequestHeader("Authorization") String jwt) throws Exception {
+        List<User> users = userService.getAllUsers();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }

@@ -9,6 +9,8 @@ import com.chahat.trading_platform.request.UpdateUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService{
 
@@ -71,5 +73,10 @@ public class UserServiceImpl implements UserService{
         user.setCountry(request.getCountry());
 
         return userRepository.save(user);
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

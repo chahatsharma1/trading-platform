@@ -18,7 +18,7 @@ const Login = () => {
     const [showOtpDialog, setShowOtpDialog] = useState(false);
     const [sessionId, setSessionId] = useState("");
 
-    const [loginLoading, setLoginLoading] = useState(false); 
+    const [loginLoading, setLoginLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
     const handleChange = (e) => {
@@ -96,6 +96,14 @@ const Login = () => {
                     Don&apos;t have an account?{" "}
                     <Link to="/signup" className="text-[#38BDF8] underline hover:text-[#3B82F6]">Sign up</Link>
                 </p>
+
+                <div className="text-center mt-4">
+                    <Link to="/admin/login">
+                        <Button className="w-full bg-[#FFD700] text-black hover:bg-[#FFC107]">
+                            Admin Login
+                        </Button>
+                    </Link>
+                </div>
             </form>
 
             {showOtpDialog && (

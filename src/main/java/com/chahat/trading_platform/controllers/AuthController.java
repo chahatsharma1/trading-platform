@@ -1,6 +1,7 @@
 package com.chahat.trading_platform.controllers;
 
 import com.chahat.trading_platform.config.JWTProvider;
+import com.chahat.trading_platform.domain.USER_ROLE;
 import com.chahat.trading_platform.model.TwoFactorOTP;
 import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.response.AuthResponse;
@@ -20,8 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -110,6 +109,31 @@ public class AuthController {
         return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
     }
 
+    @PostMapping("/signin/admin")
+    public ResponseEntity<AuthResponse> adminLogin(@RequestBody User user) {
+        String userName = user.getEmail();
+        String password = user.getPassword();
+
+        Authentication auth = authenticate(userName, password);
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        User authUser = userRepository.findUserByEmail(user.getEmail());
+
+        if (authUser.getUserRole() != USER_ROLE.ROLE_ADMIN) {
+            throw new BadCredentialsException("Access Denied: Not an Admin User");
+        }
+
+        String jwt = JWTProvider.generateToken(auth);
+
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setJwt(jwt);
+        authResponse.setStatus(true);
+        authResponse.setMessage("Admin Login Successfully");
+
+        return new ResponseEntity<>(authResponse, HttpStatus.OK);
+    }
+
     private Authentication authenticate(String userName, String password){
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
@@ -125,7 +149,7 @@ public class AuthController {
     }
 
     @PostMapping("/two-factor/otp/{otp}")
-    public ResponseEntity<AuthResponse> verifyLoginOtp(@PathVariable String otp, @RequestParam String id) throws Exception {
+    public ResponseEntity<AuthResponse> verifyLoginOtp(@PathVariable String otp, @RequestParam String id){
         TwoFactorOTP twoFactorOTP = twoFactorOTPService.findByID(id);
 
         AuthResponse authResponse = new AuthResponse();

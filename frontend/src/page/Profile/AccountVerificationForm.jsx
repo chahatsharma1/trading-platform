@@ -21,7 +21,7 @@ const AccountVerificationForm = ({ closeParentDialog, userEmail}) => {
             setOtpDialogOpen(true);
             setTimeout(() => inputRefs.current[0]?.focus(), 100);
         } catch (err) {
-            setError(err.message);
+            setError("Gmail Server is Down");
         } finally {
             setLoading(false);
         }

@@ -4,7 +4,7 @@ A full-stack, real-time crypto trading platform built with **Spring Boot (Backen
 
 ## 🔗 Live Demo
 
-Check out the live app here: [TradeX](https://trading-project-1001.web.app/)
+Check out the live app here: [TradeX](https://trading-project-1001-ffdf1.web.app/)
 
 ---
 

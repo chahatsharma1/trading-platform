@@ -46,8 +46,8 @@ const AssetTable = ({ coin, category, onRowClick }) => {
                                 </TableCell>
 
                                 <TableCell className="whitespace-nowrap">{coinItem?.symbol.toUpperCase()}</TableCell>
-                                <TableCell className="whitespace-nowrap">₹ {coinItem?.total_volume}</TableCell>
-                                <TableCell className="whitespace-nowrap">₹ {coinItem?.market_cap}</TableCell>
+                                <TableCell className="whitespace-nowrap">{coinItem?.total_volume}</TableCell>
+                                <TableCell className="whitespace-nowrap">{coinItem?.market_cap}</TableCell>
                                 <TableCell
                                     className={`whitespace-nowrap ${coinItem.price_change_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                                     ₹ {coinItem.price_change_24h.toFixed(2)}

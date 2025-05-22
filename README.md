@@ -2,6 +2,7 @@
 
 A full-stack, real-time crypto trading platform built with **Spring Boot (Backend)** and **React + TailwindCSS (Frontend)**. Designed to simulate the functionality of professional trading platforms with integrated wallet management, real-time coin data, 2FA, and secure payment handling using **Stripe**.
 
+![Dashboard Screenshot](./screenshots/screenshot.png)
 ## 🔗 Live Demo
 
 Check out the live app here: [TradeX](https://trading-project-1001-ffdf1.web.app/)
@@ -107,6 +108,11 @@ I wanted to build something that reflects my backend expertise, is deployable, i
 
 ---
 
-## ⚙️ Environment Variables (Not committed)
+## ⚙️ Environment Variables
 
-> `application.properties` is excluded from version control and contains:
+> `application.properties` is excluded from version control
+
+---
+## 🔐 Admin Access
+
+- Create a user with ROLE_ADMIN, and use those credentials to access Admin Dashboard

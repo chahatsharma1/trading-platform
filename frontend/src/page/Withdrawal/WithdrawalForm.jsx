@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button.jsx";
 import { Landmark } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPaymentDetails, withdrawRequest } from "@/page/State/Withdrawal/Action.js";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog.jsx"; // Assuming you have a Dialog component
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog.jsx";
 
 const WithdrawalForm = () => {
     const dispatch = useDispatch();

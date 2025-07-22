@@ -39,7 +39,6 @@ const AdminWithdrawal = () => {
 
     return (
         <div className="min-h-screen py-10 px-4 bg-[#0F172A] text-[#F1F5F9] relative">
-            {/* Top Right Buttons */}
             <div className="absolute top-6 right-6 flex gap-2">
                 <Button
                     onClick={handleBackToDashboard}
@@ -55,7 +54,6 @@ const AdminWithdrawal = () => {
                 </Button>
             </div>
 
-            {/* Content */}
             <div className="w-full max-w-3xl mx-auto">
                 <h1 className="text-2xl font-semibold mb-6 text-center">Withdrawal Requests</h1>
 

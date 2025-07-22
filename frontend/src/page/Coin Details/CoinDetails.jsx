@@ -15,7 +15,7 @@ const CoinDetails = () => {
     const { items } = useSelector(store => store.watchlist);
     const { coinDetails } = useSelector(store => store.coin);
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [successMessage, setSuccessMessage] = useState(""); // Added
+    const [successMessage, setSuccessMessage] = useState("");
     const dispatch = useDispatch();
     const { id } = useParams();
 
@@ -32,7 +32,7 @@ const CoinDetails = () => {
         setSuccessMessage(message);
         setTimeout(() => {
             setSuccessMessage("");
-        }, 3000); // Clear success message after 3 seconds
+        }, 3000);
     };
 
     const isInWatchlist = existInWatchlist(items, coinDetails);

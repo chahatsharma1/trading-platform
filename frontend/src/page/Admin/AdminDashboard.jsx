@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { logout } from "@/page/State/Auth/Action"; // Import the logout action
+import { logout } from "@/page/State/Auth/Action";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -18,7 +18,7 @@ const AdminDashboard = () => {
 
     const handleLogout = () => {
         dispatch(logout());
-        navigate("/"); // Redirect to login or home after logout
+        navigate("/");
     };
 
     return (
@@ -30,7 +30,6 @@ const AdminDashboard = () => {
                 Logout
             </Button>
 
-            {/* Main Dashboard Box */}
             <div className="bg-[#1E293B] rounded-2xl shadow-lg p-8 w-full max-w-md space-y-6 text-center">
                 <h1 className="text-3xl font-bold text-[#F1F5F9]">Admin Dashboard</h1>
                 <p className="text-[#F1F5F9] text-sm mb-4">Manage Withdrawals and Users</p>

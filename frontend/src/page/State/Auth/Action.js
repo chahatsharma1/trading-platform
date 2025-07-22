@@ -49,7 +49,7 @@ export const adminLogin = (adminData) => async (dispatch) => {
         localStorage.setItem("jwt", admin.jwt);
         await dispatch(getUser(admin.jwt));
         adminData.navigate("/admin/dashboard");
-        return { error: false }; // 🟢 success
+        return { error: false };
     } catch (error) {
         dispatch({ type: ADMIN_LOGIN_FAILURE, payload: error.response?.data?.message || error.message });
         return { error: true, message: error.response?.data?.message || "Admin login failed" };

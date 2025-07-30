@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from "@/components/ui/card";
+import { useDispatch, useSelector } from "react-redux";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { User, Mail, MapPin, Calendar, ShieldCheck, ShieldOff, AlertTriangle, Edit } from "lucide-react";
+
 import AccountVerificationForm from "@/page/Profile/AccountVerificationForm";
 import EditProfileForm from "@/page/Profile/EditProfileForm";
-import { useDispatch, useSelector } from "react-redux";
-import {disableTwoFactorAuth, getUser} from "@/page/State/Auth/Action.js";
+import { disableTwoFactorAuth, getUser } from "@/page/State/Auth/Action.js";
 
 const Profile = () => {
     const dispatch = useDispatch();
@@ -24,144 +20,144 @@ const Profile = () => {
     const [isDisableDialogOpen, setIsDisableDialogOpen] = useState(false);
 
     useEffect(() => {
-        const requiredFields = ['dob', 'nationality', 'address', 'city', 'postcode', 'country'];
-        const incompleteFields = requiredFields.filter(field => !user[field]);
-        setIsProfileIncomplete(incompleteFields.length > 0);
+        if (user) {
+            const requiredFields = ['dob', 'nationality', 'address', 'city', 'postcode', 'country'];
+            const incomplete = requiredFields.some(field => !user[field]);
+            setIsProfileIncomplete(incomplete);
+        }
     }, [user]);
 
-    const handleDisable = async () => {
+    const handleDisable2FA = async () => {
         await dispatch(disableTwoFactorAuth(localStorage.getItem("jwt")));
-        await dispatch(getUser(localStorage.getItem("jwt")))
+        dispatch(getUser(localStorage.getItem("jwt")));
         setIsDisableDialogOpen(false);
     };
+    
+    const containerVariants = {
+        hidden: { opacity: 0, scale: 0.98 },
+        visible: { opacity: 1, scale: 1, transition: { staggerChildren: 0.15, duration: 0.4 } },
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
+    };
+
+    const InfoRow = ({ icon, label, value }) => (
+        <div className="flex items-start gap-4">
+            <div className="text-muted-foreground pt-1">{icon}</div>
+            <div>
+                <p className="text-sm text-muted-foreground">{label}</p>
+                <p className="font-medium">{value || 'Not Provided'}</p>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="min-h-screen py-10 px-4 flex justify-center bg-[#0F172A]">
-            <div className="w-full max-w-4xl space-y-6">
+        <div className="relative min-h-screen bg-background text-foreground font-sans flex justify-center py-10">
+            <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(#2d3748_1px,transparent_1px)] [background-size:32px_32px]"></div>
+            
+            <motion.main variants={containerVariants} initial="hidden" animate="visible" className="w-full max-w-4xl space-y-8 px-4">
+                <motion.div variants={itemVariants}>
+                    <h1 className="text-3xl md:text-3xl font-bold tracking-tight text-center">My Profile</h1>
+                    <p className="text-muted-foreground mt-2 text-center">Manage your personal information and security settings.</p>
+                </motion.div>
 
-                <Card className="p-6 bg-[#1E293B] border border-slate-700 rounded-xl shadow-md">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-lg font-semibold text-[#F1F5F9]">Your Information</h2>
-                        <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
-                            <DialogTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="bg-[#3B82F6] hover:bg-[#60A5FA] text-white text-sm px-4 py-2 rounded-xl">
-                                    Edit Profile
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-[#1E293B] border border-slate-700">
-                                <DialogHeader>
-                                    <DialogTitle className="text-[#F1F5F9]">Edit Your Profile</DialogTitle>
-                                    <DialogDescription/>
-                                </DialogHeader>
-                                <EditProfileForm user={user} onClose={() => setIsEditProfileOpen(false)} />
-                            </DialogContent>
-                        </Dialog>
-                    </div>
+                <motion.div variants={itemVariants}>
+                    <Card className="bg-card/50 backdrop-blur-lg border-border/50">
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle>Personal Information</CardTitle>
+                            <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm"><Edit className="h-4 w-4 mr-2" /> Edit Profile</Button>
+                                </DialogTrigger>
+                                <DialogContent className="bg-card border-border">
+                                    <DialogHeader>
+                                        <DialogTitle>Edit Your Profile</DialogTitle>
+                                        <DialogDescription>Make sure to save your changes when you're done.</DialogDescription>
+                                    </DialogHeader>
+                                    <EditProfileForm user={user} onSuccess={() => setIsEditProfileOpen(false)} />
+                                </DialogContent>
+                            </Dialog>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                            <InfoRow icon={<User size={20}/>} label="Full Name" value={user?.fullName} />
+                            <InfoRow icon={<Mail size={20}/>} label="Email Address" value={user?.email} />
+                            <InfoRow icon={<Calendar size={20}/>} label="Date of Birth" value={user?.dob} />
+                            <InfoRow icon={<MapPin size={20}/>} label="Address" value={`${user?.address || ''}, ${user?.city || ''} ${user?.postcode || ''}`} />
+                        </CardContent>
+                    </Card>
+                </motion.div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-12 text-sm text-[#CBD5E1]">
-                        <p><span className="font-medium text-slate-400">Email</span> : {user.email}</p>
-                        <p><span className="font-medium text-slate-400">Address</span> : {user.address || 'Not Provided'}</p>
-                        <p><span className="font-medium text-slate-400">Full Name</span> : {user.fullName}</p>
-                        <p><span className="font-medium text-slate-400">City</span> : {user.city || 'Not Provided'}</p>
-                        <p><span className="font-medium text-slate-400">Date Of Birth</span> : {user.dob || 'Not Provided'}</p>
-                        <p><span className="font-medium text-slate-400">Postcode</span> : {user.postcode || 'Not Provided'}</p>
-                        <p><span className="font-medium text-slate-400">Nationality</span> : {user.nationality || 'Not Provided'}</p>
-                        <p><span className="font-medium text-slate-400">Country</span> : {user.country || 'Not Provided'}</p>
-                    </div>
-                </Card>
+                <motion.div variants={itemVariants}>
+                    <Card className="bg-card/50 backdrop-blur-lg border-border/50">
+                        <CardHeader>
+                            <CardTitle>Security</CardTitle>
+                            <CardDescription>Manage your account's security features.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex items-center justify-between p-6 pt-0">
+                            <div className="flex items-center gap-2">
+                                <p className="font-medium">Two-Factor Authentication</p>
+                                <Badge variant={user?.twoFactorAuth?.enabled ? "success" : "destructive"}>
+                                    {user?.twoFactorAuth?.enabled ? "Enabled" : "Disabled"}
+                                </Badge>
+                            </div>
+                            {user?.twoFactorAuth?.enabled ? (
+                                <Dialog open={isDisableDialogOpen} onOpenChange={setIsDisableDialogOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button variant="destructive"><ShieldOff className="h-4 w-4 mr-2" /> Disable</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-card border-border">
+                                        <DialogHeader>
+                                            <DialogTitle>Disable Two-Factor Authentication?</DialogTitle>
+                                            <DialogDescription>This will reduce your account's security. We highly recommend keeping it enabled.</DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter className="gap-2 sm:gap-0">
+                                            <Button variant="outline" onClick={() => setIsDisableDialogOpen(false)}>Cancel</Button>
+                                            <Button variant="destructive" onClick={handleDisable2FA}>Confirm Disable</Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            ) : (
+                                <Dialog open={isVerificationOpen} onOpenChange={setIsVerificationOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button><ShieldCheck className="h-4 w-4 mr-2" /> Enable</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-card border-border">
+                                        <DialogHeader>
+                                            <DialogTitle>Enable Two-Factor Authentication</DialogTitle>
+                                            <DialogDescription/>
+                                        </DialogHeader>
+                                        <AccountVerificationForm onSuccess={() => setIsVerificationOpen(false)} userEmail={user.email}  />
+                                    </DialogContent>
+                                </Dialog>
+                            )}
+                        </CardContent>
+                    </Card>
+                </motion.div>
 
-                <Card className="p-6 bg-[#1E293B] border border-slate-700 rounded-xl shadow-md flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-                    <div className="text-sm text-[#F1F5F9] font-medium flex items-center gap-2">
-                        2 Step Verification
-                        <Badge variant={user?.twoFactorAuth.enabled ? "success" : "destructive"} className="text-xs">
-                            {user?.twoFactorAuth.enabled ? "Enabled" : "Disabled"}
-                        </Badge>
-                    </div>
-
-                    {user?.twoFactorAuth.enabled ? (
-                        <Dialog open={isDisableDialogOpen} onOpenChange={setIsDisableDialogOpen}>
-                            <DialogTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="bg-red-600 hover:bg-red-700 text-white rounded-xl px-4 py-2 text-sm font-medium transition"
-                                >
-                                    Disable Two Step Verification
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-[#1E293B] border border-slate-700">
-                                <DialogHeader>
-                                    <DialogTitle className="text-[#F1F5F9]">Disable Two Step Verification</DialogTitle>
-                                    <DialogDescription className="text-[#CBD5E1]">
-                                        Are you sure you want to disable two-step verification? This may lower your account security.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="flex justify-end gap-4 mt-4">
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setIsDisableDialogOpen(false)}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        className="bg-red-600 hover:bg-red-700 text-white"
-                                        onClick={handleDisable}
-                                    >
-                                        Confirm Disable
-                                    </Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    ) : (
-                        <Dialog open={isVerificationOpen} onOpenChange={setIsVerificationOpen}>
-                            <DialogTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="bg-[#3B82F6] hover:bg-[#60A5FA] text-white rounded-xl px-4 py-2 text-sm font-medium transition"
-                                >
-                                    Enable Two Step Verification
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-[#1E293B] border border-slate-700">
-                                <DialogHeader>
-                                    <DialogTitle className="text-[#F1F5F9]">Enable Two Step Verification</DialogTitle>
-                                    <DialogDescription/>
-                                </DialogHeader>
-                                <AccountVerificationForm
-                                    closeParentDialog={() => setIsVerificationOpen(false)}
-                                    userEmail={user.email}
-                                />
-                            </DialogContent>
-                        </Dialog>
-                    )}
-                </Card>
-            </div>
-
-            {isProfileIncomplete && (
                 <Dialog open={isProfileIncomplete} onOpenChange={setIsProfileIncomplete}>
-                    <DialogContent className="bg-[#1E293B] border border-slate-700">
-                        <DialogHeader>
-                            <DialogTitle className="text-[#F1F5F9]">Please Complete Your Profile</DialogTitle>
+                    <DialogContent className="bg-card border-border">
+                         <DialogHeader>
+                            <div className="flex flex-col items-center text-center gap-4 py-4">
+                                <AlertTriangle className="w-16 h-16 text-yellow-500" />
+                                <DialogTitle className="text-2xl">Please Complete Your Profile</DialogTitle>
+                                <DialogDescription>
+                                    Some required fields are missing. Completing your profile ensures full access to all features.
+                                </DialogDescription>
+                            </div>
                         </DialogHeader>
-                        <p className="text-[#F1F5F9]">
-                            Some required fields are missing. Kindly complete your profile to ensure full access to features.
-                        </p>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                className="bg-[#3B82F6] hover:bg-[#60A5FA] text-white rounded-xl px-4 py-2 text-sm font-medium transition"
-                                onClick={() => {
-                                    setIsEditProfileOpen(true);
-                                    setIsProfileIncomplete(false);
-                                }}
-                            >
-                                Complete Profile
+                        <DialogFooter>
+                            <Button className="w-full" onClick={() => {
+                                setIsProfileIncomplete(false);
+                                setIsEditProfileOpen(true);
+                            }}>
+                                Complete Profile Now
                             </Button>
-                        </DialogTrigger>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
-            )}
+            </motion.main>
         </div>
     );
 };

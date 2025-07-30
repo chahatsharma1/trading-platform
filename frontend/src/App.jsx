@@ -1,5 +1,7 @@
-import './App.css';
-import {Routes, Route, Navigate} from "react-router-dom";
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
 import Navbar from "@/page/Navbar/Navbar.jsx";
 import Home from "@/page/Home/Home.jsx";
 import Activity from "@/page/Activity/Activity.jsx";
@@ -15,13 +17,12 @@ import HomePage from "@/page/Auth/HomePage.jsx";
 import Login from "@/page/Auth/Login.jsx";
 import Signup from "@/page/Auth/Signup.jsx";
 import ForgotPassword from "@/page/Auth/ForgotPassword.jsx";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
 import { getUser } from "@/page/State/Auth/Action.js";
 import AdminWithdrawal from "@/page/Admin/AdminWithdrawal.jsx";
 import PaymentCancel from "@/page/Wallet/PaymentCancel.jsx";
 import AdminDashboard from "@/page/Admin/AdminDashboard.jsx";
 import UserPage from "@/page/Admin/UserPage.jsx";
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
     const { user, jwt } = useSelector(store => store.auth);
@@ -32,51 +33,37 @@ function App() {
         if (token && !user) {
             dispatch(getUser(token));
         }
-    }, [jwt, dispatch, user]);
-
-    const isLoggedIn = Boolean(user);
-    const isAdmin = user?.userRole?.includes("ROLE_ADMIN");
-    const isCustomer = user?.userRole?.includes("ROLE_CUSTOMER");
-
-    const showNavbar = isLoggedIn;
-
+    }, [jwt, user, dispatch]);
 
     return (
         <>
-            {showNavbar && <Navbar />}
-
+            <Navbar />
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/cancel" element={<PaymentCancel />} />
 
-                {isLoggedIn && isAdmin && (
-                    <>
-                        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                        <Route path="/admin/withdrawals" element={<AdminWithdrawal />} />
-                        <Route path="/admin/users" element={<UserPage />} />
-                    </>
-                )}
+                <Route path="/home" element={<ProtectedRoute role="ROLE_CUSTOMER"><Home /></ProtectedRoute>} />
+                <Route path="/portfolio" element={<ProtectedRoute role="ROLE_CUSTOMER"><Portfolio /></ProtectedRoute>} />
+                <Route path="/activity" element={<ProtectedRoute role="ROLE_CUSTOMER"><Activity /></ProtectedRoute>} />
+                <Route path="/wallet" element={<ProtectedRoute role="ROLE_CUSTOMER"><Wallet /></ProtectedRoute>} />
+                <Route path="/withdrawal" element={<ProtectedRoute role="ROLE_CUSTOMER"><Withdrawal /></ProtectedRoute>} />
+                <Route path="/payment-details" element={<ProtectedRoute role="ROLE_CUSTOMER"><PaymentDetails /></ProtectedRoute>} />
+                <Route path="/market/:id" element={<ProtectedRoute role="ROLE_CUSTOMER"><CoinDetails /></ProtectedRoute>} />
+                <Route path="/watchlist" element={<ProtectedRoute role="ROLE_CUSTOMER"><Watchlist /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute role="ROLE_CUSTOMER"><Profile /></ProtectedRoute>} />
+                <Route path="/search" element={<ProtectedRoute role="ROLE_CUSTOMER"><SearchCoin /></ProtectedRoute>} />
 
-                {isLoggedIn && isCustomer && (
-                    <>
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/portfolio" element={<Portfolio />} />
-                        <Route path="/activity" element={<Activity />} />
-                        <Route path="/wallet" element={<Wallet />} />
-                        <Route path="/withdrawal" element={<Withdrawal />} />
-                        <Route path="/payment-details" element={<PaymentDetails />} />
-                        <Route path="/market/:id" element={<CoinDetails />} />
-                        <Route path="/watchlist" element={<Watchlist />} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/search" element={<SearchCoin />} />
-                        <Route path="/cancel" element={<PaymentCancel />} />
-                        <Route path="*" element={<Navigate to="/login" />} />
-                    </>
-                )}
+                <Route path="/admin/dashboard" element={<ProtectedRoute role="ROLE_ADMIN"><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/admin/withdrawals" element={<ProtectedRoute role="ROLE_ADMIN"><AdminWithdrawal /></ProtectedRoute>} />
+                <Route path="/admin/users" element={<ProtectedRoute role="ROLE_ADMIN"><UserPage /></ProtectedRoute>} />
+
+                <Route path="*" element={<Navigate to="/" />} />
             </Routes>
         </>
     );
 }
-export default App
+
+export default App;

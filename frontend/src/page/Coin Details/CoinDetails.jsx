@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, AvatarImage } from "@/components/ui/avatar.jsx";
-import { DotIcon, BookmarkIcon, BookmarkCheckIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import StockChart from "@/page/Home/StockChart.jsx";
-import TradingForm from "@/page/Coin Details/TradingForm.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Bookmark, BookmarkCheck, TrendingUp, ShoppingCart } from "lucide-react";
+
+import StockChart from "@/page/Home/StockChart.jsx";
+import TradingForm from "@/page/Coin Details/TradingForm.jsx";
 import { getCoinDetails } from "@/page/State/Coin/Action.js";
 import { addCoinToWatchlist } from "@/page/State/Watchlist/Action.js";
 import { existInWatchlist } from "@/utils/existInWatchlist.js";
 
 const CoinDetails = () => {
-    const { items } = useSelector(store => store.watchlist);
-    const { coinDetails } = useSelector(store => store.coin);
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [successMessage, setSuccessMessage] = useState("");
     const dispatch = useDispatch();
     const { id } = useParams();
+    const { items } = useSelector(store => store.watchlist);
+    const { coinDetails, loading } = useSelector(store => store.coin);
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         dispatch(getCoinDetails(id, localStorage.getItem("jwt")));
@@ -27,85 +30,95 @@ const CoinDetails = () => {
         dispatch(addCoinToWatchlist(coinDetails?.id, localStorage.getItem("jwt")));
     };
 
-    const handleTradeSuccess = (message) => {
-        setDialogOpen(false);
-        setSuccessMessage(message);
-        setTimeout(() => {
-            setSuccessMessage("");
-        }, 3000);
-    };
-
     const isInWatchlist = existInWatchlist(items, coinDetails);
 
-    return (
-        <div className="p-5 min-h-screen bg-[#0F172A] text-[#F1F5F9]">
+    const containerVariants = {
+        hidden: { opacity: 0, scale: 0.98 },
+        visible: { opacity: 1, scale: 1, transition: { staggerChildren: 0.15, duration: 0.4 } },
+    };
 
-            {successMessage && (
-                <div className="mb-4 p-3 bg-green-600 text-white rounded-lg text-center font-semibold">
-                    {successMessage}
-                </div>
-            )}
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
+    };
 
-            <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-4">
-                    <Avatar>
-                        <AvatarImage src={coinDetails?.image.large} />
-                    </Avatar>
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <p className="text-lg font-semibold text-[#F1F5F9]">
-                                {coinDetails?.symbol.toUpperCase()}
-                            </p>
-                            <DotIcon className="text-[#94A3B8]" />
-                            <p className="text-sm text-[#94A3B8]">{coinDetails?.name}</p>
+    if (loading || !coinDetails) {
+        return (
+            <div className="relative min-h-screen bg-background text-foreground font-sans flex justify-center py-10">
+                <div className="w-full max-w-7xl space-y-8 px-4">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-4">
+                            <Skeleton className="h-16 w-16 rounded-full" />
+                            <div className="space-y-2">
+                                <Skeleton className="h-6 w-48" />
+                                <Skeleton className="h-8 w-40" />
+                            </div>
                         </div>
-                        <p className="text-2xl font-bold text-[#F1F5F9]">
-                            ₹ {coinDetails?.market_data.current_price.inr.toLocaleString()}
-                        </p>
-                        <p className={`text-sm ${coinDetails?.market_data.price_change_24h_in_currency.inr >= 0
-                            ? 'text-green-500'
-                            : 'text-red-500'}`}>
-                            ₹{coinDetails?.market_data.price_change_24h_in_currency.inr.toFixed(2)}
-                            ({coinDetails?.market_data.price_change_percentage_24h_in_currency.inr.toFixed(2)}%)
-                        </p>
+                        <Skeleton className="h-10 w-48" />
                     </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <Button
-                        onClick={handleAddToWatchlist}
-                        variant="outline"
-                        size="icon"
-                        className={`border border-[#334155] text-white transition-all duration-200
-                            ${isInWatchlist ? 'bg-green-600 hover:bg-green-700' : 'bg-[#1E293B] hover:bg-[#334155]'}`}
-                        title={isInWatchlist ? "Coin in Watchlist" : "Add to Watchlist"}
-                    >
-                        {isInWatchlist ? <BookmarkCheckIcon size={18} /> : <BookmarkIcon size={18} />}
-                    </Button>
-
-                    <Button
-                        onClick={() => setDialogOpen(true)}
-                        className="rounded-lg px-6 py-2 bg-[#3B82F6] text-white hover:bg-[#2563EB]"
-                    >
-                        TRADE
-                    </Button>
+                    <Skeleton className="h-96 w-full" />
                 </div>
             </div>
+        );
+    }
 
-            <div className="h-[500px] mt-4">
-                <StockChart coinId={id} />
-            </div>
+    return (
+        <div className="relative min-h-screen bg-background text-foreground font-sans flex justify-center py-10">
+            <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(#2d3748_1px,transparent_1px)] [background-size:32px_32px]"></div>
 
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent className="bg-[#1E293B] border-none text-[#F1F5F9]">
-                    <DialogHeader>
-                        <DialogTitle className="text-[#F1F5F9]">Trade {coinDetails?.name}</DialogTitle>
-                    </DialogHeader>
-                    <div className="text-sm text-[#94A3B8]">
-                        <TradingForm onTradeSuccess={handleTradeSuccess} />
+            <motion.main variants={containerVariants} initial="hidden" animate="visible" className="w-full max-w-7xl space-y-8 px-4">
+                <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <Avatar className="h-16 w-16">
+                            <AvatarImage src={coinDetails.image.large} />
+                        </Avatar>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h1 className="text-2xl font-bold">{coinDetails.name}</h1>
+                                <p className="text-lg text-muted-foreground uppercase">{coinDetails.symbol}</p>
+                            </div>
+                            <p className="text-3xl font-bold mt-1">₹ {coinDetails.market_data.current_price.inr.toLocaleString()}</p>
+                            <p className={`font-semibold flex items-center gap-1 text-sm ${coinDetails.market_data.price_change_percentage_24h_in_currency.inr >= 0 ? "text-green-500" : "text-red-500"}`}>
+                                <TrendingUp className={`w-4 h-4 ${coinDetails.market_data.price_change_percentage_24h_in_currency.inr < 0 && "rotate-180"}`} />
+                                ₹{coinDetails.market_data.price_change_24h_in_currency.inr.toFixed(2).toLocaleString()} ({coinDetails.market_data.price_change_percentage_24h_in_currency.inr.toFixed(2)}%) 24h
+                            </p>
+                        </div>
                     </div>
-                </DialogContent>
-            </Dialog>
+                    <div className="flex items-center gap-2">
+                        <Button onClick={handleAddToWatchlist} variant="outline" size="icon" title={isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}>
+                            {isInWatchlist ? <BookmarkCheck className="h-5 w-5 text-primary" /> : <Bookmark className="h-5 w-5" />}
+                        </Button>
+                        <Dialog open={open} onOpenChange={setOpen}>
+                            <DialogTrigger asChild>
+                                <Button size="lg"><ShoppingCart className="h-5 w-5 mr-2" /> Trade</Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-card border-border">
+                                <DialogHeader>
+                                    <DialogTitle>Trade {coinDetails.name}</DialogTitle>
+                                </DialogHeader>
+                                <TradingForm onTradeSuccess={() => setOpen(false)} />
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                    <Card className="bg-card/50 backdrop-blur-lg border-border/50 h-[500px] p-2">
+                        <StockChart coinId={id} />
+                    </Card>
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                    <Card className="bg-card/50 backdrop-blur-lg border-border/50">
+                        <CardHeader>
+                            <CardTitle>About {coinDetails.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="prose prose-sm dark:prose-invert" dangerouslySetInnerHTML={{ __html: coinDetails.description.en }} />
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            </motion.main>
         </div>
     );
 };

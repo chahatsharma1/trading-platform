@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card } from "@/components/ui/card";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog.jsx";
-import { Button } from "@/components/ui/button.jsx";
-import PaymentDetailsForm from "@/page/Payment Details/PaymentDetailsForm.jsx";
 import { useDispatch, useSelector } from "react-redux";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button.jsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog.jsx";
+import { Landmark, Trash2, PlusCircle, ShieldCheck } from "lucide-react";
+import PaymentDetailsForm from "@/page/Payment Details/PaymentDetailsForm.jsx";
 import { deletePaymentDetails, getPaymentDetails } from "@/page/State/Withdrawal/Action.js";
 
 const PaymentDetails = () => {
@@ -26,69 +21,107 @@ const PaymentDetails = () => {
         fetchPaymentDetails();
     }, []);
 
-    const handleDelete = async () => {
-        await dispatch(deletePaymentDetails({ jwt: localStorage.getItem("jwt") }));
-        fetchPaymentDetails();
+    const handleDelete = () => {
+        dispatch(deletePaymentDetails({ jwt: localStorage.getItem("jwt") }));
     };
 
     const handleSuccess = () => {
         setOpen(false);
         fetchPaymentDetails();
     };
+    
+    const containerVariants = {
+        hidden: { opacity: 0, scale: 0.98 },
+        visible: { opacity: 1, scale: 1, transition: { staggerChildren: 0.15, duration: 0.4 } },
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
+    };
 
     return (
-        <div className="min-h-screen py-10 px-4 flex justify-center bg-[#0F172A] text-[#F1F5F9]">
-            <div className="w-full max-w-2xl">
-                <h1 className="text-2xl font-semibold text-[#F1F5F9] mb-6">Payment Details</h1>
+        <div className="relative min-h-screen bg-background text-foreground font-sans flex justify-center py-10">
+            <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(#2d3748_1px,transparent_1px)] [background-size:32px_32px]"></div>
 
-                {paymentDetails ? (
-                    <Card className="rounded-xl border border-[#1E293B] bg-[#1E293B] p-6 space-y-4 shadow-md">
-                        <div className="text-lg font-semibold text-[#F1F5F9]">
-                            {paymentDetails?.bankName}
-                            <p>
-                                <span className="font-medium text-[#94A3B8] text-sm">
-                                    A/c No. : {paymentDetails?.accountNo?.replace(/\d(?=\d{4})/g, '*')}
-                                </span>
-                            </p>
-                        </div>
-                        <div className="text-sm text-[#CBD5E1] space-y-1">
-                            <p>
-                                <span className="font-medium text-[#94A3B8]">A/C Holder</span> : {paymentDetails?.accountHolderName}
-                            </p>
-                            <p>
-                                <span className="font-medium text-[#94A3B8]">IFSC</span> : {paymentDetails?.ifscCode}
-                            </p>
-                        </div>
-                        <Button
-                            onClick={handleDelete}
-                            className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-xl shadow"
-                        >
-                            Delete Payment Details
-                        </Button>
-                    </Card>
-                ) : (
-                    <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogTrigger asChild>
-                            <Button className="mt-6 w-full bg-[#1E293B] text-[#F1F5F9] border border-[#334155] hover:bg-[#334155] font-medium py-3 rounded-xl shadow-sm transition-colors">
-                                + Add Payment Details
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent
-                            className="bg-[#1E293B] text-[#F1F5F9] border border-[#334155]"
-                            aria-describedby="paymentDetailsFormDescription"
-                        >
-                            <DialogHeader>
-                                <DialogTitle className="text-[#F1F5F9] text-center">Payment Details</DialogTitle>
-                                <DialogDescription/>
-                            </DialogHeader>
-                            <p id="paymentDetailsFormDescription" className="sr-only">
-                                A form to add or update your payment details including bank name, account number, and IFSC code.
-                            </p>
-                            <PaymentDetailsForm onSuccess={handleSuccess} />
-                        </DialogContent>
-                    </Dialog>
-                )}
-            </div>
+            <motion.main
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="w-full max-w-2xl space-y-8 px-4">
+                <motion.div variants={itemVariants}>
+                    <h1 className="text-3xl md:text-3xl font-bold tracking-tight text-center">Payment Details</h1>
+                    <p className="text-muted-foreground mt-2 text-center">Manage your linked bank account for withdrawals.</p>
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                    {paymentDetails ? (
+                        <Card className="bg-gradient-to-br from-primary/10 via-card/50 to-card/50 backdrop-blur-lg border-border/50 overflow-hidden">
+                            <CardHeader className="flex flex-row items-start justify-between">
+                                <div>
+                                    <CardTitle className="text-xl">{paymentDetails?.bankName}</CardTitle>
+                                    <CardDescription/>
+                                </div>
+                                <Landmark className="h-8 w-8 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent className="space-y-6 pt-4">
+                                <div className="font-mono text-2xl tracking-widest text-foreground">
+                                    {paymentDetails?.accountNo?.replace(/\d(?=\d{4})/g, '•')}
+                                </div>
+                                <div className="flex items-end justify-between">
+                                    <div>
+                                        <p className="text-xs text-muted-foreground">Account Holder</p>
+                                        <p className="font-medium">{paymentDetails?.accountHolderName}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-muted-foreground">IFSC Code</p>
+                                        <p className="font-medium">{paymentDetails?.ifscCode}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                            <div className="p-6 pt-0">
+                                <Button
+                                    onClick={handleDelete}
+                                    variant="destructive"
+                                    className="w-full"
+                                >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete Account Details
+                                </Button>
+                            </div>
+                        </Card>
+                    ) : (
+                        <Dialog open={open} onOpenChange={setOpen}>
+                            <Card className="bg-card/50 backdrop-blur-lg border-2 border-dashed border-border/50 text-center p-8">
+                                <CardHeader>
+                                    <ShieldCheck className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                                    <CardTitle>No Payment Details Found</CardTitle>
+                                    <CardDescription>
+                                        Link your bank account to start withdrawing your funds securely.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <DialogTrigger asChild>
+                                        <Button size="lg">
+                                            <PlusCircle className="h-5 w-5 mr-2" />
+                                            Add Bank Account
+                                        </Button>
+                                    </DialogTrigger>
+                                </CardContent>
+                            </Card>
+                            <DialogContent className="bg-card border-border">
+                                <DialogHeader>
+                                    <DialogTitle>Add Your Bank Account</DialogTitle>
+                                    <CardDescription>
+                                        Please ensure all details are correct.
+                                    </CardDescription>
+                                </DialogHeader>
+                                <PaymentDetailsForm onSuccess={handleSuccess} />
+                            </DialogContent>
+                        </Dialog>
+                    )}
+                </motion.div>
+            </motion.main>
         </div>
     );
 };

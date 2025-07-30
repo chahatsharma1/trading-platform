@@ -1,15 +1,16 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button.jsx";
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog.jsx";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog.jsx";
 import { Input } from "@/components/ui/input.jsx";
-import {getUser, sendVerificationOtp, verifyOtp} from "@/page/State/Auth/Action.js";
+import { getUser, sendVerificationOtp, verifyOtp } from "@/page/State/Auth/Action.js";
+import { Loader2, KeyRound } from "lucide-react";
 
-const AccountVerificationForm = ({ closeParentDialog, userEmail}) => {
+const AccountVerificationForm = ({ onSuccess, userEmail }) => {
+    const dispatch = useDispatch();
     const [otpDialogOpen, setOtpDialogOpen] = useState(false);
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const inputRefs = useRef([]);
-    const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -19,20 +20,27 @@ const AccountVerificationForm = ({ closeParentDialog, userEmail}) => {
         try {
             await dispatch(sendVerificationOtp(localStorage.getItem("jwt"), "EMAIL"));
             setOtpDialogOpen(true);
-            setTimeout(() => inputRefs.current[0]?.focus(), 100);
         } catch (err) {
-            setError("Gmail Server is Down");
+            setError("Failed to send OTP. Please try again later.");
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (otpDialogOpen) {
+            setTimeout(() => inputRefs.current[0]?.focus(), 100);
+        }
+    }, [otpDialogOpen]);
 
     const handleChangeOtp = (index, value) => {
         if (!/^[0-9]?$/.test(value)) return;
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
-        if (value && index < 5) inputRefs.current[index + 1]?.focus();
+        if (value && index < 5) {
+            inputRefs.current[index + 1]?.focus();
+        }
     };
 
     const handleKeyDown = (index, event) => {
@@ -43,48 +51,68 @@ const AccountVerificationForm = ({ closeParentDialog, userEmail}) => {
 
     const handleVerifyOtp = async () => {
         const enteredOtp = otp.join("");
+        if (enteredOtp.length !== 6) {
+            setError("Please enter the complete 6-digit OTP.");
+            return;
+        }
         setLoading(true);
         setError("");
         try {
             await dispatch(verifyOtp(localStorage.getItem("jwt"), enteredOtp));
-            await dispatch(getUser(localStorage.getItem("jwt")))
+            await dispatch(getUser(localStorage.getItem("jwt")));
             setOtpDialogOpen(false);
-            closeParentDialog();
+            if (onSuccess) onSuccess();
         } catch (err) {
-            setError(err.message);
+            setError("Invalid OTP. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <>
-            <div className="space-y-4 text-[#F1F5F9]">
-                <div className="space-y-1">
-                    <p className="text-sm text-[#94A3B8] font-medium">Sending OTP to</p>
-                    <div className="bg-[#1E293B] text-[#F1F5F9] px-4 py-3 rounded-md text-sm font-semibold border border-[#334155] max-w-full break-words">
-                        {userEmail}
-                    </div>
-                </div>
-
-                <Button
-                    type="button"
-                    onClick={handleSendOtp}
-                    className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB] rounded-xl py-2 text-sm font-medium"
-                    disabled={loading}
-                >
-                    {loading ? "Sending OTP..." : "Send OTP"}
-                </Button>
-                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        <div className="space-y-6 py-4">
+            <div className="rounded-lg bg-muted p-4">
+                <p className="text-sm text-muted-foreground">We will send a verification code to:</p>
+                <p className="text-base font-semibold">{userEmail}</p>
             </div>
 
+            <Button
+                type="button"
+                onClick={handleSendOtp}
+                className="w-full font-semibold"
+                size="lg"
+                disabled={loading}
+            >
+                {loading ? (
+                    <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Sending...</span>
+                    </div>
+                ) : (
+                    "Send Verification Code"
+                )}
+            </Button>
+            {error && !otpDialogOpen && <p className="text-sm text-red-500 text-center">{error}</p>}
+
             <Dialog open={otpDialogOpen} onOpenChange={setOtpDialogOpen}>
-                <DialogContent className="bg-[#0F172A] text-[#F1F5F9]">
+                <DialogContent className="bg-card border-border">
                     <DialogHeader>
-                        <DialogTitle className="text-[#F1F5F9]">Verify OTP</DialogTitle>
-                        <DialogDescription/>
+                        <div className="flex flex-col items-center text-center gap-4 py-4">
+                            <KeyRound className="w-16 h-16 text-primary" />
+                            <DialogTitle className="text-2xl">Enter Verification Code</DialogTitle>
+                            <DialogDescription>
+                                A 6-digit code has been sent to your email.
+                            </DialogDescription>
+                        </div>
                     </DialogHeader>
-                    <div className="flex justify-center gap-2 mt-4">
+                    
+                    <div className="flex justify-center gap-2" onPaste={(e) => {
+                        const pastedData = e.clipboardData.getData('text').slice(0, 6);
+                        if (/^\d{6}$/.test(pastedData)) {
+                            setOtp(pastedData.split(''));
+                            inputRefs.current[5]?.focus();
+                        }
+                    }}>
                         {otp.map((digit, index) => (
                             <Input
                                 key={index}
@@ -93,21 +121,33 @@ const AccountVerificationForm = ({ closeParentDialog, userEmail}) => {
                                 onChange={(e) => handleChangeOtp(index, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                 ref={(el) => (inputRefs.current[index] = el)}
-                                className="w-10 h-10 text-center text-lg bg-[#1E293B] text-[#F1F5F9] border border-[#334155] focus:ring-0 focus:border-[#3B82F6]"
+                                className="h-14 w-12 text-center text-2xl font-mono bg-background border-border"
                             />
                         ))}
                     </div>
-                    <Button
-                        onClick={handleVerifyOtp}
-                        className="w-full mt-6 bg-[#3B82F6] text-white hover:bg-[#2563EB] rounded-xl py-2 text-sm font-medium"
-                        disabled={loading}
-                    >
-                        {loading ? "Verifying OTP..." : "Verify OTP"}
-                    </Button>
-                    {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
+                    {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+                    
+                    <DialogFooter>
+                        <Button
+                            onClick={handleVerifyOtp}
+                            className="w-full font-semibold"
+                            size="lg"
+                            disabled={loading || otp.join("").length < 6}
+                        >
+                            {loading ? (
+                                <div className="flex items-center justify-center gap-2">
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    <span>Verifying...</span>
+                                </div>
+                            ) : (
+                                "Verify Code"
+                            )}
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </>
+        </div>
     );
 };
 

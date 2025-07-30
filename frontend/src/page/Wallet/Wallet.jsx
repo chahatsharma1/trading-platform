@@ -1,22 +1,17 @@
 import React, { useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.jsx";
-import { CopyIcon, HistoryIcon, RotateCw, ShuffleIcon, UploadIcon, WalletIcon } from "lucide-react";
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { motion } from "framer-motion";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ArrowDownLeft, ArrowUpRight, Copy, History, Plus, Minus, Send } from "lucide-react";
+
 import TopupForm from "@/page/Wallet/TopupForm.jsx";
 import WithdrawalForm from "@/page/Withdrawal/WithdrawalForm.jsx";
 import TransferForm from "@/page/Wallet/TransferForm.jsx";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar.jsx";
-import { useDispatch, useSelector } from "react-redux";
 import { depositMoney, getUserWallet, getWalletTransactions } from "@/page/State/Wallet/Action.js";
-import { useLocation, useNavigate } from "react-router-dom";
 
 function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -24,23 +19,18 @@ function useQuery() {
 
 const Wallet = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { userWallet, transactions } = useSelector(store => store.wallet);
     const query = useQuery();
     const orderId = query.get("order_id");
-    const navigate = useNavigate();
 
-    const formatTransactionType = (type) => {
-        return type
-            .toLowerCase()
-            .split('_')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-    };
+    const handleFetchUserWallet = () => dispatch(getUserWallet(localStorage.getItem("jwt")));
+    const handleFetchUserWalletTransaction = () => dispatch(getWalletTransactions({ jwt: localStorage.getItem("jwt") }));
 
     useEffect(() => {
         handleFetchUserWallet();
         handleFetchUserWalletTransaction();
-    }, []);
+    }, [dispatch]);
 
     useEffect(() => {
         if (orderId) {
@@ -48,121 +38,121 @@ const Wallet = () => {
         }
     }, [dispatch, orderId, navigate]);
 
-    const handleFetchUserWallet = () => {
-        dispatch(getUserWallet(localStorage.getItem("jwt")));
-    }
-
-    const handleFetchUserWalletTransaction = () => {
-        dispatch(getWalletTransactions({ jwt: localStorage.getItem("jwt") }));
+    const handleCopyToClipboard = () => {
+        navigator.clipboard.writeText(userWallet.id);
     };
 
-    const formDialogs = [
-        {
-            icon: <UploadIcon size={24} className="text-white" />,
-            label: "Add Money",
-            form: <TopupForm />
-        },
-        {
-            icon: <UploadIcon size={24} className="text-white" />,
-            label: "Withdraw",
-            form: <WithdrawalForm />
-        },
-        {
-            icon: <ShuffleIcon size={24} className="text-white" />,
-            label: "Transfer",
-            form: <TransferForm />
-        }
+    const actionDialogs = [
+        { icon: <Plus />, label: "Add Money", content: <TopupForm /> },
+        { icon: <Minus />, label: "Withdraw", content: <WithdrawalForm /> },
+        { icon: <Send />, label: "Transfer", content: <TransferForm /> }
     ];
 
-    return (
-        <div className="min-h-screen py-10 px-4 flex justify-center bg-[#0F172A] text-[#F1F5F9]">
-            <div className="w-full max-w-4xl">
-                <Card className="rounded-2xl shadow-md border border-[#1E293B] bg-[#1E293B] text-[#F1F5F9]">
-                    <CardHeader className="pb-6 border-b border-[#334155]">
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-4">
-                                <WalletIcon size={32} className="text-[#F1F5F9]" />
-                                <div>
-                                    <CardTitle className="text-2xl font-semibold">My Wallet</CardTitle>
-                                    <div className="flex items-center gap-2 text-sm text-slate-400">
-                                        {userWallet ? (
-                                            <>
-                                                <span>Wallet ID : {userWallet.id}</span>
-                                                <CopyIcon size={14} className="cursor-pointer hover:text-slate-300" />
-                                            </>
-                                        ) : (
-                                            <span className="text-yellow-400">No wallet found. Add money to create your wallet.</span>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                            <RotateCw onClick={handleFetchUserWallet} className="w-6 h-6 text-slate-400 hover:text-white cursor-pointer" />
-                        </div>
-                    </CardHeader>
+    const containerVariants = {
+        hidden: { opacity: 0, scale: 0.98 },
+        visible: { opacity: 1, scale: 1, transition: { staggerChildren: 0.15, duration: 0.4 } },
+    };
 
-                    <CardContent className="pt-6">
-                        <div className="text-3xl font-bold text-white">
-                            {userWallet ? `₹ ${userWallet.balance}` : "No Wallet Yet"}
-                        </div>
-                        <div className="flex gap-5 mt-8 flex-wrap">
-                            {formDialogs.map(({ icon, label, form }, idx) => (
-                                <Dialog key={idx}>
-                                    <DialogTrigger asChild>
-                                        <div className="w-28 h-28 flex flex-col justify-center items-center rounded-xl border border-[#334155] bg-[#0F172A] hover:bg-[#1E293B] hover:scale-105 transition-transform cursor-pointer shadow-sm">
-                                            {icon}
-                                            <span className="text-sm mt-2 text-slate-200 text-center">{label}</span>
-                                        </div>
-                                    </DialogTrigger>
-                                    <DialogClose>
-                                        <DialogContent className="bg-[#1E293B] border-none text-[#F1F5F9] w-full max-w-[550px] rounded-2xl">
-                                            <DialogHeader>
-                                                <DialogTitle>{label}</DialogTitle>
-                                                <DialogDescription />
-                                            </DialogHeader>
-                                            <div className="flex justify-center">
-                                                <div className="w-full max-w-[550px]">{form}</div>
-                                            </div>
-                                        </DialogContent>
-                                    </DialogClose>
-                                </Dialog>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
+    };
 
-                <div className="py-5 pt-10">
-                    <div className="flex gap-2 items-center pb-5">
-                        <h1 className="text-2xl font-semibold">History</h1>
-                        <HistoryIcon onClick={handleFetchUserWalletTransaction} className="h-7 w-7 p-0 cursor-pointer hover:text-white text-slate-400" />
-                    </div>
-                    <div className="space-y-5">
-                        {transactions?.length === 0 ? (
-                            <p className="text-center text-slate-400">No transactions yet. Add money or start trading to see history here.</p>
-                        ) : (
-                            [...transactions].reverse().map((item, i) => (
-                                <Card key={i} className="px-5 py-4 bg-[#1E293B] border border-[#334155] text-[#F1F5F9]">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-5">
-                                            <Avatar className="bg-[#334155]">
-                                                <AvatarFallback>
-                                                    <ShuffleIcon className="text-[#0F172A]" size={18} strokeWidth={2.5} />
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="space-y-1 text-left">
-                                                <h1 className="font-bold text-lg">{formatTransactionType(item.walletTransactionType)}</h1>
-                                                <p className="text-sm text-slate-400">{item.localDate}</p>
-                                            </div>
-                                        </div>
-                                        <p className={`font-semibold ${["WITHDRAWAL", "TRANSFER", "BUY_ASSET"].includes(item.walletTransactionType) ? "text-red-500" : "text-green-400"}`}>
-                                            {["WITHDRAWAL", "TRANSFER", "BUY_ASSET"].includes(item.walletTransactionType) ? "-₹" : "₹"} {item.amount}
-                                        </p>
-                                    </div>
-                                </Card>
-                            ))
-                        )}
-                    </div>
-                </div>
+    const TransactionRow = ({ type, amount }) => {
+        const isCredit = ["DEPOSIT", "ADD_MONEY", "SELL_ASSET"].includes(type);
+        return (
+            <div className={`flex items-center gap-2 font-medium ${isCredit ? 'text-green-500' : 'text-red-500'}`}>
+                {isCredit ? <ArrowDownLeft className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
+                <span>{type?.replace(/_/g, ' ')}</span>
             </div>
+        );
+    };
+
+    return (
+        <div className="relative min-h-screen bg-background text-foreground font-sans flex justify-center py-10">
+            <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(#2d3748_1px,transparent_1px)] [background-size:32px_32px]"></div>
+
+            <motion.main variants={containerVariants} initial="hidden" animate="visible" className="w-full max-w-7xl space-y-8 px-4">
+                <motion.div variants={itemVariants}>
+                    <Card className="bg-card/50 backdrop-blur-lg border-border/50">
+                        <CardHeader>
+                            <CardTitle className="text-2xl">My Wallet</CardTitle>
+                            {userWallet?.id && (
+                                <CardDescription className="flex items-center gap-2 cursor-pointer" onClick={handleCopyToClipboard}>
+                                    ID: {userWallet.id} <Copy className="h-3 w-3" />
+                                </CardDescription>
+                            )}
+                        </CardHeader>
+                        <CardContent className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                            <div>
+                                <p className="text-sm text-muted-foreground">Available Balance</p>
+                                <p className="text-5xl font-bold mt-1">₹{userWallet?.balance?.toLocaleString() || '0.00'}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {actionDialogs.map((action, idx) => (
+                                    <Dialog key={idx}>
+                                        <DialogTrigger asChild>
+                                            <Button>
+                                                {action.icon} <span className="ml-2 hidden sm:inline">{action.label}</span>
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="bg-card border-border">
+                                            <DialogHeader>
+                                                <DialogTitle>{action.label}</DialogTitle>
+                                            </DialogHeader>
+                                            {action.content}
+                                        </DialogContent>
+                                    </Dialog>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                    <Card className="bg-card/50 backdrop-blur-lg border-border/50">
+                        <CardHeader>
+                            <CardTitle>Transaction History</CardTitle>
+                            <CardDescription>A record of all your wallet activities.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="border-b-border/50 hover:bg-transparent">
+                                        <TableHead>Type</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Date</TableHead>
+                                        <TableHead className="text-right">Amount</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {transactions?.length > 0 ? (
+                                        transactions.map((item) => (
+                                            <TableRow key={item.id} className="border-b-border/30">
+                                                <TableCell>
+                                                    <TransactionRow type={item.walletTransactionType} amount={item.amount} />
+                                                </TableCell>
+                                                <TableCell className="text-muted-foreground hidden sm:table-cell">
+                                                    {new Date(item.localDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                </TableCell>
+                                                <TableCell className="text-right font-mono">
+                                                    ₹{item.amount.toLocaleString()}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={3} className="h-48 text-center">
+                                                <History className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                                                <p className="text-muted-foreground mt-4 mb-4">You have no transaction history yet.</p>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            </motion.main>
         </div>
     );
 };

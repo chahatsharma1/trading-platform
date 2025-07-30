@@ -1,120 +1,177 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button.jsx";
-import { MessageCircle, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input.jsx";
-import {API_BASE_URL} from "@/config/api.js";
+import { API_BASE_URL } from "@/config/api.js";
+import { MessageCircle, X, Send, Bot, User } from "lucide-react";
+import Markdown from 'react-markdown';
 
 const Chatbot = () => {
     const [inputValue, setInputValue] = useState("");
-    const [isBotRelease, setIsBotRelease] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const chatRef = useRef(null);
+    const chatEndRef = useRef(null);
 
-    const handleKeyPress = async (event) => {
-        if (event.key === "Enter" && inputValue.trim()) {
-            const userMessage = inputValue.trim();
-            if (userMessage.length > 300) return alert("Prompt too long!");
+    const scrollToBottom = () => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
 
-            setInputValue("");
-            setMessages(prev => [...prev, { type: "user", text: userMessage }]);
-            setIsLoading(true);
+    useEffect(scrollToBottom, [messages]);
 
-            try {
-                const res = await fetch(`${API_BASE_URL}/chatbot`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ prompt: userMessage }),
-                });
+    const sendMessage = async (messageText) => {
+        if (!messageText.trim()) return;
 
-                const data = await res.text();
-                setMessages(prev => [...prev, { type: "bot", text: data }]);
-            } catch (err) {
-                setMessages(prev => [...prev, { type: "bot", text: `Error talking to Gemini: ${err.message}` }]);
-            } finally {
-                setIsLoading(false);
-            }
+        setMessages(prev => [...prev, { role: "user", text: messageText }]);
+        setIsLoading(true);
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/chatbot`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: messageText }),
+            });
+
+            if (!res.ok) throw new Error(`API error: ${res.statusText}`);
+
+            const data = await res.text();
+            setMessages(prev => [...prev, { role: "bot", text: data }]);
+        } catch (err) {
+            setMessages(prev => [...prev, { role: "bot", text: `Sorry, I'm having trouble connecting. Please try again later.` }]);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const handleBotRelease = () => setIsBotRelease(!isBotRelease);
-    const handleChange = (e) => setInputValue(e.target.value);
+    const handleSend = () => {
+        sendMessage(inputValue);
+        setInputValue("");
+    };
 
-    const handleButtonClick = () => {
-        if (inputValue.trim()) {
-            handleKeyPress({ key: "Enter" });
+    const handleKeyPress = (event) => {
+        if (event.key === "Enter") {
+            handleSend();
         }
     };
 
-    useEffect(() => {
-        if (chatRef.current) {
-            chatRef.current.scrollTop = chatRef.current.scrollHeight;
-        }
-    }, [messages]);
+    const suggestedPrompts = [
+        "What is Bitcoin?",
+        "Top 5 coins by market cap?",
+        "Explain Ethereum's smart contracts."
+    ];
 
+    const chatboxVariants = {
+        hidden: { opacity: 0, y: 20, scale: 0.95 },
+        visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 120, damping: 15 } },
+        exit: { opacity: 0, y: 20, scale: 0.95, transition: { duration: 0.2 } }
+    };
+
+    const messageVariants = {
+        hidden: { opacity: 0, y: 10 },
+        visible: { opacity: 1, y: 0 }
+    };
 
     return (
-        <section className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-            {isBotRelease && (
-                <div className="w-[20rem] md:w-[25rem] h-[70vh] bg-[#1E293B] rounded-xl shadow-lg overflow-hidden flex flex-col">
-                    <div className="flex justify-between items-center border-b px-6 h-[12%] bg-[#1E293B] text-[#F1F5F9]">
-                        <p className="font-medium">Chat Bot</p>
-                        <Button onClick={handleBotRelease} variant="ghost" size="icon" className="hover:bg-gray-700 rounded-full">
-                            <XIcon className="w-5 h-5 text-white" />
-                        </Button>
-                    </div>
-
-                    <div ref={chatRef} className="h-[76%] flex flex-col overflow-y-auto gap-1 px-5 py-2 scroll-container">
-                        {messages.length === 0 && !isLoading && (
-                            <div className="text-sm text-gray-400 mt-2">
-                                💡 Try asking:
-                                <ul className="list-disc ml-4 mt-1">
-                                    <li>What is Bitcoin?</li>
-                                    <li>Give me top 5 coins</li>
-                                    <li>Should I invest in Ethereum?</li>
-                                </ul>
+        <>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        variants={chatboxVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        className="fixed bottom-20 right-6 z-50 w-[calc(100vw-3rem)] sm:w-96 h-[70vh] max-h-[550px] bg-card/80 backdrop-blur-lg border border-border/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+                    >
+                        <header className="flex items-center justify-between p-4 border-b border-border">
+                            <div className="flex items-center gap-3">
+                                <Bot className="h-6 w-6 text-primary" />
+                                <h3 className="font-semibold">TradeX AI Assistant</h3>
                             </div>
-                        )}
-
-                        {messages.map((msg, i) => (
-                            <div key={i} className={`${msg.type === "bot" ? "self-start" : "self-end"} pb-5 w-auto max-w-[90%]`}>
-                                <div className={`px-5 py-2 rounded-lg ${msg.type === "bot" ? "bg-[#3B82F6]" : "bg-[#1E293B] border border-gray-600"} text-white whitespace-pre-line break-words`}>
-                                    <p>{msg.text}</p>
+                            <Button onClick={() => setIsOpen(false)} variant="ghost" size="icon" className="rounded-full h-8 w-8">
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </header>
+                        <div className="flex-grow p-4 overflow-y-auto space-y-4">
+                            {messages.length === 0 && !isLoading && (
+                                <div className="text-sm text-muted-foreground space-y-3">
+                                    <p>Hi! I'm the TradeX AI. How can I help you today?</p>
+                                    <div className="space-y-2">
+                                        {suggestedPrompts.map(prompt => (
+                                            <button
+                                                key={prompt}
+                                                onClick={() => sendMessage(prompt)}
+                                                className="w-full text-left p-2 rounded-md bg-muted/50 hover:bg-muted text-foreground transition-colors text-xs"
+                                            >
+                                                {prompt}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
+                            )}
+                            <AnimatePresence>
+                                {messages.map((msg, i) => (
+                                    <motion.div key={i} variants={messageVariants} initial="hidden" animate="visible" className={`flex gap-3 items-start ${msg.role === 'user' && 'justify-end'}`}>
+                                        {msg.role === 'bot' && <Bot className="h-5 w-5 text-primary flex-shrink-0 mt-1" />}
+                                        <div className={`prose prose-sm dark:prose-invert max-w-[85%] rounded-lg p-3 ${msg.role === 'bot' ? 'bg-muted' : 'bg-primary text-primary-foreground'}`}>
+                                            <Markdown>{msg.text}</Markdown>
+                                        </div>
+                                        {msg.role === 'user' && <User className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />}
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                            {isLoading && (
+                                <motion.div variants={messageVariants} initial="hidden" animate="visible" className="flex gap-3 items-start">
+                                    <Bot className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
+                                    <div className="prose prose-sm dark:prose-invert rounded-lg p-3 bg-muted flex items-center space-x-1.5">
+                                        <span className="h-1.5 w-1.5 bg-primary rounded-full animate-pulse [animation-delay:-0.3s]"></span>
+                                        <span className="h-1.5 w-1.5 bg-primary rounded-full animate-pulse [animation-delay:-0.15s]"></span>
+                                        <span className="h-1.5 w-1.5 bg-primary rounded-full animate-pulse"></span>
+                                    </div>
+                                </motion.div>
+                            )}
+                            <div ref={chatEndRef} />
+                        </div>
+                        <footer className="p-4 border-t border-border">
+                            <div className="relative">
+                                <Input
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                    placeholder="Ask about crypto..."
+                                    className="pr-12 h-10"
+                                />
+                                <Button
+                                    onClick={handleSend}
+                                    disabled={isLoading || !inputValue.trim()}
+                                    variant="ghost"
+                                    size="icon"
+                                    className="absolute top-1/2 right-2 -translate-y-1/2 h-8 w-8 rounded-full"
+                                >
+                                    <Send className="h-4 w-4" />
+                                </Button>
                             </div>
-                        ))}
+                        </footer>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-                        {isLoading && (
-                            <div className="self-start pb-5 w-auto">
-                                <div className="px-5 py-2 rounded-lg bg-[#3B82F6] text-white animate-pulse">
-                                    <p>Typing...</p>
-                                </div>
-                            </div>
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5, type: "spring", stiffness: 150 }}>
+                <Button onClick={() => setIsOpen(!isOpen)} size="lg" className="rounded-full shadow-lg h-14 w-14 p-0">
+                    <AnimatePresence mode="wait">
+                        {isOpen ? (
+                            <motion.div key="close" initial={{ rotate: -90, scale: 0 }} animate={{ rotate: 0, scale: 1 }} exit={{ rotate: 90, scale: 0 }}>
+                                <X className="h-6 w-6" />
+                            </motion.div>
+                        ) : (
+                            <motion.div key="open" initial={{ rotate: -90, scale: 0 }} animate={{ rotate: 0, scale: 1 }} exit={{ rotate: 90, scale: 0 }}>
+                                <MessageCircle className="h-6 w-6" />
+                            </motion.div>
                         )}
-                    </div>
-
-                    <div className="h-[12%] border-t border-gray-700 flex items-center px-5 py-2 gap-2">
-                        <Input
-                            className="flex-grow h-full bg-[#0F172A] text-white placeholder-gray-400 border-none focus:outline-none focus:ring-0 rounded-md px-3"
-                            placeholder="Write Prompt..."
-                            onChange={handleChange}
-                            value={inputValue}
-                            onKeyPress={handleKeyPress}/>
-                        <Button
-                            onClick={handleButtonClick}
-                            className="py-2 px-6 bg-[#3B82F6] text-white rounded-lg hover:bg-[#2563eb] transition-all duration-300 ease-in-out flex-shrink-0"
-                            aria-label="Send message"
-                            disabled={isLoading || !inputValue.trim()}>
-                            Enter
-                        </Button>
-                    </div>
-                </div>
-            )}
-            <Button onClick={handleBotRelease} className="h-[2.75rem] px-4 py-2 rounded-xl bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] text-white shadow-md hover:scale-105 transition-transform duration-300 ease-in-out">
-                <MessageCircle className="w-5 h-5 mr-2 stroke-white rotate-[270deg]" />
-                <span className="text-base font-medium tracking-wide">Chat Bot</span>
-            </Button>
-        </section>
+                    </AnimatePresence>
+                </Button>
+            </motion.div>
+        </>
     );
 };
+
 export default Chatbot;

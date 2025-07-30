@@ -7,7 +7,6 @@ out/
 target/
 .mvn/timing.properties
 
-### Logs ###
 *.log
 
 .DS_Store
@@ -23,11 +22,14 @@ frontend/dist/
 frontend/.firebaserc
 frontend/.firebase
 frontend/.idea
+frontend/.env.production
+
 .vite/
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 
 application-dev.properties
 

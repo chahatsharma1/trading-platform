@@ -1,151 +1,137 @@
 import React, { useEffect, useState } from 'react';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
+import { Input } from "@/components/ui/input.jsx";
+import { Button } from "@/components/ui/button.jsx";
 import { getUserWallet } from "@/page/State/Wallet/Action.js";
 import { getAssetDetails } from "@/page/State/Asset/Action.js";
 import { payOrder } from "@/page/State/Order/Action.js";
+import { Loader2 } from "lucide-react";
 
 const TradingForm = ({ onTradeSuccess }) => {
     const dispatch = useDispatch();
     const [isBuyMode, setIsBuyMode] = useState(true);
     const [amount, setAmount] = useState("");
     const [quantity, setQuantity] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const {assetDetails} = useSelector((store) => store.asset);
-    const {userWallet} = useSelector((store) => store.wallet);
-    const {coinDetails} = useSelector(store => store.coin);
+    const { assetDetails } = useSelector((store) => store.asset);
+    const { userWallet } = useSelector((store) => store.wallet);
+    const { coinDetails } = useSelector(store => store.coin);
 
     useEffect(() => {
         dispatch(getUserWallet(localStorage.getItem("jwt")));
-        dispatch(getAssetDetails({ coinId: coinDetails?.id, jwt: localStorage.getItem("jwt") }));
-    }, []);
-
-    const toggleMode = () => setIsBuyMode((prev) => !prev);
+        if (coinDetails?.id) {
+            dispatch(getAssetDetails({ coinId: coinDetails.id, jwt: localStorage.getItem("jwt") }));
+        }
+    }, [dispatch, coinDetails]);
 
     const handleChange = (e) => {
         const inputAmount = e.target.value;
         setAmount(inputAmount);
+        setError('');
 
         const price = coinDetails?.market_data?.current_price?.inr;
         if (!price || isNaN(inputAmount) || inputAmount <= 0) {
             setQuantity(0);
             return;
         }
-
-        const volume = calculateBuyCost(inputAmount, price);
-        setQuantity(volume);
+        setQuantity(Number((inputAmount / price).toFixed(6)));
     };
 
-    const calculateBuyCost = (amount, price) => {
-        const volume = amount / price;
-        const decimalPlaces = 6;
-        return Number(volume.toFixed(decimalPlaces));
-    };
+    const handleTrade = async (e) => {
+        e.preventDefault();
+        const numericAmount = parseFloat(amount);
+        if (isNaN(numericAmount) || numericAmount <= 0) {
+            setError("Please enter a valid amount.");
+            return;
+        }
+        if (isBuyMode && numericAmount > userWallet?.balance) {
+            setError("Insufficient wallet balance.");
+            return;
+        }
+        if (!isBuyMode && quantity > assetDetails?.quantity) {
+            setError("Insufficient asset quantity.");
+            return;
+        }
 
-    const handleTrade = async () => {
+        setIsLoading(true);
+        setError('');
         try {
-            const orderType = isBuyMode ? "BUY" : "SELL";
             await dispatch(payOrder({
-                orderData: { coinId: coinDetails?.id, quantity, orderType },
+                orderData: { coinId: coinDetails.id, quantity, orderType: isBuyMode ? "BUY" : "SELL" },
                 jwt: localStorage.getItem("jwt"),
-                amount: amount
+                amount: numericAmount
             }));
-
-            if (onTradeSuccess) {
-                const successMsg = isBuyMode
-                    ? `Successfully bought ${quantity} ${coinDetails?.symbol.toUpperCase()}!`
-                    : `Successfully sold ${quantity} ${coinDetails?.symbol.toUpperCase()}!`;
-
-                onTradeSuccess(successMsg);
-            }
-
+            if (onTradeSuccess) onTradeSuccess();
         } catch (error) {
+            setError("Trade failed. Please try again.");
             console.error("Trade failed", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const price = coinDetails?.market_data?.current_price?.inr || 0;
-    const priceChange = coinDetails?.market_data?.price_change_24h_in_currency?.inr || 0;
-    const priceChangePercent = coinDetails?.market_data?.price_change_percentage_24h_in_currency?.inr || 0;
-
-    const walletBalance = userWallet?.balance || 0;
-    const isInsufficient = isBuyMode && Number(amount) > walletBalance;
+    const availableBalance = isBuyMode ? userWallet?.balance || 0 : assetDetails?.quantity || 0;
+    const balanceSymbol = isBuyMode ? "₹" : coinDetails?.symbol?.toUpperCase();
 
     return (
-        <div className="space-y-6 text-[#F1F5F9]">
-            <div className="flex flex-col gap-2">
-                <div className="relative w-full">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm">₹</span>
+        <form onSubmit={handleTrade} className="space-y-6 py-4">
+            <div className="p-1 bg-muted rounded-lg grid grid-cols-2 gap-1">
+                <Button type="button" onClick={() => setIsBuyMode(true)} variant={isBuyMode ? 'default' : 'ghost'} className="w-full">Buy</Button>
+                <Button type="button" onClick={() => setIsBuyMode(false)} variant={!isBuyMode ? 'destructive' : 'ghost'} className="w-full">Sell</Button>
+            </div>
+
+            <div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+                    <span>{isBuyMode ? "You Pay" : "You Sell"}</span>
+                    <span>Available: {availableBalance.toLocaleString()} {balanceSymbol}</span>
+                </div>
+                <div className="relative">
+                    <p className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 font-semibold text-lg">
+                        {isBuyMode ? "₹" : coinDetails?.symbol?.toUpperCase()}
+                    </p>
                     <Input
-                        placeholder="Enter amount..."
                         value={amount}
                         onChange={handleChange}
-                        className="pl-7 pr-3 bg-[#1E293B] text-[#F1F5F9] border border-[#334155] placeholder:text-[#94A3B8]"
+                        className="h-14 pl-12 pr-4 text-2xl font-bold bg-background border-border text-right"
+                        placeholder="0.00"
                     />
                 </div>
-                {isBuyMode && (
-                    <div className="text-sm text-right text-[#94A3B8]">
-                        You will get: <span className="text-[#F1F5F9] font-medium">{quantity} {coinDetails?.symbol?.toUpperCase()}</span>
-                    </div>
+            </div>
+
+            <AnimatePresence>
+                {amount > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="text-center text-muted-foreground"
+                    >
+                        <p>{isBuyMode ? "You will get approx." : "You will receive approx."}</p>
+                        <p className="text-xl font-bold text-foreground">
+                            {isBuyMode ? `${quantity.toLocaleString()} ${coinDetails?.symbol?.toUpperCase()}` : `₹ ${(quantity * coinDetails?.market_data.current_price.inr).toLocaleString()}`}
+                        </p>
+                    </motion.div>
                 )}
-                {isInsufficient && (
-                    <div className="text-sm text-red-500 text-right font-medium">
-                        Insufficient Balance
-                    </div>
-                )}
+            </AnimatePresence>
+
+            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+
+            <div className="pt-2">
+                <Button type="submit" size="lg" className="w-full font-semibold" disabled={isLoading || !amount}>
+                    {isLoading ? (
+                        <div className="flex items-center justify-center gap-2">
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <span>Processing...</span>
+                        </div>
+                    ) : (
+                        isBuyMode ? "Buy Asset" : "Sell Asset"
+                    )}
+                </Button>
             </div>
-
-            <div className="flex items-center gap-3">
-                <img
-                    src={coinDetails?.image.large}
-                    alt="coin-logo"
-                    className="w-6 h-6"
-                />
-                <div>
-                    <div className="flex items-center gap-2">
-                        <p className="font-medium text-[#F1F5F9]">{coinDetails?.symbol?.toUpperCase()}</p>
-                        <span className="text-[#94A3B8]">• {coinDetails?.name}</span>
-                    </div>
-                    <p className="text-sm">
-                        <span className="text-[#F1F5F9] font-semibold">₹ {price}</span>{' '}
-                        <span className={`text-sm ${priceChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                            {priceChange.toFixed(2)} ({priceChangePercent.toFixed(2)}%)
-                        </span>
-                    </p>
-                </div>
-            </div>
-
-            <div className="flex justify-between text-sm">
-                <span className="text-[#94A3B8]">Order Type</span>
-                <span className="text-[#F1F5F9] font-medium">{isBuyMode ? "Buy" : "Sell"}</span>
-            </div>
-
-            <div className="flex justify-between text-sm">
-                <span className="text-[#94A3B8]">{isBuyMode ? "Wallet Amount" : "Available Quantity"}</span>
-                <span className="text-xl font-semibold text-[#F1F5F9]">
-                    {isBuyMode
-                        ? `₹ ${walletBalance}`
-                        : `${assetDetails?.quantity || 0} ${coinDetails?.symbol?.toUpperCase()}`}
-                </span>
-            </div>
-
-            <Button
-                onClick={handleTrade}
-                disabled={isInsufficient}
-                className={`w-full rounded-md text-white ${
-                    isInsufficient
-                        ? "bg-gray-500 cursor-not-allowed"
-                        : "bg-[#3B82F6] hover:bg-[#2563EB]"}`}>
-                {isBuyMode ? "BUY" : "SELL"}
-            </Button>
-
-            <p
-                onClick={toggleMode}
-                className="text-center text-sm underline text-[#94A3B8] cursor-pointer">
-                {isBuyMode ? " Or Sell" : "Or Buy"}
-            </p>
-        </div>
+        </form>
     );
 };
 

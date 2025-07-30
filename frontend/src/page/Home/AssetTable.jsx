@@ -1,64 +1,61 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Avatar, AvatarImage } from "@/components/ui/avatar.jsx";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
-import { ScrollArea } from "@/components/ui/scroll-area.jsx";
+import { TrendingUp } from "lucide-react";
 
-const AssetTable = ({ coin, category, onRowClick }) => {
+const AssetTable = ({ coin, onRowClick, selectedCoinId }) => {
     const navigate = useNavigate();
-
     return (
-        <div className="bg-[#1E293B] rounded-2xl shadow-md p-2 text-[#F1F5F9]">
-            <Table className="w-full table-fixed">
-                <ScrollArea className={`${category === "all" ? "h-[76vh]" : "h-[82vh]"}`}>
-                    <TableHeader>
-                        <TableRow className="hover:bg-transparent pointer-events-none">
-                            <TableHead className="w-[200px] text-[#F1F5F9]">Coin</TableHead>
-                            <TableHead className="w-[100px] text-[#F1F5F9]">Symbol</TableHead>
-                            <TableHead className="w-[160px] text-[#F1F5F9]">Volume</TableHead>
-                            <TableHead className="w-[180px] text-[#F1F5F9]">Market Cap</TableHead>
-                            <TableHead className="w-[180px] text-[#F1F5F9]">Price Change (24h)</TableHead>
-                            <TableHead className="w-[140px] text-[#F1F5F9]">Amount</TableHead>
-                        </TableRow>
-                    </TableHeader>
-
-                    <TableBody>
-                        {coin.map((coinItem) => (
-                            <TableRow
-                                key={coinItem.id}
-                                onClick={() => onRowClick(coinItem)}
-                                title="Click coin name to view info, or row to view chart & details"
-                                className="cursor-pointer hover:bg-[#334155] transition-colors"
-                            >
-                                <TableCell className="font-medium flex items-center gap-2 whitespace-nowrap overflow-hidden">
-                                    <Avatar>
-                                        <AvatarImage className="w-10 h-10" src={coinItem?.image} />
-                                    </Avatar>
-                                    <span
-                                        className="truncate max-w-[120px]"
-                                        title={coinItem?.name}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(`/market/${coinItem.id}`);
-                                        }}
-                                    >
-                                        {coinItem?.name}
-                                    </span>
-                                </TableCell>
-
-                                <TableCell className="whitespace-nowrap">{coinItem?.symbol.toUpperCase()}</TableCell>
-                                <TableCell className="whitespace-nowrap">{coinItem?.total_volume}</TableCell>
-                                <TableCell className="whitespace-nowrap">{coinItem?.market_cap}</TableCell>
-                                <TableCell
-                                    className={`whitespace-nowrap ${coinItem.price_change_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                    ₹ {coinItem.price_change_24h.toFixed(2)}
-                                </TableCell>
-                                <TableCell className="whitespace-nowrap">₹ {coinItem.current_price.toLocaleString()}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </ScrollArea>
-            </Table>
-        </div>
+        <Table>
+            <TableHeader>
+                <TableRow className="border-b-border/50 hover:bg-transparent">
+                    <TableHead className="pl-4">Coin</TableHead>
+                    <TableHead>Symbol</TableHead>
+                    <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="text-right">24h %</TableHead>
+                    <TableHead className="text-right hidden md:table-cell">Market Cap</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {coin.map((coinItem) => (
+                    <TableRow
+                        key={coinItem.id}
+                        onClick={() => onRowClick(coinItem.id)}
+                        className={`cursor-pointer border-b-border/30 transition-colors duration-200 ${
+                            selectedCoinId === coinItem.id
+                                ? "bg-primary/10 hover:bg-primary/20"
+                                : "hover:bg-muted/50"
+                        }`}>
+                        <TableCell className="font-medium flex items-center gap-3 pl-4">
+                            <Avatar className="h-8 w-8">
+                                <AvatarImage src={coinItem.image} alt={coinItem.name} />
+                            </Avatar>
+                            <span
+                                className="font-semibold hover:underline"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/market/${coinItem.id}`);
+                                }}>
+                                {coinItem.name}
+                            </span>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{coinItem.symbol.toUpperCase()}</TableCell>
+                        <TableCell className="font-semibold text-right">
+                            ₹{coinItem.current_price.toLocaleString()}
+                        </TableCell>
+                        <TableCell className={`font-semibold text-right flex justify-end items-center gap-1 ${
+                            coinItem.price_change_percentage_24h >= 0 ? "text-green-500" : "text-red-500"
+                        }`}>
+                            <TrendingUp className={`h-4 w-4 ${coinItem.price_change_percentage_24h < 0 && "rotate-180"}`} />
+                            {coinItem.price_change_percentage_24h.toFixed(2)}%
+                        </TableCell>
+                        <TableCell className="text-right hidden md:table-cell">
+                            ₹{coinItem.market_cap.toLocaleString()}
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
     );
 };
 

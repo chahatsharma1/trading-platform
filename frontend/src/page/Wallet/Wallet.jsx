@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -58,7 +58,7 @@ const Wallet = () => {
         visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
     };
 
-    const TransactionRow = ({ type, amount }) => {
+    const TransactionRow = ({ type }) => {
         const isCredit = ["DEPOSIT", "ADD_MONEY", "SELL_ASSET"].includes(type);
         return (
             <div className={`flex items-center gap-2 font-medium ${isCredit ? 'text-green-500' : 'text-red-500'}`}>
@@ -126,7 +126,7 @@ const Wallet = () => {
                                 </TableHeader>
                                 <TableBody>
                                     {transactions?.length > 0 ? (
-                                        transactions.map((item) => (
+                                        [...transactions].reverse().map((item) => (
                                             <TableRow key={item.id} className="border-b-border/30">
                                                 <TableCell>
                                                     <TransactionRow type={item.walletTransactionType} amount={item.amount} />

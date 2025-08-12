@@ -1,12 +1,13 @@
-import React from 'react';
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchX } from "lucide-react";
+import { searchCoin } from '../State/Coin/Action';
 
 const SearchLoadingSkeleton = () => (
     <div className="space-y-4">
@@ -25,6 +26,18 @@ const SearchLoadingSkeleton = () => (
 const SearchCoin = () => {
     const { searchCoinList, loading } = useSelector((state) => state.coin);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const location = useLocation();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const query = params.get('query');
+        const jwt = localStorage.getItem("jwt");
+
+        if (query && jwt) {
+            dispatch(searchCoin(query, jwt));
+        }
+    }, [location.search, dispatch]);
 
     const containerVariants = {
         hidden: { opacity: 0, scale: 0.98 },
@@ -44,8 +57,7 @@ const SearchCoin = () => {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="w-full max-w-4xl space-y-8 px-4"
-            >
+                className="w-full max-w-4xl space-y-8 px-4">
                 <motion.div variants={itemVariants}>
                     <h1 className="text-3xl md:text-3xl font-bold tracking-tight text-center">Search Results</h1>
                     <p className="text-muted-foreground mt-2 text-center">Explore assets matching your query.</p>
@@ -53,7 +65,6 @@ const SearchCoin = () => {
 
                 <motion.div variants={itemVariants}>
                     <Card className="bg-card/50 backdrop-blur-lg border-border/50">
-                        <CardDescription/>
                         <CardContent>
                             {loading ? (
                                 <SearchLoadingSkeleton />

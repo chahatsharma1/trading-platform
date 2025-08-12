@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet.jsx";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar.jsx";
-import { Menu, SearchIcon, Sun, Moon, Coins, LayoutDashboard } from "lucide-react";
-import Sidebar from "@/page/Navbar/Sidebar.jsx";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.jsx";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {Menu, SearchIcon, Sun, Moon, Coins, LayoutDashboard, LogOut, User,HomeIcon, BriefcaseIcon, EyeIcon, ActivityIcon, WalletIcon, LandmarkIcon, BanknoteIcon} from "lucide-react";
+
+const menuItems = [
+    { name: "Dashboard", path: "/home", icon: <HomeIcon className='h-5 w-5' /> },
+    { name: "Portfolio", path: "/portfolio", icon: <BriefcaseIcon className='h-5 w-5' /> },
+    { name: "Watchlist", path: "/watchlist", icon: <EyeIcon className='h-5 w-5' /> },
+    { name: "Activity", path: "/activity", icon: <ActivityIcon className='h-5 w-5' /> },
+    { name: "Wallet", path: "/wallet", icon: <WalletIcon className='h-5 w-5' /> },
+    { name: "Payment Details", path: "/payment-details", icon: <LandmarkIcon className='h-5 w-5' /> },
+    { name: "Withdrawal", path: "/withdrawal", icon: <BanknoteIcon className='h-5 w-5' /> },
+];
 
 const isTokenValid = (token) => {
     if (!token) return false;
@@ -61,8 +71,13 @@ const Navbar = () => {
         }
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem("jwt");
+        navigate("/login");
+    };
+
     const AppLogo = () => (
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/" className="flex shrink-0 items-center gap-2">
             <Coins className="w-7 h-7 text-primary" />
             <span className="text-xl font-bold text-foreground">TradeX</span>
         </Link>
@@ -75,12 +90,31 @@ const Navbar = () => {
         </Button>
     );
 
-    const UserAvatar = () => (
-        <Avatar onClick={() => navigate("/profile")} className="cursor-pointer h-9 w-9">
-            <AvatarFallback className="bg-primary text-primary-foreground">
-                {user?.fullName?.[0]?.toUpperCase() || 'U'}
-            </AvatarFallback>
-        </Avatar>
+    const UserProfileDropdown = () => (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9">
+                        <AvatarImage src={user?.picture || "/user.png"} alt={user?.name} />
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                            {user?.fullName?.[0]?.toUpperCase() || <User />}
+                        </AvatarFallback>
+                    </Avatar>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-24" align="end" forceMount>
+                <Link to="/profile">
+                    <DropdownMenuItem className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                    </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-500 focus:text-red-500">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 
     if (["/login", "/signup", "/forgot-password"].includes(location.pathname) || location.pathname.startsWith("/admin")) {
@@ -88,8 +122,8 @@ const Navbar = () => {
     }
 
     const navClassName = `sticky top-0 left-0 right-0 z-50 transition-colors duration-300 ${
-    isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-border" : "bg-background"
-}`;
+        isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-border" : "bg-background"
+    }`;
 
     if (location.pathname === "/") {
         return (
@@ -104,7 +138,7 @@ const Navbar = () => {
                                     <LayoutDashboard className="h-4 w-4 mr-2" />
                                     My Dashboard
                                 </Button>
-                                <UserAvatar />
+                                <UserProfileDropdown />
                             </>
                         ) : (
                             <>
@@ -121,48 +155,69 @@ const Navbar = () => {
     return (
         <div className={navClassName}>
             <div className="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                    <Sheet>
-                        <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon" className="rounded-full">
-                                <Menu className="h-6 w-6" />
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent className="w-72 bg-background border-r-0" side="left">
-                            <SheetHeader>
-                                <SheetTitle>
-                                    <Link to="/home" className="flex items-center gap-2 px-4 py-2">
-                                        <Coins className="w-8 h-8 text-primary" />
-                                        <span className="text-2xl font-bold text-foreground">TradeX</span>
-                                    </Link>
-                                </SheetTitle>
-                            </SheetHeader>
-                            <Sidebar />
-                        </SheetContent>
-                    </Sheet>
-                    <Link to="/home" className="hidden md:flex items-center gap-2">
-                        <Coins className="w-7 h-7 text-primary" />
-                        <span className="text-xl font-bold text-foreground">TradeX</span>
-                    </Link>
+                <div className="flex items-center gap-x-2 lg:gap-x-4">
+                    <AppLogo />
+                    <nav className="hidden md:flex items-center gap-x-1 lg:gap-x-2">
+                        {menuItems.map((item) => (
+                            <Link to={item.path} key={item.name}>
+                                <Button
+                                    variant="ghost"
+                                    className={`px-3 text-sm font-medium ${location.pathname.startsWith(item.path) ? "text-primary" : "text-muted-foreground"}`}>
+                                    {item.name}
+                                </Button>
+                            </Link>
+                        ))}
+                    </nav>
                 </div>
 
-                <div className="flex-1 flex justify-center">
-                    <div className="relative w-full max-w-md">
+                <div className="flex items-center gap-3">
+                    <div className="relative hidden lg:block w-full max-w-xs">
                         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
                         <Input
                             type="text"
-                            placeholder="Search coins..."
+                            placeholder="Search..."
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             onKeyDown={handleSearch}
                             className="pl-10 h-10 w-full bg-muted border-border rounded-full"
                         />
                     </div>
-                </div>
-
-                <div className="flex items-center gap-3">
                     <ThemeToggler />
-                    <UserAvatar />
+                    <UserProfileDropdown />
+                    <div className="md:hidden">
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button variant="ghost" size="icon" className="rounded-full">
+                                    <Menu className="h-6 w-6" />
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent className="w-72 bg-background border-r-0" side="left">
+                                <SheetHeader>
+                                    <SheetTitle>
+                                        <AppLogo />
+                                    </SheetTitle>
+                                </SheetHeader>
+                                <div className='mt-6 space-y-2'>
+                                    {menuItems.map((item) => (
+                                        <SheetClose asChild key={item.name}>
+                                            <Link to={item.path}>
+                                                <Button
+                                                    variant="ghost"
+                                                    className={`w-full flex items-center justify-start gap-3 rounded-md px-3 py-6 text-base transition-colors ${
+                                                        location.pathname.startsWith(item.path)
+                                                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                                    }`}>
+                                                    {item.icon}
+                                                    <span>{item.name}</span>
+                                                </Button>
+                                            </Link>
+                                        </SheetClose>
+                                    ))}
+                                </div>
+                            </SheetContent>
+                        </Sheet>
+                    </div>
                 </div>
             </div>
         </div>

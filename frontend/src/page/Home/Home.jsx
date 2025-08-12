@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronLeft, ChevronRight, TrendingUp } from "lucide-react";
-
 import StockChart from "@/page/Home/StockChart.jsx";
-import AssetTable from "@/page/Home/AssetTable.jsx";
 import Chatbot from "@/page/Home/Chatbot.jsx";
 import { getCoinList, getTop50Coins } from "@/page/State/Coin/Action.js";
 
 const Home = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { coinList, top50 } = useSelector((store) => store.coin);
     const [activeCategory, setActiveCategory] = useState("all");
     const [selectedCoinId, setSelectedCoinId] = useState("bitcoin");
@@ -38,7 +39,11 @@ const Home = () => {
 
     const handleActiveCategory = (category) => {
         setActiveCategory(category);
-        setCurrentPage(1);
+        if (category === "top50" && top50.length > 0) {
+            setSelectedCoinId(top50[0].id);
+        } else if (category === "all" && coinList.length > 0) {
+            setSelectedCoinId(coinList[0].id);
+        }
     };
 
     const handlePageChange = (direction) => {
@@ -58,16 +63,16 @@ const Home = () => {
     return (
         <div className="relative h-[calc(100vh-4rem)] flex flex-col bg-background text-foreground font-sans overflow-hidden">
             <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(#2d3748_1px,transparent_1px)] [background-size:32px_32px]"></div>
-            <main className="flex-grow container mx-auto p-4 flex flex-col gap-4 min-h-0">
-                <div className="flex-grow grid grid-cols-1 lg:grid-cols-7 gap-2 min-h-0">
-                    <motion.div
+            <main className="flex-grow container mx-auto p-4 flex flex-col gap-4 min-h-0 overflow-hidden">
+            <div className="flex-grow grid grid-cols-1 lg:grid-cols-7 gap-2 min-h-0">
+                <motion.div
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2, duration: 0.5 }}
                         className="lg:col-span-4 flex flex-col min-h-0">
-                        <Card className="flex flex-col flex-grow bg-card/50 backdrop-blur-lg border-border/50 shadow-lg min-h-0">
+                        <Card className="flex flex-col flex-grow bg-card/50 backdrop-blur-lg border-border/50 shadow-lg min-h-0 overflow-hidden">
                             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                                <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                                <div className="flex items-center gap-2 -mt-2">
                                     <div className="p-1 bg-muted rounded-lg flex gap-1">
                                         <Button onClick={() => handleActiveCategory("all")} size="sm" variant={activeCategory === 'all' ? 'default' : 'ghost'}>All</Button>
                                         <Button onClick={() => handleActiveCategory("top50")} size="sm" variant={activeCategory === 'top50' ? 'default' : 'ghost'}>Top 50</Button>
@@ -80,12 +85,57 @@ const Home = () => {
                                     )}
                                 </div>
                             </CardHeader>
-                            <CardContent className="flex-grow overflow-y-auto">
-                                <AssetTable
-                                    coin={coinToDisplay}
-                                    onRowClick={(coin) => handleRowClick(coin.id)}
-                                    selectedCoinId={selectedCoinId}
-                                />
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="border-b-border/50 hover:bg-transparent">
+                                            <TableHead className="pl-4">Coin</TableHead>
+                                            <TableHead>Symbol</TableHead>
+                                            <TableHead className="text-right">Price</TableHead>
+                                            <TableHead className="text-right">24h %</TableHead>
+                                            <TableHead className="text-right hidden md:table-cell">Market Cap</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {coinToDisplay.map((coinItem) => (
+                                            <TableRow
+                                                key={coinItem.id}
+                                                onClick={() => handleRowClick(coinItem.id)}
+                                                className={`cursor-pointer border-b-border/30 transition-colors duration-200 ${
+                                                    selectedCoinId === coinItem.id
+                                                        ? "bg-primary/10 hover:bg-primary/20"
+                                                        : "hover:bg-muted/50"
+                                                }`}>
+                                                <TableCell className="font-medium flex items-center gap-3 pl-4 py-2">
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarImage src={coinItem.image} alt={coinItem.name} />
+                                                    </Avatar>
+                                                    <span
+                                                        className="font-semibold hover:underline"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/market/${coinItem.id}`);
+                                                        }}>
+                                                        {coinItem.name}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="text-muted-foreground py-2">{coinItem.symbol.toUpperCase()}</TableCell>
+                                                <TableCell className="font-semibold text-right py-2">
+                                                    ₹{coinItem.current_price.toLocaleString()}
+                                                </TableCell>
+                                                <TableCell className={`font-semibold text-right flex justify-end items-center gap-1 py-2 ${
+                                                    coinItem.price_change_percentage_24h >= 0 ? "text-green-500" : "text-red-500"
+                                                }`}>
+                                                    <TrendingUp className={`h-4 w-4 ${coinItem.price_change_percentage_24h < 0 && "rotate-180"}`} />
+                                                    {coinItem.price_change_percentage_24h.toFixed(2)}%
+                                                </TableCell>
+                                                <TableCell className="text-right hidden md:table-cell py-2">
+                                                    ₹{coinItem.market_cap.toLocaleString()}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
                             </CardContent>
                         </Card>
                     </motion.div>

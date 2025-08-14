@@ -30,27 +30,12 @@ const isTokenValid = (token) => {
     }
 };
 
-const useScrollHandler = () => {
-    const [isScrolled, setIsScrolled] = useState(false);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 10);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    return isScrolled;
-};
-
 const Navbar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user } = useSelector((store) => store.auth);
     const [query, setQuery] = useState("");
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
-    const isScrolled = useScrollHandler();
 
     const token = localStorage.getItem("jwt");
     const isAuthenticated = isTokenValid(token);
@@ -84,7 +69,7 @@ const Navbar = () => {
     );
 
     const ThemeToggler = () => (
-        <Button onClick={toggleTheme} variant="outline" size="icon" className="rounded-full">
+        <Button onClick={toggleTheme} size="icon" className="rounded-full">
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
         </Button>
@@ -121,9 +106,8 @@ const Navbar = () => {
         return null;
     }
 
-    const navClassName = `sticky top-0 left-0 right-0 z-50 transition-colors duration-300 ${
-        isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-border" : "bg-background"
-    }`;
+    const navClassName = `sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background`
+
 
     if (location.pathname === "/") {
         return (
@@ -142,7 +126,7 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Button onClick={() => navigate('/login')} variant="outline">Login</Button>
+                                <Button onClick={() => navigate('/login')}>Login</Button>
                                 <Button onClick={() => navigate('/signup')}>Sign Up</Button>
                             </>
                         )}

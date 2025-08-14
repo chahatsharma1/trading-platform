@@ -20,8 +20,9 @@ Thumbs.db
 frontend/node_modules/
 frontend/dist/
 frontend/.firebaserc
-frontend/.firebase
+frontend/.firebase*
 frontend/.idea
+frontend/.env*
 frontend/.env.production
 
 .vite/

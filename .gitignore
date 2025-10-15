@@ -9,6 +9,7 @@ frontend/node_modules/
 frontend/dist/
 frontend/.firebase*
 frontend/.idea
+frontend/.firebaserc
 
 .vite/
 .env

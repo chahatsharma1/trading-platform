@@ -80,7 +80,7 @@ const Navbar = () => {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                     <Avatar className="h-9 w-9">
-                        <AvatarImage src={user?.picture || "/user.png"} alt={user?.name} />
+                        <AvatarImage src={"/user.png"} alt={user?.name} />
                         <AvatarFallback className="bg-primary text-primary-foreground">
                             {user?.fullName?.[0]?.toUpperCase() || <User />}
                         </AvatarFallback>
@@ -102,12 +102,69 @@ const Navbar = () => {
         </DropdownMenu>
     );
 
-    if (["/login", "/signup", "/forgot-password"].includes(location.pathname) || location.pathname.startsWith("/admin")) {
-        return null;
+    const navClassName = `sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background`;
+
+    // Navbar for Admin pages
+    if (location.pathname.startsWith("/admin")) {
+        return (
+            <div className={navClassName}>
+                <div className="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-x-2 lg:gap-x-4">
+                        <AppLogo />
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="relative hidden lg:block w-full max-w-xs">
+                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
+                            <Input
+                                type="text"
+                                placeholder="Search..."
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                onKeyDown={handleSearch}
+                                className="pl-10 h-10 w-full bg-muted border-border rounded-full"
+                            />
+                        </div>
+                        <ThemeToggler />
+                        <UserProfileDropdown />
+                    </div>
+                </div>
+            </div>
+        );
     }
 
-    const navClassName = `sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background`
+    // Navbar for Forgot Password page
+    if (location.pathname === "/forgot-password") {
+        return (
+            <header className={navClassName}>
+                <div className="px-4 sm:px-6 h-16 flex items-center justify-between">
+                    <AppLogo />
+                    <div className="flex items-center gap-2">
+                        <ThemeToggler />
+                        <Button onClick={() => navigate('/login')}>Login</Button>
+                        <Button onClick={() => navigate('/signup')}>Sign Up</Button>
+                    </div>
+                </div>
+            </header>
+        );
+    }
 
+    if (["/login", "/signup"].includes(location.pathname)) {
+        return (
+            <header className={navClassName}>
+                <div className="px-4 sm:px-6 h-16 flex items-center justify-between">
+                    <AppLogo />
+                    <div className="flex items-center gap-2">
+                        <ThemeToggler />
+                        {location.pathname === "/login" ? (
+                            <Button onClick={() => navigate('/signup')}>Sign Up</Button>
+                        ) : (
+                            <Button onClick={() => navigate('/login')}>Login</Button>
+                        )}
+                    </div>
+                </div>
+            </header>
+        );
+    }
 
     if (location.pathname === "/") {
         return (
@@ -118,7 +175,7 @@ const Navbar = () => {
                         <ThemeToggler />
                         {isAuthenticated ? (
                             <>
-                                <Button onClick={() => navigate('/home')} variant="outline">
+                                <Button onClick={() => navigate('/home')}>
                                     <LayoutDashboard className="h-4 w-4 mr-2" />
                                     My Dashboard
                                 </Button>

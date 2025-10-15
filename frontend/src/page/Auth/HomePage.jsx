@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { getTop50Coins } from "@/page/State/Coin/Action.js";
-import { Sun, Moon, ShieldCheck, GaugeCircle, Banknote, Coins, TrendingUp, ArrowRight } from "lucide-react";
+import { ShieldCheck, GaugeCircle, Banknote, Coins, TrendingUp, ArrowRight } from "lucide-react";
 
 const isTokenValid = (token) => {
     if (!token) return false;
@@ -20,18 +20,6 @@ const isTokenValid = (token) => {
     }
 };
 
-const AuroraBackground = () => (
-    <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-card">
-            <div className="absolute w-[40rem] h-[40rem] bg-primary/5 rounded-full -top-1/4 -left-1/4 filter blur-3xl animate-aurora-pulse" />
-            <div className="absolute w-[50rem] h-[50rem] bg-accent/5 rounded-full -bottom-1/4 -right-1/4 filter blur-3xl animate-aurora-pulse" style={{ animationDelay: '2s' }} />
-            <div className="absolute w-[30rem] h-[30rem] bg-chart-3/5 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 filter blur-3xl animate-aurora-pulse" style={{ animationDelay: '4s' }} />
-            <div className="absolute top-20 left-20 w-4 h-4 border border-primary/30 rotate-45 animate-float" />
-            <div className="absolute top-40 right-32 w-6 h-6 border border-accent/30 rounded-full animate-float" style={{ animationDelay: '1s' }} />
-            <div className="absolute bottom-32 left-40 w-3 h-3 bg-chart-4/30 rotate-12 animate-float" style={{ animationDelay: '3s' }} />
-        </div>
-    </div>
-);
 
 const Homepage = () => {
     const navigate = useNavigate();

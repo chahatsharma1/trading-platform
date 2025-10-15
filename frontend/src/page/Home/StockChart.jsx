@@ -33,7 +33,7 @@ const StockChart = ({ coinId }) => {
             height: "100%",
             toolbar: { show: false },
             zoom: { enabled: false },
-            background: 'transparent',
+            background: "transparent",
         },
         dataLabels: { enabled: false },
         xaxis: {
@@ -56,24 +56,26 @@ const StockChart = ({ coinId }) => {
                 formatter: (val) => `₹${val.toLocaleString()}`,
             },
         },
-        colors: ["hsl(var(--primary))"],
+        colors: ["hsl(var(--chart-1))"],
         fill: {
             type: "gradient",
             gradient: {
-                shadeIntensity: 1,
-                opacityFrom: 0.4,
-                opacityTo: 0.1,
-                stops: [0, 100]
-            }
+                shade: "dark",
+                type: "vertical",
+                shadeIntensity: 0.8,
+                opacityFrom: 0.6,
+                opacityTo: 0.2,
+                stops: [0, 100],
+            },
         },
         stroke: {
             curve: 'smooth',
-            width: 2,
+            width: 3,
         },
         grid: {
             show: true,
             borderColor: "hsl(var(--border))",
-            strokeDasharray: 3,
+            strokeDashArray: 3,
         },
         tooltip: {
             theme: "dark",

@@ -1,36 +1,18 @@
 .idea/
-*.iml
-*.iws
 out/
-!.mvn/wrapper/maven-wrapper.jar
-
 target/
-.mvn/timing.properties
-
-*.log
-
-.DS_Store
-Thumbs.db
+/.mvn
 
 /target/
-/*.jar
-/*.war
-/*.ear
 
 frontend/node_modules/
 frontend/dist/
-frontend/.firebaserc
 frontend/.firebase*
 frontend/.idea
-frontend/.env*
-frontend/.env.production
 
 .vite/
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.production
+.env
+frontend/.env.production
 
 application-dev.properties
 
@@ -44,7 +26,3 @@ yarn-error.log*
 
 coverage/
 **/coverage/
-
-*.class
-*.swp
-*~

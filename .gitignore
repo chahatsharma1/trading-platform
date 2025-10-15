@@ -7,7 +7,7 @@ target/
 
 frontend/node_modules/
 frontend/dist/
-frontend/.firebase*
+frontend/.firebase
 frontend/.idea
 frontend/.firebaserc
 

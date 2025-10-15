@@ -62,5 +62,4 @@ jobs:
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }},\
             FRONTEND_URL=${{ secrets.FRONTEND_URL }},\
             MAIL_USERNAME=${{ secrets.MAIL_USERNAME }},\
-            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }},\
-            SERVER_PORT=${{ secrets.SERVER_PORT }}"
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}"

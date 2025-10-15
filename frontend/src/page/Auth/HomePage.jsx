@@ -150,7 +150,7 @@ const Homepage = () => {
                         ))}
                     </div>
                 </section>
-                <footer className="text-center px-6 py-20 border-t border-border/30">
+                <footer className="text-center px-6 pt-20 border-t border-border/30">
                     <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.6 }}>
                         <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 ring-1 ring-border">
                             <Coins className="w-8 h-8 text-primary" />
@@ -160,7 +160,10 @@ const Homepage = () => {
                         <Button asChild size="lg" className="font-semibold">
                             <Link to="/signup" className="group">Create Account Now<ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" /></Link>
                         </Button>
-                        <p className="text-sm text-muted-foreground/60 mt-12">© {new Date().getFullYear()} TradeX. All Rights Reserved.</p>
+                        <div className="p-4 mt-10">
+                            <hr className="border-border/30" />
+                            <p className="text-sm text-muted-foreground/60 mt-2">© {new Date().getFullYear()} TradeX. All Rights Reserved.</p>
+                        </div>
                     </motion.div>
                 </footer>
             </motion.div>

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { register } from '../State/Auth/Action';
-import { Coins, CheckCircle2, UserPlus } from 'lucide-react';
+import {Coins, CheckCircle2, UserPlus, EyeOff, Eye} from 'lucide-react';
 
 const StaticBackground = () => (
     <div className="absolute inset-0 -z-10 h-full w-full bg-background">
@@ -27,6 +27,7 @@ const Signup = () => {
     const [signupLoading, setSignupLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -72,8 +73,7 @@ const Signup = () => {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="w-full max-w-md bg-card/50 backdrop-blur-lg border border-border/30 shadow-xl rounded-2xl p-8 space-y-6 z-10"
-            >
+                className="w-full max-w-md bg-card/50 backdrop-blur-lg border border-border/30 shadow-xl rounded-2xl p-8 space-y-6 z-10">
                 <motion.div variants={itemVariants} className="text-center">
                     <motion.div
                         animate={{ y: [0, -8, 0] }}
@@ -109,15 +109,26 @@ const Signup = () => {
                         className="bg-transparent border-border h-12"
                         required
                     />
-                    <Input
-                        name="password"
-                        type="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="bg-transparent border-border h-12"
-                        required
-                    />
+
+                    <div className="relative">
+                        <Input
+                            name="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className="bg-transparent border-border h-12 pr-10"
+                            required
+                        />
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}>
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </Button>
+                    </div>
 
                     {errorMessage && <p className="text-destructive text-sm text-center">{errorMessage}</p>}
 
@@ -126,6 +137,7 @@ const Signup = () => {
                         {signupLoading ? "Creating Account..." : "Create Account"}
                     </Button>
                 </motion.form>
+
 
                 <motion.p variants={itemVariants} className="text-sm text-center text-muted-foreground">
                     Already have an account?{" "}

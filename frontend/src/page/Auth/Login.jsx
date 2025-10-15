@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { adminLogin, login, verifyLoginOtp } from "@/page/State/Auth/Action";
-import { Coins } from 'lucide-react';
+import {Coins, Eye, EyeOff} from 'lucide-react';
 
 const LoginPage = () => {
     const dispatch = useDispatch();
@@ -18,6 +18,11 @@ const LoginPage = () => {
     const [showOtpDialog, setShowOtpDialog] = useState(false);
     const [loginLoading, setLoginLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -114,15 +119,26 @@ const LoginPage = () => {
                         className="bg-transparent border-border h-12"
                         required
                     />
-                    <Input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        placeholder="Password"
-                        className="bg-transparent border-border h-12"
-                        required
-                    />
+                    <div className="relative">
+                        <Input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="Password"
+                            className="bg-transparent border-border h-12 pr-10" // add padding right for the button
+                            required
+                        />
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:bg-transparent"
+                            onClick={togglePasswordVisibility}>
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </Button>
+                    </div>
+
                     <div className="text-right">
                         <Link to="/forgot-password" className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">
                             Forgot password?

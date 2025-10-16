@@ -48,9 +48,8 @@ const Signup = () => {
                 navigate("/login");
             }, 2500);
         } catch (error) {
-            console.error("Registration failed:", error);
             setErrorMessage(error.response?.data?.message || "Registration failed. Please try again.");
-            setTimeout(() => setErrorMessage(""), 3000);
+            setTimeout(() => setErrorMessage(""), 4000);
         } finally {
             setSignupLoading(false);
         }
@@ -142,7 +141,7 @@ const Signup = () => {
                 <motion.p variants={itemVariants} className="text-sm text-center text-muted-foreground">
                     Already have an account?{" "}
                     <Link to="/login" className="font-medium text-primary hover:text-primary/80 transition-colors">
-                        Login Now
+                        Login
                     </Link>
                 </motion.p>
             </motion.div>

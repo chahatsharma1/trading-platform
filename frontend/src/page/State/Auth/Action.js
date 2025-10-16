@@ -32,10 +32,10 @@ export const register = (userData) => async (dispatch) => {
         const user = response.data;
         dispatch({ type: REGISTER_SUCCESS, payload: user.jwt });
         localStorage.setItem("jwt", user.jwt);
-        return Promise.resolve()
+        return Promise.resolve(response)
     } catch (error) {
         dispatch({ type: REGISTER_FAILURE, payload: error.message });
-        return Promise.reject();
+        return Promise.reject(error);
     }
 };
 
@@ -117,15 +117,13 @@ export const getUser = (jwt) => async (dispatch) => {
 export const getAllUsers = (jwt) => async (dispatch) => {
     dispatch({ type: FETCH_USERS_REQUEST });
     try {
-        const response = await axios.get(`${API_BASE_URL}/users/all`, {
+        const response = await axios.get(`${API_BASE_URL}/admin/users/all`, {
             headers: {
                 Authorization: `Bearer ${jwt}`,
             },
         });
         dispatch({ type: FETCH_USERS_SUCCESS, payload: response.data });
-        console.log(response.data);
     } catch (error) {
-        console.log(error)
         dispatch({ type: FETCH_USERS_FAILURE, payload: error.message });
     }
 };

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet.jsx";
+import {jwtDecode} from "jwt-decode";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.jsx";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import {Menu, SearchIcon, Sun, Moon, Coins, LayoutDashboard, LogOut, User,HomeIcon, BriefcaseIcon, EyeIcon, ActivityIcon, WalletIcon, LandmarkIcon, BanknoteIcon} from "lucide-react";
+import { Coins, SearchIcon, Sun, Moon, LayoutDashboard, User, LogOut, HomeIcon, BriefcaseIcon, EyeIcon, ActivityIcon, WalletIcon, LandmarkIcon, BanknoteIcon } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const menuItems = [
     { name: "Dashboard", path: "/home", icon: <HomeIcon className='h-5 w-5' /> },
@@ -18,18 +18,6 @@ const menuItems = [
     { name: "Withdrawal", path: "/withdrawal", icon: <BanknoteIcon className='h-5 w-5' /> },
 ];
 
-const isTokenValid = (token) => {
-    if (!token) return false;
-    try {
-        const [, payload] = token.split(".");
-        if (!payload) return false;
-        const decoded = JSON.parse(atob(payload));
-        return Date.now() < decoded.exp * 1000;
-    } catch {
-        return false;
-    }
-};
-
 const Navbar = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -38,7 +26,9 @@ const Navbar = () => {
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
 
     const token = localStorage.getItem("jwt");
-    const isAuthenticated = isTokenValid(token);
+    const decodedJwt = token ? jwtDecode(token) : null;
+    const userRole = decodedJwt?.roles;
+    const isAuthenticated = !!token;
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -58,7 +48,7 @@ const Navbar = () => {
 
     const handleLogout = () => {
         localStorage.removeItem("jwt");
-        navigate("/login");
+        navigate("/");
     };
 
     const AppLogo = () => (
@@ -104,68 +94,35 @@ const Navbar = () => {
 
     const navClassName = `sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background`;
 
-    // Navbar for Admin pages
+    // Access Denied Page
+    if (location.pathname === "/access-denied") {
+        return (
+            <header className={navClassName}>
+                <div className="px-4 sm:px-6 h-16 flex items-center justify-center">
+                    <AppLogo />
+                </div>
+            </header>
+        );
+    }
+
+    // Admin Pages
     if (location.pathname.startsWith("/admin")) {
         return (
             <div className={navClassName}>
                 <div className="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-x-2 lg:gap-x-4">
-                        <AppLogo />
-                    </div>
+                    <AppLogo />
                     <div className="flex items-center gap-3">
-                        <div className="relative hidden lg:block w-full max-w-xs">
-                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
-                            <Input
-                                type="text"
-                                placeholder="Search..."
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
-                                onKeyDown={handleSearch}
-                                className="pl-10 h-10 w-full bg-muted border-border rounded-full"
-                            />
-                        </div>
                         <ThemeToggler />
-                        <UserProfileDropdown />
+                        <Button onClick={handleLogout} className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md">
+                            Logout
+                        </Button>
                     </div>
                 </div>
             </div>
         );
     }
 
-    // Navbar for Forgot Password page
-    if (location.pathname === "/forgot-password") {
-        return (
-            <header className={navClassName}>
-                <div className="px-4 sm:px-6 h-16 flex items-center justify-between">
-                    <AppLogo />
-                    <div className="flex items-center gap-2">
-                        <ThemeToggler />
-                        <Button onClick={() => navigate('/login')}>Login</Button>
-                        <Button onClick={() => navigate('/signup')}>Sign Up</Button>
-                    </div>
-                </div>
-            </header>
-        );
-    }
-
-    if (["/login", "/signup"].includes(location.pathname)) {
-        return (
-            <header className={navClassName}>
-                <div className="px-4 sm:px-6 h-16 flex items-center justify-between">
-                    <AppLogo />
-                    <div className="flex items-center gap-2">
-                        <ThemeToggler />
-                        {location.pathname === "/login" ? (
-                            <Button onClick={() => navigate('/signup')}>Sign Up</Button>
-                        ) : (
-                            <Button onClick={() => navigate('/login')}>Login</Button>
-                        )}
-                    </div>
-                </div>
-            </header>
-        );
-    }
-
+    // Landing Page
     if (location.pathname === "/") {
         return (
             <header className={navClassName}>
@@ -174,13 +131,12 @@ const Navbar = () => {
                     <div className="flex items-center gap-2">
                         <ThemeToggler />
                         {isAuthenticated ? (
-                            <>
-                                <Button onClick={() => navigate('/home')}>
-                                    <LayoutDashboard className="h-4 w-4 mr-2" />
-                                    My Dashboard
-                                </Button>
-                                <UserProfileDropdown />
-                            </>
+                            <Button
+                                onClick={() => navigate(userRole?.includes("ROLE_ADMIN") ? "/admin/dashboard" : "/home")}
+                                className="bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-1 rounded-md flex items-center gap-2">
+                                <LayoutDashboard className="h-4 w-4" />
+                                My Dashboard
+                            </Button>
                         ) : (
                             <>
                                 <Button onClick={() => navigate('/login')}>Login</Button>
@@ -193,6 +149,7 @@ const Navbar = () => {
         );
     }
 
+    // All other pages
     return (
         <div className={navClassName}>
             <div className="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
@@ -203,7 +160,8 @@ const Navbar = () => {
                             <Link to={item.path} key={item.name}>
                                 <Button
                                     variant="ghost"
-                                    className={`px-3 text-sm font-medium ${location.pathname.startsWith(item.path) ? "text-primary" : "text-muted-foreground"}`}>
+                                    className={`px-3 text-sm font-medium ${location.pathname.startsWith(item.path) ? "text-primary" : "text-muted-foreground"}`}
+                                >
                                     {item.name}
                                 </Button>
                             </Link>
@@ -225,40 +183,6 @@ const Navbar = () => {
                     </div>
                     <ThemeToggler />
                     <UserProfileDropdown />
-                    <div className="md:hidden">
-                        <Sheet>
-                            <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="rounded-full">
-                                    <Menu className="h-6 w-6" />
-                                </Button>
-                            </SheetTrigger>
-                            <SheetContent className="w-72 bg-background border-r-0" side="left">
-                                <SheetHeader>
-                                    <SheetTitle>
-                                        <AppLogo />
-                                    </SheetTitle>
-                                </SheetHeader>
-                                <div className='mt-6 space-y-2'>
-                                    {menuItems.map((item) => (
-                                        <SheetClose asChild key={item.name}>
-                                            <Link to={item.path}>
-                                                <Button
-                                                    variant="ghost"
-                                                    className={`w-full flex items-center justify-start gap-3 rounded-md px-3 py-6 text-base transition-colors ${
-                                                        location.pathname.startsWith(item.path)
-                                                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                                                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                                                    }`}>
-                                                    {item.icon}
-                                                    <span>{item.name}</span>
-                                                </Button>
-                                            </Link>
-                                        </SheetClose>
-                                    ))}
-                                </div>
-                            </SheetContent>
-                        </Sheet>
-                    </div>
                 </div>
             </div>
         </div>

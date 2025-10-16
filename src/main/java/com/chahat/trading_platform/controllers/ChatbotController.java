@@ -8,7 +8,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/chatbot")
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('CUSTOMER')")
 public class ChatbotController {
 
     private final ChatbotService chatbotService;

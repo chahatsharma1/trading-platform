@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/transaction")
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('CUSTOMER')")
 public class TransactionController {
 
     @Autowired

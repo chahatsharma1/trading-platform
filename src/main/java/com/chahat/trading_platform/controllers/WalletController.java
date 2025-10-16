@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/wallet")
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('CUSTOMER')")
 public class WalletController {
 
     @Autowired

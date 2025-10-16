@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/asset")
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('CUSTOMER')")
 public class AssetController {
 
     @Autowired

@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/withdrawal")
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('CUSTOMER')")
 public class WithdrawalController {
 
     @Autowired

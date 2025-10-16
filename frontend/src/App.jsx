@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Navbar from "@/page/Navbar/Navbar.jsx";
@@ -22,8 +22,20 @@ import AdminDashboard from "@/page/Admin/AdminDashboard.jsx";
 import UserPage from "@/page/Admin/UserPage.jsx";
 import ProtectedRoute from './ProtectedRoute';
 import AccessDenied from "@/page/Auth/AccessDenied.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {getUser} from "@/page/State/Auth/Action.js";
 
 function App() {
+    const { user, jwt } = useSelector(store => store.auth);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const token = jwt || localStorage.getItem("jwt");
+        if (token && !user) {
+            dispatch(getUser(token));
+        }
+    }, [jwt, user, dispatch]);
+
     return (
         <>
             <Navbar />

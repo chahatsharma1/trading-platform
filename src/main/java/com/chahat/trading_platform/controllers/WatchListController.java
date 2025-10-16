@@ -8,10 +8,12 @@ import com.chahat.trading_platform.service.UserService;
 import com.chahat.trading_platform.service.WatchListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/watchlist")
+@PreAuthorize("hasRole('USER')")
 public class WatchListController {
 
     @Autowired

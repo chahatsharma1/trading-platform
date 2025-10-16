@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     @Autowired
@@ -26,7 +27,6 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("withdrawal/proceed/{id}/{accept}")
     public ResponseEntity<?> proceedWithdrawal(@PathVariable Long id, @PathVariable boolean accept, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJWT(jwt);
@@ -39,10 +39,15 @@ public class AdminController {
         return new ResponseEntity<>(withdrawal, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/withdrawal")
     public ResponseEntity<List<Withdrawal>> getWithdrawalRequest(@RequestHeader("Authorization") String jwt) throws Exception {
         List<Withdrawal> withdrawals = withdrawalService.getAllWithdrawal();
         return new ResponseEntity<>(withdrawals, HttpStatus.OK);
+    }
+
+    @GetMapping("/users/all")
+    public ResponseEntity<List<User>> getAllUsers(@RequestHeader("Authorization") String jwt) throws Exception {
+        List<User> users = userService.getAllUsers();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }

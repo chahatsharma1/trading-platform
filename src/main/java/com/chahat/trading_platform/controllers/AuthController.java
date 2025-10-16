@@ -43,7 +43,7 @@ public class AuthController {
     private WatchListService watchListService;
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception {
+    public ResponseEntity<AuthResponse> register(@RequestBody User user) {
 
         User emailExist = userRepository.findUserByEmail(user.getEmail());
         if (emailExist != null){

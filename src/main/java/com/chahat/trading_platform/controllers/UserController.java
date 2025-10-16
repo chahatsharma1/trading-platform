@@ -20,10 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@PreAuthorize("hasRole('USER')")
 public class UserController {
 
     @Autowired
@@ -135,11 +135,5 @@ public class UserController {
         User user = userService.findUserByJWT(jwt);
         User updatedUser = userService.updateUser(request, user);
         return ResponseEntity.ok(updatedUser);
-    }
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers(@RequestHeader("Authorization") String jwt) throws Exception {
-        List<User> users = userService.getAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }

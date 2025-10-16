@@ -9,6 +9,7 @@ import com.chahat.trading_platform.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/wallet")
+@PreAuthorize("hasRole('USER')")
 public class WalletController {
 
     @Autowired

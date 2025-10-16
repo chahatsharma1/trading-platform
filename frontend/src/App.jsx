@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 
 import Navbar from "@/page/Navbar/Navbar.jsx";
 import Home from "@/page/Home/Home.jsx";
@@ -17,7 +16,6 @@ import HomePage from "@/page/Auth/HomePage.jsx";
 import Login from "@/page/Auth/Login.jsx";
 import Signup from "@/page/Auth/Signup.jsx";
 import ForgotPassword from "@/page/Auth/ForgotPassword.jsx";
-import { getUser } from "@/page/State/Auth/Action.js";
 import AdminWithdrawal from "@/page/Admin/AdminWithdrawal.jsx";
 import PaymentCancel from "@/page/Wallet/PaymentCancel.jsx";
 import AdminDashboard from "@/page/Admin/AdminDashboard.jsx";
@@ -26,16 +24,6 @@ import ProtectedRoute from './ProtectedRoute';
 import AccessDenied from "@/page/Auth/AccessDenied.jsx";
 
 function App() {
-    const { user, jwt } = useSelector(store => store.auth);
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        const token = jwt || localStorage.getItem("jwt");
-        if (token && !user) {
-            dispatch(getUser(token));
-        }
-    }, [jwt, user, dispatch]);
-
     return (
         <>
             <Navbar />

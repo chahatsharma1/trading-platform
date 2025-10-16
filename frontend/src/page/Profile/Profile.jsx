@@ -128,7 +128,7 @@ const Profile = () => {
                                             <DialogTitle>Enable Two-Factor Authentication</DialogTitle>
                                             <DialogDescription/>
                                         </DialogHeader>
-                                        <AccountVerificationForm onSuccess={() => setIsVerificationOpen(false)} userEmail={user.email}  />
+                                        <AccountVerificationForm onSuccess={() => setIsVerificationOpen(false)} userEmail={user?.email}  />
                                     </DialogContent>
                                 </Dialog>
                             )}

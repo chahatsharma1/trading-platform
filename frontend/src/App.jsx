@@ -23,6 +23,7 @@ import PaymentCancel from "@/page/Wallet/PaymentCancel.jsx";
 import AdminDashboard from "@/page/Admin/AdminDashboard.jsx";
 import UserPage from "@/page/Admin/UserPage.jsx";
 import ProtectedRoute from './ProtectedRoute';
+import AccessDenied from "@/page/Auth/AccessDenied.jsx";
 
 function App() {
     const { user, jwt } = useSelector(store => store.auth);
@@ -44,6 +45,8 @@ function App() {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/cancel" element={<PaymentCancel />} />
+                <Route path="/access-denied" element={<AccessDenied />} />
+
 
                 <Route path="/home" element={<ProtectedRoute role="ROLE_CUSTOMER"><Home /></ProtectedRoute>} />
                 <Route path="/portfolio" element={<ProtectedRoute role="ROLE_CUSTOMER"><Portfolio /></ProtectedRoute>} />

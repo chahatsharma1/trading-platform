@@ -2,6 +2,7 @@ package com.chahat.trading_platform.controllers;
 
 import com.chahat.trading_platform.config.JWTProvider;
 import com.chahat.trading_platform.domain.USER_ROLE;
+import com.chahat.trading_platform.exceptions.UserAlreadyExistsException;
 import com.chahat.trading_platform.model.TwoFactorOTP;
 import com.chahat.trading_platform.model.User;
 import com.chahat.trading_platform.response.AuthResponse;
@@ -46,7 +47,7 @@ public class AuthController {
 
         User emailExist = userRepository.findUserByEmail(user.getEmail());
         if (emailExist != null){
-            throw new Exception("User already exist with this email, try again with different email");
+            throw new UserAlreadyExistsException("User already exist with this email, try again with different email");
         }
 
         User newUser = new User();

@@ -122,6 +122,49 @@ const Navbar = () => {
         );
     }
 
+    if (location.pathname === "/login") {
+        return (
+            <div className={navClassName}>
+                <div className="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+                    <AppLogo />
+                    <div className="flex items-center gap-3">
+                        <ThemeToggler />
+                        <Button onClick={() => navigate('/signup')}>Sign Up</Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (location.pathname === "/signup") {
+        return (
+            <div className={navClassName}>
+                <div className="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+                    <AppLogo />
+                    <div className="flex items-center gap-3">
+                        <ThemeToggler />
+                        <Button onClick={() => navigate('/login')}>Login</Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (location.pathname === "/forgot-password") {
+        return (
+            <div className={navClassName}>
+                <div className="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+                    <AppLogo />
+                    <div className="flex items-center gap-3">
+                        <ThemeToggler />
+                        <Button variant= "secondary" onClick={() => navigate('/login')}>Login</Button>
+                        <Button onClick={() => navigate('/signup')}>Sign Up</Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     // Landing Page
     if (location.pathname === "/") {
         return (

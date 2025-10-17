@@ -16,6 +16,32 @@ const StockChart = ({ coinId }) => {
     const dispatch = useDispatch();
     const { marketChart, loading } = useSelector(store => store.coin);
     const [activeTimespan, setActiveTimespan] = useState(timeSeries[0]);
+    const [themeColors, setThemeColors] = useState({
+        text: "#000000",
+        border: "#e5e7eb",
+        chart: "#3b82f6"
+    });
+
+    const getCssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+    useEffect(() => {
+        const updateColors = () => {
+            const textColor = getCssVar("--muted-foreground");
+            const borderColor = getCssVar("--border");
+            const chartColor = getCssVar("--chart-1");
+            setThemeColors({ text: textColor, border: borderColor, chart: chartColor });
+        };
+
+        updateColors();
+
+        const observer = new MutationObserver(updateColors);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
+
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         dispatch(getMarketChart(coinId, activeTimespan.value, localStorage.getItem("jwt")));
@@ -40,7 +66,7 @@ const StockChart = ({ coinId }) => {
             type: "datetime",
             labels: {
                 style: {
-                    colors: "hsl(var(--muted-foreground))",
+                    colors: themeColors.text,
                     fontSize: '12px',
                 },
             },
@@ -50,13 +76,13 @@ const StockChart = ({ coinId }) => {
         yaxis: {
             labels: {
                 style: {
-                    colors: "hsl(var(--muted-foreground))",
+                    colors: themeColors.text,
                     fontSize: '12px',
                 },
                 formatter: (val) => `₹${val.toLocaleString()}`,
             },
         },
-        colors: ["hsl(var(--chart-1))"],
+        colors: [themeColors.chart],
         fill: {
             type: "gradient",
             gradient: {
@@ -74,7 +100,7 @@ const StockChart = ({ coinId }) => {
         },
         grid: {
             show: true,
-            borderColor: "hsl(var(--border))",
+            borderColor: themeColors.border,
             strokeDashArray: 3,
         },
         tooltip: {
@@ -91,8 +117,7 @@ const StockChart = ({ coinId }) => {
                         key={item.label}
                         onClick={() => setActiveTimespan(item)}
                         variant={activeTimespan.label === item.label ? "default" : "outline"}
-                        size="sm"
-                    >
+                        size="sm">
                         {item.label}
                     </Button>
                 ))}

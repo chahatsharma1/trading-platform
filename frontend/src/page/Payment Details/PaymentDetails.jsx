@@ -21,8 +21,9 @@ const PaymentDetails = () => {
         fetchPaymentDetails();
     }, []);
 
-    const handleDelete = () => {
-        dispatch(deletePaymentDetails({ jwt: localStorage.getItem("jwt") }));
+    const handleDelete = async () => {
+        await dispatch(deletePaymentDetails({ jwt: localStorage.getItem("jwt") }));
+        dispatch(getPaymentDetails({ jwt: localStorage.getItem("jwt") }));
     };
 
     const handleSuccess = () => {
@@ -83,8 +84,7 @@ const PaymentDetails = () => {
                                 <Button
                                     onClick={handleDelete}
                                     variant="destructive"
-                                    className="w-full"
-                                >
+                                    className="w-full">
                                     <Trash2 className="h-4 w-4 mr-2" />
                                     Delete Account Details
                                 </Button>
@@ -111,8 +111,8 @@ const PaymentDetails = () => {
                             </Card>
                             <DialogContent className="bg-card border-border">
                                 <DialogHeader>
-                                    <DialogTitle>Add Your Bank Account</DialogTitle>
-                                    <CardDescription>
+                                    <DialogTitle className="text-center">Add Your Bank Account</DialogTitle>
+                                    <CardDescription className="text-center">
                                         Please ensure all details are correct.
                                     </CardDescription>
                                 </DialogHeader>

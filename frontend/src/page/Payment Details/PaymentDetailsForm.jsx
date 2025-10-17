@@ -12,7 +12,7 @@ const PaymentDetailsForm = ({ onSuccess }) => {
     const [formData, setFormData] = useState({
         accountHolderName: '',
         ifscCode: '',
-        accountNumber: '',
+        accountNo: '',
         bankName: ''
     });
     const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +20,7 @@ const PaymentDetailsForm = ({ onSuccess }) => {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-        if(error) setError('');
+        if (error) setError('');
     };
 
     const handleSubmit = async (e) => {
@@ -47,71 +47,32 @@ const PaymentDetailsForm = ({ onSuccess }) => {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
-            <motion.div variants={itemVariants}>
-                <Label htmlFor="accountHolderName">Account Holder Name</Label>
-                <div className="relative mt-2">
-                    <User className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                        id="accountHolderName"
-                        name="accountHolderName"
-                        value={formData.accountHolderName}
-                        onChange={handleChange}
-                        className="h-12 pl-12 bg-background border-border"
-                        placeholder="e.g., Chahat Sharma"
-                        required
-                    />
-                </div>
-            </motion.div>
+            {[
+                { id: "accountHolderName", label: "Account Holder Name", icon: <User />, placeholder: "e.g., Chahat Sharma" },
+                { id: "bankName", label: "Bank Name", icon: <Landmark />, placeholder: "e.g., YES Bank" },
+                { id: "accountNo", label: "Account Number", icon: <Hash />, placeholder: "Enter your account number" },
+                { id: "ifscCode", label: "IFSC Code", icon: <Shield />, placeholder: "e.g., YESB0000007" }
+            ].map(({ id, label, icon, placeholder }) => (
+                <motion.div key={id} variants={itemVariants}>
+                    <Label htmlFor={id}>{label}</Label>
+                    <div className="relative mt-2">
+                        <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+                            <div className="text-muted-foreground">{icon}</div>
+                        </div>
+                        <Input
+                            id={id}
+                            name={id}
+                            value={formData[id]}
+                            onChange={handleChange}
+                            className="h-12 pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
+                            placeholder={placeholder}
+                            required
+                        />
+                    </div>
+                </motion.div>
+            ))}
 
-            <motion.div variants={itemVariants}>
-                <Label htmlFor="bankName">Bank Name</Label>
-                <div className="relative mt-2">
-                    <Landmark className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                        id="bankName"
-                        name="bankName"
-                        value={formData.bankName}
-                        onChange={handleChange}
-                        className="h-12 pl-12 bg-background border-border"
-                        placeholder="e.g., YES Bank"
-                        required
-                    />
-                </div>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-                <Label htmlFor="accountNumber">Account Number</Label>
-                <div className="relative mt-2">
-                    <Hash className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                        id="accountNumber"
-                        name="accountNumber"
-                        value={formData.accountNumber}
-                        onChange={handleChange}
-                        className="h-12 pl-12 bg-background border-border"
-                        placeholder="Enter your account number"
-                        required
-                    />
-                </div>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-                <Label htmlFor="ifscCode">IFSC Code</Label>
-                <div className="relative mt-2">
-                    <Shield className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                        id="ifscCode"
-                        name="ifscCode"
-                        value={formData.ifscCode}
-                        onChange={handleChange}
-                        className="h-12 pl-12 bg-background border-border"
-                        placeholder="e.g., YESB0000007"
-                        required
-                    />
-                </div>
-            </motion.div>
-
-            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+            {error && <p className="text-sm text-destructive text-center">{error}</p>}
 
             <motion.div variants={itemVariants} className="pt-4">
                 <Button type="submit" size="lg" className="w-full font-semibold" disabled={isLoading}>
